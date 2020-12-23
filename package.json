@@ -9,9 +9,10 @@
         "prod": "npm run production",
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --config=node_modules/laravel-mix/setup/webpack.config.js",
         "h5": "cd ./h5 && npm run dev",
-        "up": "cd ./docker && sh sync.sh up redis mysql nginx workspace",
+        "up": "cd ./docker && sh sync.sh up redis nginx workspace",
         "down": "cd ./docker && sh sync.sh down",
-        "up-w": "cd ./docker && sh sync.sh up workspace"
+        "up-w": "cd ./docker && sh sync.sh up workspace",
+        "bash": "winpty docker exec -it 6c73304adb10_laradock_workspace_1 bash"
     },
     "devDependencies": {
         "axios": "^0.19",
