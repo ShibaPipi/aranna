@@ -45,9 +45,9 @@ class UserService extends BaseService
      */
     public function checkRegCaptchaCount(string $mobile)
     {
-        $countKey = 'reg_captcha_count_'.$mobile;
+        $countKey = 'sms_captcha_count_'.$mobile;
         if (Cache::has($countKey)) {
-            $count = Cache::increment('reg_captcha_count_'.$mobile);
+            $count = Cache::increment('sms_captcha_count_'.$mobile);
             if ($count > 10) {
                 return false;
             }
@@ -82,11 +82,13 @@ class UserService extends BaseService
      */
     public function checkCaptcha(string $mobile, string $code)
     {
-        $key = 'reg_captcha_'.$mobile;
-        if ($code === Cache::get($key)) {
-            Cache::forget($key);
-        } else {
-            throw new BusinessException(CodeResponse::AUTH_CAPTCHA_MISMATCH);
+        if (app()->environment('production')) {
+            $key = 'sms_captcha_'.$mobile;
+            if ($code === Cache::get($key)) {
+                Cache::forget($key);
+            } else {
+                throw new BusinessException(CodeResponse::AUTH_CAPTCHA_MISMATCH);
+            }
         }
         return true;
     }
@@ -99,7 +101,7 @@ class UserService extends BaseService
     public function setCaptcha(string $mobile)
     {
         $code = strval(random_int(100000, 999999));
-        Cache::put('reg_captcha_'.$mobile, $code, 600);
+        Cache::put('sms_captcha_'.$mobile, $code, 600);
         return $code;
     }
 }

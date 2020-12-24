@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 return [
 
     /*
@@ -14,7 +16,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'wechat',
         'passwords' => 'users',
     ],
 
@@ -46,6 +48,12 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+        'wechat' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+            'hash' => false,
+        ]
     ],
 
     /*
@@ -68,7 +76,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\User::class,
+            'model' => User::class,
         ],
 
         // 'users' => [

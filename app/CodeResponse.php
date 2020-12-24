@@ -13,6 +13,8 @@ class CodeResponse
     const SUCCESS = [0, '成功'];
     const FAIL = [-1, '错误'];
     const INVALID_PARAM = [401, '非法参数'];
+    const NOT_LOGIN = [501, '请登录'];
+    const UPDATE_FAILED = [505, '数据更新失败'];
 
     // 业务返回码
     const AUTH_INVALID_ACCOUNT = [700, ''];
@@ -21,7 +23,7 @@ class CodeResponse
     const AUTH_CAPTCHA_MISMATCH = [703, '验证码错误'];
     const AUTH_NAME_REGISTERED = [704, '用户已注册'];
     const AUTH_MOBILE_REGISTERED = [705, '手机号已注册'];
-    const AUTH_MOBILE_UNREGISTERED = [706, ''];
+    const AUTH_MOBILE_UNREGISTERED = [706, '手机号未注册'];
     const AUTH_INVALID_MOBILE = [707, '手机号格式不正确'];
     const AUTH_OPENID_UNACCESS = [708, ''];
     const AUTH_OPENID_BINDED = [709, ''];
