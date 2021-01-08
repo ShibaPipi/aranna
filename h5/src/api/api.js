@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const IndexUrl = 'wx/home/index'; //首页数据接口
+const IndexUrl = 'wechat/home/index'; //首页数据接口
 export function getHome() {
   return request({
     url: IndexUrl,
@@ -8,7 +8,7 @@ export function getHome() {
   })
 }
 
-const CatalogList = 'wx/catalog/index'; //分类目录全部分类数据接口
+const CatalogList = 'wechat/catalog/index'; //分类目录全部分类数据接口
 export function catalogList() {
   return request({
     url: CatalogList,
@@ -16,7 +16,7 @@ export function catalogList() {
   })
 }
 
-const CatalogCurrent = 'wx/catalog/current'; //分类目录当前分类数据接口
+const CatalogCurrent = 'wechat/catalog/current'; //分类目录当前分类数据接口
 export function catalogCurrent(query) {
   return request({
     url: CatalogCurrent,
@@ -30,12 +30,11 @@ export function authLoginByAccount(data) {
   return request({
     url: AuthLoginByAccount,
     method: 'post',
-    version: 'v2',
     data
   })
 }
 
-const AuthLogout = 'wx/auth/logout'; //账号登出
+const AuthLogout = 'wechat/auth/logout'; //账号登出
 export function authLogout() {
   return request({
     url: AuthLogout,
@@ -43,15 +42,15 @@ export function authLogout() {
   })
 }
 
-const AuthInfo = 'wx/auth/info'; //用户信息
+const AuthInfo = 'wechat/auth/info'; //用户信息
 export function authInfo() {
   return request({
     url: AuthInfo,
-    method: 'get'
+    method: 'get',
   })
 }
 
-const AuthProfile = 'wx/auth/profile'; //账号修改
+const AuthProfile = 'wechat/auth/profile'; //账号修改
 export function authProfile(data) {
   return request({
     url: AuthProfile,
@@ -65,12 +64,11 @@ export function authRegister(data) {
   return request({
     url: AuthRegister,
     method: 'post',
-    version: 'v2',
     data
   });
 }
 
-const AuthReset = 'wx/auth/reset'; //账号密码重置
+const AuthReset = 'wechat/auth/reset'; //账号密码重置
 export function authReset(data) {
   return request({
     url: AuthReset,
@@ -84,12 +82,11 @@ export function authRegisterCaptcha(data) {
   return request({
     url: AuthRegisterCaptcha,
     method: 'post',
-    version: 'v2',
     data
   })
 }
 
-const AuthCaptcha = 'wx/auth/captcha'; //验证码
+const AuthCaptcha = 'wechat/auth/captcha'; //验证码
 export function authCaptcha(data) {
   return request({
     url: AuthCaptcha,
@@ -98,7 +95,7 @@ export function authCaptcha(data) {
   })
 }
 
-const GoodsCount = 'wx/goods/count'; //统计商品总数
+const GoodsCount = 'wechat/goods/count'; //统计商品总数
 export function goodsCount() {
   return request({
     url: GoodsCount,
@@ -106,7 +103,7 @@ export function goodsCount() {
   })
 }
 
-export const GoodsList = 'wx/goods/list'; //获得商品列表
+export const GoodsList = 'wechat/goods/list'; //获得商品列表
 export function goodsList(query) {
   return request({
     url: GoodsList,
@@ -115,7 +112,7 @@ export function goodsList(query) {
   })
 }
 
-const GoodsCategory = 'wx/goods/category'; //获得分类数据
+const GoodsCategory = 'wechat/goods/category'; //获得分类数据
 export function goodsCategory(query) {
   return request({
     url: GoodsCategory,
@@ -124,7 +121,7 @@ export function goodsCategory(query) {
   })
 }
 
-const GoodsDetail = 'wx/goods/detail'; //获得商品的详情
+const GoodsDetail = 'wechat/goods/detail'; //获得商品的详情
 export function goodsDetail(query) {
   return request({
     url: GoodsDetail,
@@ -133,7 +130,7 @@ export function goodsDetail(query) {
   })
 }
 
-const BrandList = 'wx/brand/list'; //品牌列表
+const BrandList = 'wechat/brand/list'; //品牌列表
 export function brandList(query) {
   return request({
     url: BrandList,
@@ -142,7 +139,7 @@ export function brandList(query) {
   })
 }
 
-const BrandDetail = 'wx/brand/detail'; //品牌详情
+const BrandDetail = 'wechat/brand/detail'; //品牌详情
 export function brandDetail(query) {
   return request({
     url: BrandDetail,
@@ -151,7 +148,7 @@ export function brandDetail(query) {
   })
 }
 
-const CartList = 'wx/cart/index'; //获取购物车的数据
+const CartList = 'wechat/cart/index'; //获取购物车的数据
 export function cartList(query) {
   return request({
     url: CartList,
@@ -160,7 +157,7 @@ export function cartList(query) {
   })
 }
 
-const CartAdd = 'wx/cart/add'; // 添加商品到购物车
+const CartAdd = 'wechat/cart/add'; // 添加商品到购物车
 export function cartAdd(data) {
   return request({
     url: CartAdd,
@@ -169,7 +166,7 @@ export function cartAdd(data) {
   })
 }
 
-const CartFastAdd = 'wx/cart/fastadd'; // 立即购买商品
+const CartFastAdd = 'wechat/cart/fastadd'; // 立即购买商品
 export function cartFastAdd(data) {
   return request({
     url: CartFastAdd,
@@ -178,7 +175,7 @@ export function cartFastAdd(data) {
   })
 }
 
-const CartUpdate = 'wx/cart/update'; // 更新购物车的商品
+const CartUpdate = 'wechat/cart/update'; // 更新购物车的商品
 export function cartUpdate(data) {
   return request({
     url: CartUpdate,
@@ -187,7 +184,7 @@ export function cartUpdate(data) {
   })
 }
 
-const CartDelete = 'wx/cart/delete'; // 删除购物车的商品
+const CartDelete = 'wechat/cart/delete'; // 删除购物车的商品
 export function cartDelete(data) {
   return request({
     url: CartDelete,
@@ -196,7 +193,7 @@ export function cartDelete(data) {
   })
 }
 
-const CartChecked = 'wx/cart/checked'; // 选择或取消选择商品
+const CartChecked = 'wechat/cart/checked'; // 选择或取消选择商品
 export function cartChecked(data) {
   return request({
     url: CartChecked,
@@ -205,7 +202,7 @@ export function cartChecked(data) {
   })
 }
 
-const CartGoodsCount = 'wx/cart/goodscount'; // 获取购物车商品件数
+const CartGoodsCount = 'wechat/cart/goodscount'; // 获取购物车商品件数
 export function cartGoodsCount() {
   return request({
     url: CartGoodsCount,
@@ -213,7 +210,7 @@ export function cartGoodsCount() {
   })
 }
 
-const CartCheckout = 'wx/cart/checkout'; // 下单前信息确认
+const CartCheckout = 'wechat/cart/checkout'; // 下单前信息确认
 export function cartCheckout(query) {
   return request({
     url: CartCheckout,
@@ -222,7 +219,7 @@ export function cartCheckout(query) {
   })
 }
 
-const CollectList = 'wx/collect/list'; //收藏列表
+const CollectList = 'wechat/collect/list'; //收藏列表
 export function collectList(query) {
   return request({
     url: CollectList,
@@ -231,7 +228,7 @@ export function collectList(query) {
   })
 }
 
-const CollectAddOrDelete = 'wx/collect/addordelete'; //添加或取消收藏
+const CollectAddOrDelete = 'wechat/collect/addordelete'; //添加或取消收藏
 export function collectAddOrDelete(data) {
   return request({
     url: CollectAddOrDelete,
@@ -240,7 +237,7 @@ export function collectAddOrDelete(data) {
   })
 }
 
-const TopicList = 'wx/topic/list'; //专题列表
+const TopicList = 'wechat/topic/list'; //专题列表
 export function topicList(query) {
   return request({
     url: TopicList,
@@ -249,7 +246,7 @@ export function topicList(query) {
   })
 }
 
-const TopicDetail = 'wx/topic/detail'; //专题详情
+const TopicDetail = 'wechat/topic/detail'; //专题详情
 export function topicDetail(query) {
   return request({
     url: TopicDetail,
@@ -258,7 +255,7 @@ export function topicDetail(query) {
   })
 }
 
-const TopicRelated = 'wx/topic/related'; //相关专题
+const TopicRelated = 'wechat/topic/related'; //相关专题
 export function topicRelated(query) {
   return request({
     url: TopicRelated,
@@ -267,7 +264,7 @@ export function topicRelated(query) {
   })
 }
 
-const AddressList = 'wx/address/list'; //收货地址列表
+const AddressList = 'wechat/address/list'; //收货地址列表
 export function addressList(query) {
   return request({
     url: AddressList,
@@ -276,7 +273,7 @@ export function addressList(query) {
   })
 }
 
-const AddressDetail = 'wx/address/detail'; //收货地址详情
+const AddressDetail = 'wechat/address/detail'; //收货地址详情
 export function addressDetail(query) {
   return request({
     url: AddressDetail,
@@ -285,7 +282,7 @@ export function addressDetail(query) {
   })
 }
 
-const AddressSave = 'wx/address/save'; //保存收货地址
+const AddressSave = 'wechat/address/save'; //保存收货地址
 export function addressSave(data) {
   return request({
     url: AddressSave,
@@ -294,7 +291,7 @@ export function addressSave(data) {
   })
 }
 
-const AddressDelete = 'wx/address/delete'; //保存收货地址
+const AddressDelete = 'wechat/address/delete'; //保存收货地址
 export function addressDelete(data) {
   return request({
     url: AddressDelete,
@@ -303,7 +300,7 @@ export function addressDelete(data) {
   })
 }
 
-const OrderSubmit = 'wx/order/submit'; // 提交订单
+const OrderSubmit = 'wechat/order/submit'; // 提交订单
 export function orderSubmit(data) {
   return request({
     url: OrderSubmit,
@@ -312,7 +309,7 @@ export function orderSubmit(data) {
   })
 }
 
-const OrderPrepay = 'wx/order/prepay'; // 订单的预支付会话
+const OrderPrepay = 'wechat/order/prepay'; // 订单的预支付会话
 export function orderPrepay(data) {
   return request({
     url: OrderPrepay,
@@ -321,7 +318,7 @@ export function orderPrepay(data) {
   })
 }
 
-const OrderH5pay = 'wx/order/h5pay'; // h5支付
+const OrderH5pay = 'wechat/order/h5pay'; // h5支付
 export function orderH5pay(data) {
   return request({
     url: OrderH5pay,
@@ -330,7 +327,7 @@ export function orderH5pay(data) {
   });
 }
 
-export const OrderList = 'wx/order/list'; //订单列表
+export const OrderList = 'wechat/order/list'; //订单列表
 export function orderList(query) {
   return request({
     url: OrderList,
@@ -339,7 +336,7 @@ export function orderList(query) {
   })
 }
 
-const OrderDetail = 'wx/order/detail'; //订单详情
+const OrderDetail = 'wechat/order/detail'; //订单详情
 export function orderDetail(query) {
   return request({
     url: OrderDetail,
@@ -348,7 +345,7 @@ export function orderDetail(query) {
   })
 }
 
-const OrderCancel = 'wx/order/cancel'; //取消订单
+const OrderCancel = 'wechat/order/cancel'; //取消订单
 export function orderCancel(data) {
   return request({
     url: OrderCancel,
@@ -357,7 +354,7 @@ export function orderCancel(data) {
   })
 }
 
-const OrderRefund = 'wx/order/refund'; //退款取消订单
+const OrderRefund = 'wechat/order/refund'; //退款取消订单
 export function orderRefund(data) {
   return request({
     url: OrderRefund,
@@ -366,7 +363,7 @@ export function orderRefund(data) {
   })
 }
 
-const OrderDelete = 'wx/order/delete'; //删除订单
+const OrderDelete = 'wechat/order/delete'; //删除订单
 export function orderDelete(data) {
   return request({
     url: OrderDelete,
@@ -375,7 +372,7 @@ export function orderDelete(data) {
   })
 }
 
-const OrderConfirm = 'wx/order/confirm'; //确认收货
+const OrderConfirm = 'wechat/order/confirm'; //确认收货
 export function orderConfirm(data) {
   return request({
     url: OrderConfirm,
@@ -384,7 +381,7 @@ export function orderConfirm(data) {
   })
 }
 
-const FeedbackAdd = 'wx/feedback/submit'; //添加反馈
+const FeedbackAdd = 'wechat/feedback/submit'; //添加反馈
 export function feedbackAdd(data) {
   return request({
     url: FeedbackAdd,
@@ -393,7 +390,7 @@ export function feedbackAdd(data) {
   })
 }
 
-const GrouponList = 'wx/groupon/list'; //团购列表
+const GrouponList = 'wechat/groupon/list'; //团购列表
 export function grouponList(query) {
   return request({
     url: GrouponList,
@@ -402,7 +399,7 @@ export function grouponList(query) {
   })
 }
 
-const CouponList = 'wx/coupon/list'; //优惠券列表
+const CouponList = 'wechat/coupon/list'; //优惠券列表
 export function couponList(query) {
   return request({
     url: CouponList,
@@ -411,7 +408,7 @@ export function couponList(query) {
   })
 }
 
-export const CouponMyList = 'wx/coupon/mylist'; //我的优惠券列表
+export const CouponMyList = 'wechat/coupon/mylist'; //我的优惠券列表
 export function couponMyList(query) {
   return request({
     url: CouponMyList,
@@ -420,7 +417,7 @@ export function couponMyList(query) {
   })
 }
 
-const CouponSelectList = 'wx/coupon/selectlist'; //当前订单可用优惠券列表
+const CouponSelectList = 'wechat/coupon/selectlist'; //当前订单可用优惠券列表
 export function couponSelectList(query) {
   return request({
     url: CouponSelectList,
@@ -429,7 +426,7 @@ export function couponSelectList(query) {
   })
 }
 
-const CouponReceive = 'wx/coupon/receive'; //优惠券领取
+const CouponReceive = 'wechat/coupon/receive'; //优惠券领取
 export function couponReceive(data) {
   return request({
     url: CouponReceive,
@@ -438,7 +435,7 @@ export function couponReceive(data) {
   })
 }
 
-const UserIndex = 'wx/user/index'; //个人页面用户相关信息
+const UserIndex = 'wechat/user/index'; //个人页面用户相关信息
 export function userIndex() {
   return request({
     url: UserIndex,
@@ -446,7 +443,7 @@ export function userIndex() {
   })
 }
 
-const IssueList = 'wx/issue/list'; //帮助信息
+const IssueList = 'wechat/issue/list'; //帮助信息
 export function issueList() {
   return request({
     url: IssueList,

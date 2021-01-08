@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends BaseController
 {
-    protected $middlewareOnly = ['info'];
+    protected $middlewareOnly = ['info', 'profile'];
 
     /**
      * 账号信息修改
@@ -24,20 +24,17 @@ class AuthController extends BaseController
      * @param  Request  $request
      * @return JsonResponse
      */
-    public function profile(Request $request)
+    public function profile(Request $request): JsonResponse
     {
         $user = $this->user();
-        $avatar = $request->input('avatar');
-        $gender = $request->input('gender');
-        $nickname = $request->input('nickname');
-//        ['avatar' => $avatar, 'gender' => $gender, 'nickname' => $nickname] = $request->input();
-        if (!empty($avatar)) {
+
+        if (!empty($avatar = $request->input('avatar'))) {
             $user->avatar = $avatar;
         }
-        if (!empty($gender)) {
+        if (!empty($gender = $request->input('gender'))) {
             $user->gender = $gender;
         }
-        if (!empty($nickname)) {
+        if (!empty($nickname = $request->input('nickname'))) {
             $user->nickname = $nickname;
         }
 
@@ -52,17 +49,13 @@ class AuthController extends BaseController
      *
      * @throws BusinessException
      */
-    public function reset(Request $request)
+    public function reset(Request $request): JsonResponse
     {
-        $password = $request->input('password');
-        $mobile = $request->input('mobile');
-        $code = $request->input('code');
-        if (empty($password) || empty($mobile) || empty($code)) {
+        if (empty($password = $request->input('password')) || empty($mobile = $request->input('mobile')) || empty($code = $request->input('code'))) {
             $this->fail(CodeResponse::INVALID_PARAM);
         }
         UserService::getInstance()->checkCaptcha($mobile, $code);
-        $user = UserService::getInstance()->getByMobile($mobile);
-        if (is_null($user)) {
+        if (is_null($user = UserService::getInstance()->getByMobile($mobile))) {
             return $this->fail(CodeResponse::AUTH_MOBILE_UNREGISTERED);
         }
         $user->password = bcrypt($password);
@@ -75,7 +68,7 @@ class AuthController extends BaseController
      *
      * @return JsonResponse
      */
-    public function logout()
+    public function logout(): JsonResponse
     {
         auth('wechat')->logout();
 
@@ -87,11 +80,12 @@ class AuthController extends BaseController
      *
      * @return JsonResponse
      */
-    public function info()
+    public function info(): JsonResponse
     {
         $user = $this->user();
+
         return $this->success([
-            'nickName' => $user->nickanme,
+            'nickname' => $user->nickname,
             'avatar' => $user->avatar,
             'gender' => $user->gender,
             'mobile' => $user->mobile
@@ -227,7 +221,7 @@ class AuthController extends BaseController
         return $this->success([
             'token' => $token,
             'userInfo' => [
-                'nickname' => $username,
+                'nickname' => $user->nickname,
                 'avatarUrl' => $user->avatar
             ]
         ]);

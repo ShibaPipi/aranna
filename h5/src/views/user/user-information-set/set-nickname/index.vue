@@ -1,7 +1,7 @@
 <template>
   <div class="set_nickname">
     <van-cell-group>
-      <van-field v-model="nickName" label="昵称" />
+      <van-field v-model="nickname" label="昵称" />
     </van-cell-group>
 
     <div class="bottom_btn">
@@ -17,7 +17,7 @@ import { Field } from 'vant';
 export default {
   data() {
     return {
-      nickName: ''
+      nickname: ''
     };
   },
 
@@ -27,11 +27,11 @@ export default {
 
   methods: {
     getNick() {
-      this.nickName = localStorage.getItem('nickName') || '';
+      this.nickname = localStorage.getItem('nickname') || '';
     },
     saveNick() {
-      authProfile({ nickname: this.nickName }).then(res => {
-        localStorage.setItem('nickName', this.nickName);
+      authProfile({ nickname: this.nickname }).then(res => {
+        localStorage.setItem('nickname', this.nickname);
         this.$dialog.alert({ message: '保存成功' }).then(() => {
           this.$router.go(-1);
         });

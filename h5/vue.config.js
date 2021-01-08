@@ -12,6 +12,13 @@ module.exports = {
   devServer: {
     //九键输入法的 「mall」= 「6255」
     port: 6255,
+    // 处理跨域请求
+    proxy: {
+      '/': {
+        target: 'http://www.aranna.test/index.php/',
+        changeOrigin: true
+      }
+    }
   },
   chainWebpack: config => {
     config.plugins.delete('prefetch');

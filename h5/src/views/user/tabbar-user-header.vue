@@ -1,17 +1,17 @@
 <template>
   <div class="user_header" :style="{backgroundImage: `url(${background_image})`}">
-    <van-icon name="set" class="user_set" @click="toSetting"/>
+    <van-icon name="set" class="user_set" @click="toSetting" />
     <div class="user_avatar">
       <img :src="avatar" alt="头像" width="55" height="55">
     </div>
-    <div>{{nickName}}</div>
+    <div>{{ nickname }}</div>
   </div>
 </template>
 
 <script>
-import avatar_default from '@/assets/images/avatar_default.png';
-import bg_default from '@/assets/images/user_head_bg.png';
-import { getLocalStorage } from '@/utils/local-storage';
+import avatar_default from '@/assets/images/avatar_default.png'
+import bg_default from '@/assets/images/user_head_bg.png'
+import { getLocalStorage } from '@/utils/local-storage'
 
 export default {
   name: 'user-header',
@@ -25,30 +25,30 @@ export default {
 
   data() {
     return {
-      nickName: '昵称',
+      nickname: '昵称',
       avatar: avatar_default,
       background_image: bg_default
-    };
+    }
   },
 
   activated() {
-    this.getUserInfo();
+    this.getUserInfo()
   },
 
   methods: {
     getUserInfo() {
       const infoData = getLocalStorage(
-        'nickName',
+        'nickname',
         'avatar'
-      );
-      this.avatar = infoData.avatar || avatar_default;
-      this.nickName = infoData.nickName || '昵称';
+      )
+      this.avatar = infoData.avatar || avatar_default
+      this.nickname = infoData.nickname || '昵称'
     },
     toSetting() {
-      this.$router.push({ name: 'user-information' });
+      this.$router.push({ name: 'user-information' })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -67,8 +67,10 @@ export default {
   right: 10px;
   font-size: 24px;
 }
+
 .user_avatar {
   margin-bottom: 10px;
+
   img {
     border: 0;
     border-radius: 50%;

@@ -10,13 +10,10 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
     config => {
-      if (!config.headers['X-Litemall-Token']) {
-        config.headers['X-Litemall-Token'] = `${ window.localStorage.getItem(
+      if (!config.headers['Authorization']) {
+        config.headers['Authorization'] = `Bearer ${ window.localStorage.getItem(
             'Authorization'
         ) || '' }`;
-      }
-      if ('v2' === config.version) {
-        config.baseURL = process.env['VUE_APP_BASE_API_V2']
       }
       return config;
     },
