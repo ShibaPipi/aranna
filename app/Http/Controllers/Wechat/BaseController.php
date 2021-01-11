@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\User\User;
 use Illuminate\Http\JsonResponse;
 
 class BaseController extends Controller
@@ -54,6 +54,11 @@ class BaseController extends Controller
         $errmsg = $info ?: $errmsg;
         $ret = compact('errno', 'errmsg');
         if ($data) {
+            if (is_array($data)) {
+                $data = array_filter($data, function ($item) {
+                    return null !== $item;
+                });
+            }
             $ret += compact('data');
         }
         return response()->json($ret);

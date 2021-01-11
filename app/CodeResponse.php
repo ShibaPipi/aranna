@@ -13,6 +13,7 @@ class CodeResponse
     const SUCCESS = [0, '成功'];
     const FAIL = [-1, '错误'];
     const INVALID_PARAM = [401, '非法参数'];
+    const INVALID_PARAM_VALUE = [402, '参数值不对'];
     const NOT_LOGIN = [501, '请登录'];
     const UPDATE_FAILED = [505, '数据更新失败'];
 

@@ -7,6 +7,9 @@
 
 namespace App\Services;
 
+use App\CodeResponse;
+use App\Exceptions\BusinessException;
+
 class BaseService
 {
     protected static $instance;
@@ -35,5 +38,18 @@ class BaseService
         }
         static::$instance = new static;
         return static::$instance;
+    }
+
+    /**
+     * 抛出异常，默认为非法参数异常
+     *
+     * @param  array  $codeResponse
+     * @return void
+     *
+     * @throws BusinessException
+     */
+    public function throwBusinessException(array $codeResponse = CodeResponse::INVALID_PARAM): void
+    {
+        throw new BusinessException($codeResponse);
     }
 }

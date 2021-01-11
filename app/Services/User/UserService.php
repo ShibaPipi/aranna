@@ -6,12 +6,13 @@
  */
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\User;
 
 use App\CodeResponse;
 use App\Exceptions\BusinessException;
-use App\Models\User;
+use App\Models\User\User;
 use App\Notifications\VerificationCode;
+use App\Services\BaseService;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;

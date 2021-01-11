@@ -8,19 +8,30 @@
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
-    Route::post('register', 'AuthController@register'); //账号注册
-    Route::post('regCaptcha', 'AuthController@captcha'); // 获取验证码
-    Route::post('login', 'AuthController@login'); //账号登录
-    Route::get('info', 'AuthController@info'); //用户信息
-    Route::post('logout', 'AuthController@logout'); //账号登出
-    Route::post('profile', 'AuthController@profile'); //账号修改
-    Route::post('reset', 'AuthController@reset'); //账号密码重置
+    Route::post('register', 'AuthController@register'); // 账号注册
+    Route::post('regCaptcha', 'AuthController@captcha'); //  获取验证码
+    Route::post('login', 'AuthController@login'); // 账号登录
+    Route::get('info', 'AuthController@info'); // 用户信息
+    Route::post('logout', 'AuthController@logout'); // 账号登出
+    Route::post('profile', 'AuthController@profile'); // 账号修改
+    Route::post('reset', 'AuthController@reset'); // 账号密码重置
     Route::post('captcha', 'AuthController@captcha'); // 获取验证码
 });
 
+Route::prefix('address')->group(function () {
+    Route::get('list', 'AddressController@list'); // 收货地址列表
+    Route::get('detail', 'AddressController@detail'); // 收货地址详情
+    Route::post('save', 'AddressController@save'); // 保存收货地址
+    Route::post('delete', 'AddressController@delete'); // 删除收货地址
+});
+
+Route::prefix('category')->group(function () {
+    Route::get('index', 'CategoryController@index'); // 分类目录全部分类数据接口
+    Route::get('current', 'CategoryController@current'); // 分类目录当前分类数据接口
+});
+
+
 //Route::any('home/index', ''); //首页数据接口
-//Route::any('catalog/index', ''); //分类目录全部分类数据接口
-//Route::any('catalog/current', ''); //分类目录当前分类数据接口
 //Route::any('goods/count', ''); //统计商品总数
 //Route::any('goods/list', ''); //获得商品列表
 //Route::any('goods/category', ''); //获得分类数据
@@ -40,10 +51,6 @@ Route::prefix('auth')->group(function () {
 //Route::any('topic/list', ''); //专题列表
 //Route::any('topic/detail', ''); //专题详情
 //Route::any('topic/related', ''); //相关专题
-//Route::any('address/list', ''); //收货地址列表
-//Route::any('address/detail', ''); //收货地址详情
-//Route::any('address/save', ''); //保存收货地址
-//Route::any('address/delete', ''); //保存收货地址
 //Route::any('order/submit', ''); //
 //Route::any('order/prepay', ''); //
 //Route::any('order/h5pay', ''); //

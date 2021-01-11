@@ -8,18 +8,18 @@ export function getHome() {
   })
 }
 
-const CatalogList = 'wechat/catalog/index'; //分类目录全部分类数据接口
-export function catalogList() {
+const CategoryList = 'wechat/category/index'; //分类目录全部分类数据接口
+export function categoryList() {
   return request({
-    url: CatalogList,
+    url: CategoryList,
     method: 'get'
   })
 }
 
-const CatalogCurrent = 'wechat/catalog/current'; //分类目录当前分类数据接口
-export function catalogCurrent(query) {
+const CategoryCurrent = 'wechat/category/current'; //分类目录当前分类数据接口
+export function categoryCurrent(query) {
   return request({
-    url: CatalogCurrent,
+    url: CategoryCurrent,
     method: 'get',
     params: query
   })

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Services\UserService;
+use App\Services\User\UserService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -15,19 +15,6 @@ use Tests\TestCase;
 class AuthTest extends TestCase
 {
     use DatabaseTransactions;
-
-    protected $username;
-    protected $password;
-    protected $mobile;
-
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        $this->username = 'user123';
-        $this->password = 'user123';
-        $this->mobile = '13000000001';
-
-        parent::__construct($name, $data, $dataName);
-    }
 
     public function testRegister()
     {
@@ -50,7 +37,7 @@ class AuthTest extends TestCase
             'username' => 'pipi',
             'password' => 123456,
             'mobile' => $this->mobile,
-            'code' => '1212'
+            'code' => '8888'
         ]);
         $response->assertJson(['errno' => 703, 'errmsg' => '验证码错误']);
     }
@@ -86,11 +73,11 @@ class AuthTest extends TestCase
 
     public function testInfo()
     {
-        $res = $this->get('wechat/auth/info', ['Authorization' => 'Bearer '.$this->getToken()]);
+        $res = $this->get('wechat/auth/info', $this->getAuthHeader());
         $user = UserService::getInstance()->getByUsername($this->username);
         $res->assertJson([
             'data' => [
-                'nickName' => $user->nickanme,
+                'nickname' => $user->nickname,
                 'avatar' => $user->avatar,
                 'gender' => $user->gender,
                 'mobile' => $user->mobile
@@ -100,12 +87,12 @@ class AuthTest extends TestCase
 
     public function testLogout()
     {
-        $headers = ['Authorization' => 'Bearer '.$this->getToken()];
+        $headers = $this->getAuthHeader();
         $res = $this->get('wechat/auth/info', $headers);
         $user = UserService::getInstance()->getByUsername($this->username);
         $res->assertJson([
             'data' => [
-                'nickName' => $user->nickanme,
+                'nickname' => $user->nickname,
                 'avatar' => $user->avatar,
                 'gender' => $user->gender,
                 'mobile' => $user->mobile
@@ -130,16 +117,9 @@ class AuthTest extends TestCase
     {
         $nickname = 'user1111';
         $this->post('wechat/auth/profile', ['nickname' => $nickname, 'gender' => 1, 'avatar' => ''],
-            ['Authorization' => 'Bearer '.$this->getToken()])->assertJson(['errno' => 0]);
+            $this->getAuthHeader())->assertJson(['errno' => 0]);
         $user = UserService::getInstance()->getByUsername($this->username);
         self::assertEquals($nickname, $user->nickname);
         self::assertEquals(1, $user->gender);
-    }
-
-    protected function getToken()
-    {
-        $response = $this->post('wechat/auth/login', ['username' => $this->username, 'password' => $this->password]);
-
-        return $response->getOriginalContent()['data']['token'] ?? '';
     }
 }
