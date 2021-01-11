@@ -27,7 +27,7 @@ class AuthTest extends TestCase
         self::assertFalse($pass);
         Cache::forget('reg_captcha_count_'.$mobile);
         $pass = UserService::getInstance()->checkRegCaptchaCount($mobile);
-        self::assertTrue($pass);
+        self::assertFalse($pass);
     }
 
     /**

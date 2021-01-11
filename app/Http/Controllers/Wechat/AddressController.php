@@ -21,7 +21,7 @@ class AddressController extends BaseController
         return $this->success([
             'total' => $list->count(),
             'page' => 1,
-            'list' => $list->toArray(),
+            'list' => $list,
             'pages' => 1,
             'limit' => $list->count()
         ]);

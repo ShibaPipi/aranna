@@ -37,7 +37,7 @@ class AuthTest extends TestCase
             'username' => 'pipi',
             'password' => 123456,
             'mobile' => $this->mobile,
-            'code' => '8888'
+            'code' => '1212'
         ]);
         $response->assertJson(['errno' => 703, 'errmsg' => '验证码错误']);
     }
