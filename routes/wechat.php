@@ -30,14 +30,16 @@ Route::prefix('category')->group(function () {
     Route::get('current', 'CategoryController@current'); // 分类目录当前分类数据接口
 });
 
+Route::prefix('brand')->group(function () {
+    Route::get('list', 'BrandController@list'); // 品牌列表
+    Route::get('detail', 'BrandController@detail'); // 品牌详情
+});
 
 //Route::any('home/index', ''); //首页数据接口
 //Route::any('goods/count', ''); //统计商品总数
 //Route::any('goods/list', ''); //获得商品列表
 //Route::any('goods/category', ''); //获得分类数据
 //Route::any('goods/detail', ''); //获得商品的详情
-//Route::any('brand/list', ''); //品牌列表
-//Route::any('brand/detail', ''); //品牌详情
 //Route::any('cart/index', ''); //获取购物车的数据
 //Route::any('cart/add', ''); //
 //Route::any('cart/fastadd', ''); //

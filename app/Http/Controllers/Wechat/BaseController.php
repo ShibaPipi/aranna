@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Wechat;
 use App\CodeResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 
 class BaseController extends Controller
@@ -42,6 +43,31 @@ class BaseController extends Controller
         return auth('wechat')->user();
     }
 
+    public function paginate($data)
+    {
+        if ($data instanceof LengthAwarePaginator) {
+            return [
+                'total' => $data->total(),
+                'page' => $data->currentPage(),
+                'limit' => $data->perPage(),
+                'pages' => $data->lastPage(),
+                'list' => $data->items()
+            ];
+        } elseif (is_array($data)) {
+            $total = count($data);
+
+            return [
+                'total' => $total,
+                'page' => 1,
+                'limit' => $total,
+                'pages' => 1,
+                'list' => $data
+            ];
+        }
+
+        return $data;
+    }
+
     /**
      * @param  array  $codeResponse
      * @param  array|null  $data
@@ -62,6 +88,15 @@ class BaseController extends Controller
             $ret += compact('data');
         }
         return response()->json($ret);
+    }
+
+    /**
+     * @param $data
+     * @return JsonResponse
+     */
+    public function successPaginate($data): JsonResponse
+    {
+        return $this->success($this->paginate($data));
     }
 
     /**

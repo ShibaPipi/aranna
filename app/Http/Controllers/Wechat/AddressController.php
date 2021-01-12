@@ -18,13 +18,7 @@ class AddressController extends BaseController
     {
         $list = AddressService::getInstance()->getListByUserId($this->user()->id);
 
-        return $this->success([
-            'total' => $list->count(),
-            'page' => 1,
-            'list' => $list,
-            'pages' => 1,
-            'limit' => $list->count()
-        ]);
+        return $this->successPaginate($list);
     }
 
     public function detail()
