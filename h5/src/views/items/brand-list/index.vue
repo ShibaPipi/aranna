@@ -1,26 +1,26 @@
 <template>
   <div class="goods_brand_list">
     <van-list v-model="loading"
-              :finished="finished"
-              :immediate-check="false"
-              finished-text="没有更多了"
-              @load="getBrandList">
+      :finished="finished"
+      :immediate-check="false"
+      finished-text="没有更多了"
+      @load="getBrandList">
       <div class="brand-info"
-           v-for="(brand, index) in list"
-           :key="index"
-           @click="itemClick(brand.id)">
+        v-for="(brand, index) in list"
+        :key="index"
+        @click="itemClick(brand.id)">
         <div class="name">
           <img class="img"
-               :src="brand.picUrl"
-               background-size="cover" />
+            :src="brand.picUrl"
+            background-size="cover" />
           <div class="info-box">
-            <div class="txt">{{brand.name}}</div>
+            <div class="txt">{{ brand.name }}</div>
             <div class="line"></div>
-            <div class="price">{{brand.floorPrice}}元起</div>
+            <div class="price">{{ brand.floorPrice }}元起</div>
           </div>
         </div>
         <div class="desc">
-          {{brand.desc}}
+          {{ brand.desc }}
         </div>
       </div>
     </van-list>
@@ -29,8 +29,8 @@
 </template>
 
 <script>
-import { brandList } from '@/api/api';
-import { List } from 'vant';
+import { brandList } from '@/api/api'
+import { List } from 'vant'
 
 export default {
   data() {
@@ -40,39 +40,39 @@ export default {
       limit: 10,
       loading: false,
       finished: false
-    };
+    }
   },
 
   created() {
-    this.init();
+    this.init()
   },
 
   methods: {
     init() {
-      this.page = 0;
-      this.list = [];
-      this.getBrandList();
+      this.page = 0
+      this.list = []
+      this.getBrandList()
     },
     getBrandList() {
-      this.page++;
+      this.page++
       brandList({
         page: this.page,
         limit: this.limit
       }).then(res => {
-        this.list.push(...res.data.data.list);
-        this.loading = false;
-        this.finished = res.data.data.page >= res.data.data.pages;
-      });
+        this.list.push(...res.data.data.list)
+        this.loading = false
+        this.finished = res.data.data.page >= res.data.data.pages
+      })
     },
     itemClick(id) {
-      this.$router.push(`/items/brand/${id}`);
+      this.$router.push(`/items/brand/${ id }`)
     }
   },
 
   components: {
     [List.name]: List
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -118,13 +118,15 @@ export default {
           width: 300px;
           background: #fff;
         }
-        .price{
+
+        .price {
           height: 25px;
           font-size: 25px;
           color: #fff;
         }
       }
     }
+
     .desc {
       background: #fff;
       width: 100%;

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 
 class BaseController extends Controller
 {
@@ -43,17 +44,47 @@ class BaseController extends Controller
         return auth('wechat')->user();
     }
 
-    public function paginate($data)
+    /**
+     * 判断用户是否登录
+     *
+     * @return bool
+     */
+    public function isLogin(): bool
+    {
+        return !is_null($this->user());
+    }
+
+    /**
+     * 获取登录用户 id
+     *
+     * @return mixed
+     */
+    public function userId()
+    {
+        return $this->user()->getAuthIdentifier();
+    }
+
+    /**
+     * @param  array|Collection|LengthAwarePaginator  $data
+     * @return array
+     */
+    public function paginate($data): array
     {
         if ($data instanceof LengthAwarePaginator) {
+            $data = $data->toArray();
+
             return [
-                'total' => $data->total(),
-                'page' => $data->currentPage(),
-                'limit' => $data->perPage(),
-                'pages' => $data->lastPage(),
-                'list' => $data->items()
+                'total' => $data['total'],
+                'page' => $data['current_page'],
+                'limit' => $data['per_page'],
+                'pages' => $data['last_page'],
+                'list' => $data['data']
             ];
-        } elseif (is_array($data)) {
+        }
+        if ($data instanceof Collection) {
+            $data = $data->toArray();
+        }
+        if (is_array($data)) {
             $total = count($data);
 
             return [
@@ -91,7 +122,7 @@ class BaseController extends Controller
     }
 
     /**
-     * @param $data
+     * @param  array|LengthAwarePaginator  $data
      * @return JsonResponse
      */
     public function successPaginate($data): JsonResponse

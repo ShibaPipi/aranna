@@ -48,6 +48,18 @@ class UserService extends BaseService
 
     /**
      * @param  string  $mobile
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function sendCaptcha(string $mobile): void
+    {
+        $code = self::getInstance()->setCaptcha($mobile);
+        UserService::getInstance()->sendCaptchaMsg($mobile, $code);
+    }
+
+    /**
+     * @param  string  $mobile
      * @return bool
      */
     public function checkRegCaptchaCount(string $mobile): bool
@@ -75,10 +87,12 @@ class UserService extends BaseService
      */
     public function sendCaptchaMsg(string $mobile, string $code): void
     {
-        Notification::route(
-            EasySmsChannel::class,
-            new PhoneNumber($mobile, 86)
-        )->notify(new VerificationCode($code));
+        if ('production' === app()->environment()) {
+            Notification::route(
+                EasySmsChannel::class,
+                new PhoneNumber($mobile, 86)
+            )->notify(new VerificationCode($code));
+        }
     }
 
     /**
@@ -113,10 +127,11 @@ class UserService extends BaseService
      */
     public function setCaptcha(string $mobile): string
     {
-        if (app()->environment('testing')) {
-            return '111111';
+        if ('production' !== app()->environment()) {
+            $code = '111111';
+        } else {
+            $code = strval(random_int(100000, 999999));
         }
-        $code = strval(random_int(100000, 999999));
         Cache::put('sms_captcha_'.$mobile, $code, 600);
 
         return $code;

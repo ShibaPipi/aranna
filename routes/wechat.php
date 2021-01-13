@@ -35,11 +35,15 @@ Route::prefix('brand')->group(function () {
     Route::get('detail', 'BrandController@detail'); // 品牌详情
 });
 
+Route::prefix('goods')->group(function () {
+    Route::get('count', 'GoodsController@count'); // 统计商品总数
+    Route::any('list', 'GoodsController@list'); // 获得商品列表
+    Route::get('category', 'GoodsController@category'); // 获得分类数据
+    Route::any('detail', 'GoodsController@detail'); // 获得商品的详情
+});
+
+
 //Route::any('home/index', ''); //首页数据接口
-//Route::any('goods/count', ''); //统计商品总数
-//Route::any('goods/list', ''); //获得商品列表
-//Route::any('goods/category', ''); //获得分类数据
-//Route::any('goods/detail', ''); //获得商品的详情
 //Route::any('cart/index', ''); //获取购物车的数据
 //Route::any('cart/add', ''); //
 //Route::any('cart/fastadd', ''); //

@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class BaseModel extends Model
 {
+    public const CREATED_AT = 'add_time';
+
+    public const UPDATED_AT = 'update_time';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -18,7 +23,19 @@ class BaseModel extends Model
         'deleted' => 'boolean'
     ];
 
-    public function toArray()
+    /**
+     * @param  DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return now()->parse($date)->toDateTimeString();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
     {
         $items = parent::toArray();
         $keys = array_keys($items);

@@ -21,12 +21,18 @@ class BrandTest extends TestCase
 
     public function testDetail()
     {
-        $response = $this->get('wechat/brand/detail', $this->getAuthHeader());
+        $response = $this->get('wechat/brand/detail');
         self::assertEquals(401, $response['errno']);
-        $response = $this->get('wechat/brand/detail?id=1', $this->getAuthHeader());
+        $response = $this->get('wechat/brand/detail?id=1');
         self::assertEquals(402, $response['errno']);
-        $response = $this->get('wechat/brand/detail?id=1001000', $this->getAuthHeader());
+        $response = $this->get('wechat/brand/detail?id=1001000');
         self::assertEquals(0, $response['errno']);
         self::assertNotEmpty($response['data']);
+    }
+
+    public function testList()
+    {
+        $response = $this->get('wechat/brand/list');
+        self::assertNotEmpty($response['data']['list']);
     }
 }

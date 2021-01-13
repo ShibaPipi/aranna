@@ -154,9 +154,7 @@ class AuthController extends BaseController
      */
     public function captcha(Request $request): JsonResponse
     {
-        // 获取手机号
-        $mobile = $request->input('mobile');
-        if (empty($mobile)) {
+        if (empty($mobile = $request->input('mobile'))) {
             return $this->fail(CodeResponse::INVALID_PARAM);
         }
         $validator = Validator::make(['mobile' => $mobile], ['mobile' => 'regex:/^1[0-9]{10}$/']);
@@ -164,22 +162,17 @@ class AuthController extends BaseController
             return $this->fail(CodeResponse::AUTH_INVALID_MOBILE);
         }
         // 验证手机号是否被注册
-        $user = UserService::getInstance()->getByMobile($mobile);
-        if (!is_null($user)) {
+        if (!is_null($user = UserService::getInstance()->getByMobile($mobile))) {
             return $this->fail(CodeResponse::AUTH_MOBILE_REGISTERED);
         }
         // 防刷验证，一分钟只能请求一次，一天只能10次
-        $lock = Cache::add('reg_captcha_lock_'.$mobile, 1, 60);
-        if (!$lock) {
+        if (!$lock = Cache::add('reg_captcha_lock_'.$mobile, 1, 60)) {
             return $this->fail(CodeResponse::AUTH_CAPTCHA_FREQUENCY, '验证码一分钟只能获取1次');
         }
         if (!UserService::getInstance()->checkRegCaptchaCount($mobile)) {
             return $this->fail(CodeResponse::AUTH_CAPTCHA_FREQUENCY, '验证码一天只能获取10次');
         }
-        // 随机生成6位验证码
-        $code = UserService::getInstance()->setCaptcha($mobile);
-        // 发送短信
-        UserService::getInstance()->sendCaptchaMsg($mobile, $code);
+        UserService::getInstance()->sendCaptcha($mobile);
 
         return $this->success(null, '短信验证码发送成功');
     }

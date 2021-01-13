@@ -19,7 +19,7 @@ class BrandController extends BaseController
         $order = $request->input('order', 'desc');
 
         $columns = ['id', 'name', 'desc', 'pic_url', 'floor_price'];
-        $list = BrandService::getInstance()->getList($page, $limit, $sort, $order, $columns);
+        $list = BrandService::getInstance()->getList(intval($page), intval($limit), $sort, $order, $columns);
 
         return $this->successPaginate($list);
     }
