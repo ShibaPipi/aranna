@@ -15,6 +15,8 @@ class Goods extends BaseModel
         'retail_price' => 'float',
         'is_new' => 'boolean',
         'is_hot' => 'boolean',
+        'gallery' => 'array',
+        'is_on_sale' => 'boolean',
         'deleted' => 'boolean'
     ];
 

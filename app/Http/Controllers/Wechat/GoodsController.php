@@ -5,11 +5,15 @@ namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
 use App\Enums\SearchHistory\From;
+use App\Services\CollectService;
+use App\Services\CommentService;
+use App\Services\Goods\BrandService;
 use App\Services\Goods\CategoryService;
 use App\Services\Goods\GoodsService;
 use App\Services\SearchHistoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use stdClass;
 
 class GoodsController extends BaseController
 {
@@ -54,10 +58,10 @@ class GoodsController extends BaseController
 
     public function category(Request $request): JsonResponse
     {
-        if (empty($id = $request->input('id', 0))) {
+        if (empty($id = intval($request->input('id', 0)))) {
             return $this->fail(CodeResponse::INVALID_PARAM);
         }
-        if (empty($currentCategory = CategoryService::getInstance()->getById(intval($id)))) {
+        if (empty($currentCategory = CategoryService::getInstance()->getById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
         if (0 === $currentCategory->pid) {
@@ -72,8 +76,33 @@ class GoodsController extends BaseController
         return $this->success(compact('currentCategory', 'parentCategory', 'brotherCategory'));
     }
 
-    public function detail(): JsonResponse
+    public function detail(Request $request): JsonResponse
     {
+        if (empty($id = intval($request->input('id', 0)))) {
+            return $this->fail(CodeResponse::INVALID_PARAM);
+        }
+        if (empty($info = GoodsService::getInstance()->getById($id))) {
+            return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
+        }
 
+        $attribute = GoodsService::getInstance()->getAttributes($id);
+        $specificationList = GoodsService::getInstance()->getSpecifications($id);
+        $productList = GoodsService::getInstance()->getProducts($id);
+        $issue = GoodsService::getInstance()->getIssues();
+        $brand = $info->brand_id ? BrandService::getInstance()->getDetail($info->brand_id) : new stdClass();
+        $comment = CommentService::getInstance()->getWithUserInfo($id);
+        // TODO：团购
+        $groupon = [];
+        $userHasCollect = 0;
+        if ($this->isLogin()) {
+            $userHasCollect = CollectService::getInstance()->countByGoodsId($this->userId(), $id);
+            GoodsService::getInstance()->saveFootprint($this->userId(), $id);
+        }
+        // TODO：系统配置
+        $share = false;
+        $shareImage = $info->shareUrl;
+
+        return $this->success(compact('info', 'issue','userHasCollect', 'comment', 'specificationList', 'productList',
+            'attribute', 'brand', 'groupon', 'share', 'shareImage'));
     }
 }

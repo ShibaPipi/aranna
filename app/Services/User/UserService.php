@@ -15,6 +15,7 @@ use App\Notifications\VerificationCode;
 use App\Services\BaseService;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use Leonis\Notifications\EasySms\Channels\EasySmsChannel;
@@ -22,6 +23,22 @@ use Overtrue\EasySms\PhoneNumber;
 
 class UserService extends BaseService
 {
+    /**
+     * @param  array  $ids
+     * @return User[]|Collection
+     */
+    public function getByIds(array $ids)
+    {
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return User::query()
+            ->whereIn('id', $ids)
+            ->where('deleted', 0)
+            ->get();
+    }
+
     /**
      * @param  string  $username
      * @return User|Model|null

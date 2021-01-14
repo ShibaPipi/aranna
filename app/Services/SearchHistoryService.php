@@ -13,7 +13,13 @@ use App\Models\SearchHistory;
 
 class SearchHistoryService extends BaseService
 {
-    public function save(int $userId, string $keyword, string $from)
+    /**
+     * @param  int  $userId
+     * @param  string  $keyword
+     * @param  string  $from
+     * @return SearchHistory
+     */
+    public function save(int $userId, string $keyword, string $from): SearchHistory
     {
         $searchHistory = new SearchHistory;
         $searchHistory->fill([
