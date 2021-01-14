@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
+use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Models\User\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class BaseController extends Controller
 {
@@ -169,5 +172,91 @@ class BaseController extends Controller
         string $info = ''
     ): JsonResponse {
         return $success ? $this->success($data, $info) : $this->fail($codeResponse, $info);
+    }
+
+    /**
+     * @param  string  $key
+     * @param  null  $default
+     * @return mixed
+     *
+     * @throws BusinessException
+     */
+    public function verifyId(string $key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'integer|digits_between:1,20');
+    }
+
+    /**
+     * @param  string  $key
+     * @param  null  $default
+     * @return mixed|null
+     *
+     * @throws BusinessException
+     */
+    public function verifyInteger(string $key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'integer');
+    }
+
+    /**
+     * @param  string  $key
+     * @param  null  $default
+     * @return mixed|null
+     *
+     * @throws BusinessException
+     */
+    public function verifyString(string $key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'string');
+    }
+
+    /**
+     * @param  string  $key
+     * @param  null  $default
+     * @return mixed|null
+     *
+     * @throws BusinessException
+     */
+    public function verifyBoolean(string $key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'boolean');
+    }
+
+    /**
+     * @param  string  $key
+     * @param  null  $default
+     * @param  array  $enum
+     * @return mixed|null
+     *
+     * @throws BusinessException
+     */
+    public function verifyEnum(string $key, $default = null, array $enum = [])
+    {
+        return $this->verifyData($key, $default, Rule::in($enum));
+    }
+
+    /**
+     * @param  string  $key
+     * @param $default
+     * @param  string|array  $rules
+     * @return mixed|null
+     *
+     * @throws BusinessException
+     */
+    public function verifyData(string $key, $default, $rules)
+    {
+        $value = request()->input($key, $default);
+
+        if (is_null($value) && is_null($default)) {
+            return null;
+        }
+
+        $validator = Validator::make([$key => $value], [$key => $rules]);
+
+        if ($validator->fails()) {
+            throw new BusinessException(CodeResponse::PARAM_VALIDATION_ERROR);
+        }
+
+        return $value;
     }
 }

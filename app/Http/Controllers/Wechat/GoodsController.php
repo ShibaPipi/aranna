@@ -13,6 +13,7 @@ use App\Services\Goods\GoodsService;
 use App\Services\SearchHistoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use stdClass;
 
 class GoodsController extends BaseController
@@ -26,15 +27,15 @@ class GoodsController extends BaseController
 
     public function list(Request $request): JsonResponse
     {
-        $categoryId = intval($request->input('categoryId'));
-        $brandId = intval($request->input('brandId'));
-        $keyword = $request->input('keyword', '');
-        $isNew = boolval($request->input('isNew'));
-        $isHot = boolval($request->input('isHot'));
-        $sort = $request->input('sort', 'add_time');
-        $order = $request->input('order', 'desc');
-        $page = intval($request->input('page', 1));
-        $limit = intval($request->input('limit', 10));
+        $categoryId = $this->verifyId('categoryId');
+        $brandId = $this->verifyId('brandId');
+        $keyword = $this->verifyString('keyword', '');
+        $isNew = $this->verifyBoolean('isNew');
+        $isHot = $this->verifyBoolean('isHot');
+        $sort = $this->verifyEnum('sort', 'add_time', ['add_time', 'retail_price', 'name']);
+        $order = $this->verifyEnum('order', 'desc', ['desc', 'asc']);
+        $page = $this->verifyInteger('page', 1);
+        $limit = $this->verifyInteger('limit', 10);
 
         // TODO: 验证参数
         if ($this->isLogin() && !empty($keyword)) {
@@ -102,7 +103,7 @@ class GoodsController extends BaseController
         $share = false;
         $shareImage = $info->shareUrl;
 
-        return $this->success(compact('info', 'issue','userHasCollect', 'comment', 'specificationList', 'productList',
+        return $this->success(compact('info', 'issue', 'userHasCollect', 'comment', 'specificationList', 'productList',
             'attribute', 'brand', 'groupon', 'share', 'shareImage'));
     }
 }

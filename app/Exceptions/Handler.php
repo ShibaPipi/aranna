@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
+use App\CodeResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -53,9 +55,19 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if ($exception instanceof BusinessException) {
-            return response()->json(['errno' => $exception->getCode(), 'errmsg' => $exception->getMessage()]);
+        if ($exception instanceof ValidationException) {
+            return response()->json([
+                'errno' => CodeResponse::PARAM_VALIDATION_ERROR[0],
+                'errmsg' => CodeResponse::PARAM_VALIDATION_ERROR[1]
+            ]);
         }
+        if ($exception instanceof BusinessException) {
+            return response()->json([
+                'errno' => $exception->getCode(),
+                'errmsg' => $exception->getMessage()
+            ]);
+        }
+
         return parent::render($request, $exception);
     }
 }
