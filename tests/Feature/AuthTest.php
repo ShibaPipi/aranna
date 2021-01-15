@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\User\UserService;
+use Exception;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -16,6 +17,9 @@ class AuthTest extends TestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * @throws Exception
+     */
     public function testRegister()
     {
         $code = UserService::getInstance()->setCaptcha($this->mobile);
@@ -104,6 +108,9 @@ class AuthTest extends TestCase
         $infoRes->assertJson(['errno' => 501]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testReset()
     {
         $mobile = '13012271786';

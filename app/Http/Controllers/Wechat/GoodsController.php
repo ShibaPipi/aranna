@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
 use App\Enums\SearchHistory\From;
+use App\Exceptions\BusinessException;
+use App\Inputs\Goods\ListInput;
 use App\Services\CollectService;
 use App\Services\CommentService;
 use App\Services\Goods\BrandService;
@@ -12,8 +14,6 @@ use App\Services\Goods\CategoryService;
 use App\Services\Goods\GoodsService;
 use App\Services\SearchHistoryService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use stdClass;
 
 class GoodsController extends BaseController
@@ -25,19 +25,15 @@ class GoodsController extends BaseController
         return $this->success((array) GoodsService::getInstance()->countOnSale());
     }
 
-    public function list(Request $request): JsonResponse
+    /**
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     */
+    public function list(): JsonResponse
     {
-        $categoryId = $this->verifyId('categoryId');
-        $brandId = $this->verifyId('brandId');
-        $keyword = $this->verifyString('keyword', '');
-        $isNew = $this->verifyBoolean('isNew');
-        $isHot = $this->verifyBoolean('isHot');
-        $sort = $this->verifyEnum('sort', 'add_time', ['add_time', 'retail_price', 'name']);
-        $order = $this->verifyEnum('order', 'desc', ['desc', 'asc']);
-        $page = $this->verifyInteger('page', 1);
-        $limit = $this->verifyInteger('limit', 10);
+        $input = ListInput::new();
 
-        // TODO: 验证参数
         if ($this->isLogin() && !empty($keyword)) {
             SearchHistoryService::getInstance()->save($this->userId(), $keyword, From::WECHAT);
         }
@@ -45,23 +41,23 @@ class GoodsController extends BaseController
         $columns = [
             'id', 'name', 'brief', 'pic_url', 'is_new', 'is_hot', 'counter_price', 'retail_price'
         ];
-        // TODO: 优化参数传递
-        $goodsList = GoodsService::getInstance()->list($categoryId, $brandId, $isNew, $isHot, $keyword, $columns, $sort,
-            $order,
-            $page, $limit);
+        $goodsList = GoodsService::getInstance()->list($input, $columns);
 
-        $filterCategoryList = GoodsService::getInstance()->l2CategoryList($brandId, $isNew, $isHot, $keyword);
+        $filterCategoryList = GoodsService::getInstance()->l2CategoryList($input);
 
         $goodsList = $this->paginate($goodsList) + compact('filterCategoryList');
 
         return $this->success($goodsList);
     }
 
-    public function category(Request $request): JsonResponse
+    /**
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     */
+    public function category(): JsonResponse
     {
-        if (empty($id = intval($request->input('id', 0)))) {
-            return $this->fail(CodeResponse::INVALID_PARAM);
-        }
+        $id = $this->verifyRequiredId('id');
         if (empty($currentCategory = CategoryService::getInstance()->getById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
@@ -77,11 +73,14 @@ class GoodsController extends BaseController
         return $this->success(compact('currentCategory', 'parentCategory', 'brotherCategory'));
     }
 
-    public function detail(Request $request): JsonResponse
+    /**
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     */
+    public function detail(): JsonResponse
     {
-        if (empty($id = intval($request->input('id', 0)))) {
-            return $this->fail(CodeResponse::INVALID_PARAM);
-        }
+        $id = $this->verifyRequiredId('id');
         if (empty($info = GoodsService::getInstance()->getById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }

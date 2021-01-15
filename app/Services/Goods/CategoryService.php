@@ -5,7 +5,7 @@
  * Created By 皮神
  * Date: 2021/1/11
  */
-declare(strict_types=1);
+//declare(strict_types=1);
 
 namespace App\Services\Goods;
 

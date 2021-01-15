@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Models\Goods;
 
+use App\Inputs\Goods\ListInput;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -22,33 +23,28 @@ class Goods extends BaseModel
 
     /**
      * @param  Builder  $query
-     * @param  int  $brandId
-     * @param  bool  $isNew
-     * @param  bool  $isHot
-     * @param  string  $keyword
+     * @param  int|null  $brandId
+     * @param  int|null  $isNew
+     * @param  int|null  $isHot
+     * @param  string|null  $keyword
      * @return Builder
      */
-    public function scopeCommonFilter(
-        Builder $query,
-        int $brandId,
-        bool $isNew,
-        bool $isHot,
-        string $keyword
-    ): Builder {
+    public function scopeCommonFilter(Builder $query, ListInput $input): Builder
+    {
         return $query
-            ->when(!empty($brandId), function (Builder $query) use ($brandId) {
-                $query->where('brand_id', $brandId);
+            ->when(!empty($input->brandId), function (Builder $query) use ($input) {
+                $query->where('brand_id', $input->brandId);
             })
-            ->when(!empty($isNew), function (Builder $query) use ($isNew) {
-                $query->where('is_new', $isNew);
+            ->when(!is_null($input->isNew), function (Builder $query) use ($input) {
+                $query->where('is_new', $input->isNew);
             })
-            ->when(!empty($isHot), function (Builder $query) use ($isHot) {
-                $query->where('is_hot', $isHot);
+            ->when(!is_null($input->isHot), function (Builder $query) use ($input) {
+                $query->where('is_hot', $input->isHot);
             })
-            ->when(!empty($keyword), function (Builder $query) use ($keyword) {
-                $query->where(function (Builder $query) use ($keyword) {
-                    $query->where('keywords', 'like', "%${keyword}%")
-                        ->orWhere('name', 'like', "%${keyword}%");
+            ->when(!empty($input->keyword), function (Builder $query) use ($input) {
+                $query->where(function (Builder $query) use ($input) {
+                    $query->where('keywords', 'like', "%{$input->keyword}%")
+                        ->orWhere('name', 'like', "%{$input->keyword}%");
                 });
             });
     }

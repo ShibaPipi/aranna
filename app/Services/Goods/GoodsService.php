@@ -1,6 +1,6 @@
 <?php
 /**
- * 品牌服务层
+ * 商品服务层
  *
  * Created By 皮神
  * Date: 2021/1/11
@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Goods;
 
+use App\Inputs\Goods\ListInput;
 use App\Models\Goods\Footprint;
 use App\Models\Goods\Goods;
 use App\Models\Goods\GoodsAttribute;
@@ -107,47 +108,26 @@ class GoodsService extends BaseService
     }
 
     /**
-     * @param  int  $categoryId
-     * @param  int  $brandId
-     * @param  bool  $isNew
-     * @param  bool  $isHot
-     * @param  string  $keyword
-     * @param  string  $sort
-     * @param  string  $order
-     * @param  int  $page
-     * @param  int  $limit
+     * @param  ListInput  $input
+     * @param  array  $columns
      * @return LengthAwarePaginator
      */
-    public function list(
-        int $categoryId,
-        int $brandId,
-        bool $isNew,
-        bool $isHot,
-        string $keyword,
-        array $columns = ['*'],
-        string $sort = 'add_time',
-        string $order = 'desc',
-        int $page = 1,
-        int $limit = 10
-    ): LengthAwarePaginator {
+    public function list(ListInput $input, array $columns = ['*']): LengthAwarePaginator
+    {
         return Goods::query()
             ->where('deleted', 0)
-            ->when(!empty($categoryId), function (Builder $query) use ($categoryId) {
-                $query->where('category_id', $categoryId);
+            ->when(!empty($input->categoryId), function (Builder $query) use ($input) {
+                $query->where('category_id', $input->categoryId);
             })
-            ->commonFilter($brandId, $isNew, $isHot, $keyword)
-            ->orderBy($sort, $order)
-            ->paginate($limit, $columns, 'page', $page);
+            ->commonFilter($input)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function l2CategoryList(
-        int $brandId,
-        bool $isNew,
-        bool $isHot,
-        string $keyword
-    ) {
+    public function l2CategoryList(ListInput $input)
+    {
         $categoryIds = Goods::query()
-            ->commonFilter($brandId, $isNew, $isHot, $keyword)
+            ->commonFilter($input)
             ->select(['category_id'])
             ->pluck('category_id')
             ->unique()
