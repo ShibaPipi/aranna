@@ -1,5 +1,9 @@
 <?php
-
+/**
+ *
+ * Created By 皮神
+ * Date: 2020/12/21
+ */
 namespace Tests\Feature;
 
 use App\Services\User\UserService;
@@ -8,11 +12,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-/**
- *
- * Created By 皮神
- * Date: 2020/12/21
- */
 class AuthTest extends TestCase
 {
     use DatabaseTransactions;

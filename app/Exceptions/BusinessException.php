@@ -6,9 +6,9 @@ use Exception;
 
 class BusinessException extends Exception
 {
-    public function __construct(array $codeResponse, string $info = '')
+    public function __construct(array $codeResponse, string $message = '')
     {
         [$errno, $errmsg] = $codeResponse;
-        parent::__construct($info ?: $errmsg, $errno);
+        parent::__construct($message ?: $errmsg, $errno);
     }
 }

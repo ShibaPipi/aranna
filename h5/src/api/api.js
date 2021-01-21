@@ -408,7 +408,7 @@ export function couponList(query) {
   })
 }
 
-export const CouponMyList = 'wechat/coupon/mylist'; //我的优惠券列表
+export const CouponMyList = 'wechat/coupon/myList'; //我的优惠券列表
 export function couponMyList(query) {
   return request({
     url: CouponMyList,

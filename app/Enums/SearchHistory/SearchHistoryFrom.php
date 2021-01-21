@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Enums\SearchHistory;
 
-class From
+class SearchHistoryFrom
 {
     const WECHAT = 'wechat';
     const APP = 'app';

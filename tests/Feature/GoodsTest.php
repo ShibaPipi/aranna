@@ -1,15 +1,15 @@
 <?php
+/**
+ *
+ * Created By 皮神
+ * Date: 2020/12/21
+ */
 
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
-/**
- *
- * Created By 皮神
- * Date: 2020/12/21
- */
 class GoodsTest extends TestCase
 {
     use DatabaseTransactions;

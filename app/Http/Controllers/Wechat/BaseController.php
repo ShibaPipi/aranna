@@ -69,19 +69,20 @@ class BaseController extends Controller
 
     /**
      * @param  array|Collection|LengthAwarePaginator  $data
+     * @param  null  $list
      * @return array
      */
-    public function paginate($data): array
+    public function paginate($data, $list = null): array
     {
         if ($data instanceof LengthAwarePaginator) {
             $data = $data->toArray();
 
             return [
                 'total' => $data['total'],
-                'page' => $data['current_page'],
+                'page' => 0 === $data['total'] ? 0 : $data['current_page'],
                 'limit' => $data['per_page'],
-                'pages' => $data['last_page'],
-                'list' => $data['data']
+                'pages' => 0 === $data['total'] ? 0 : $data['last_page'],
+                'list' => $list ?? $data['data']
             ];
         }
         if ($data instanceof Collection) {
@@ -92,9 +93,9 @@ class BaseController extends Controller
 
             return [
                 'total' => $total,
-                'page' => 1,
+                'page' => $total ? 1 : 0,
                 'limit' => $total,
-                'pages' => 1,
+                'pages' => $total ? 1 : 0,
                 'list' => $data
             ];
         }

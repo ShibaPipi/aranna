@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Models\Goods;
 
-use App\Inputs\Goods\ListInput;
+use App\Inputs\Goods\GoodsListInput;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -29,7 +29,7 @@ class Goods extends BaseModel
      * @param  string|null  $keyword
      * @return Builder
      */
-    public function scopeCommonFilter(Builder $query, ListInput $input): Builder
+    public function scopeCommonFilter(Builder $query, GoodsListInput $input): Builder
     {
         return $query
             ->when(!empty($input->brandId), function (Builder $query) use ($input) {

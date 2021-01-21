@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\Comment\Type;
+use App\Enums\Comment\CollectType;
 use App\Models\Comment;
 use App\Services\User\UserService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -32,7 +32,7 @@ class CommentService extends BaseService
     ): LengthAwarePaginator {
         return Comment::query()
             ->where('value_id', $goodsId)
-            ->where('type', Type::Goods)
+            ->where('type', CollectType::Goods)
             ->where('deleted', 0)
             ->orderBy($sort, $order)
             ->paginate($limit, ['*'], 'page', $page);

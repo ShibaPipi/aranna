@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
-use App\Enums\SearchHistory\From;
+use App\Enums\SearchHistory\SearchHistoryFrom;
 use App\Exceptions\BusinessException;
-use App\Inputs\Goods\ListInput;
+use App\Inputs\Goods\GoodsListInput;
 use App\Services\CollectService;
 use App\Services\CommentService;
 use App\Services\Goods\BrandService;
@@ -32,10 +32,10 @@ class GoodsController extends BaseController
      */
     public function list(): JsonResponse
     {
-        $input = ListInput::new();
+        $input = GoodsListInput::new();
 
         if ($this->isLogin() && !empty($keyword)) {
-            SearchHistoryService::getInstance()->save($this->userId(), $keyword, From::WECHAT);
+            SearchHistoryService::getInstance()->save($this->userId(), $keyword, SearchHistoryFrom::WECHAT);
         }
 
         $columns = [

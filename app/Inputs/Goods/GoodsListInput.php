@@ -10,7 +10,7 @@ namespace App\Inputs\Goods;
 use App\Inputs\Input;
 use Illuminate\Validation\Rule;
 
-class ListInput extends Input
+class GoodsListInput extends Input
 {
     public $categoryId;
     public $brandId;

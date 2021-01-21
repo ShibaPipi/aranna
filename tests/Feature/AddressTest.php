@@ -1,4 +1,9 @@
 <?php
+/**
+ *
+ * Created By 皮神
+ * Date: 2020/12/21
+ */
 
 namespace Tests\Feature;
 
@@ -6,11 +11,6 @@ use App\Models\User\Address;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
-/**
- *
- * Created By 皮神
- * Date: 2020/12/21
- */
 class AddressTest extends TestCase
 {
     use DatabaseTransactions;

@@ -44,12 +44,15 @@ class BaseService
      * 抛出异常，默认为非法参数异常
      *
      * @param  array  $codeResponse
+     * @param  string  $message
      * @return void
      *
      * @throws BusinessException
      */
-    public function throwBusinessException(array $codeResponse = CodeResponse::INVALID_PARAM): void
-    {
-        throw new BusinessException($codeResponse);
+    public function throwBusinessException(
+        array $codeResponse = CodeResponse::INVALID_PARAM,
+        string $message = ''
+    ): void {
+        throw new BusinessException($codeResponse, $message);
     }
 }

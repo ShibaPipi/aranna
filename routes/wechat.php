@@ -42,6 +42,12 @@ Route::prefix('goods')->group(function () {
     Route::any('detail', 'GoodsController@detail'); // 获得商品的详情
 });
 
+Route::prefix('coupon')->group(function () {
+    Route::get('list', 'CouponController@list'); // 优惠券列表
+    Route::get('myList', 'CouponController@myList'); // 我的优惠券列表
+//    Route::any('selectlist', 'CouponController@selectlist'); // 当前订单可用优惠券列表
+    Route::post('receive', 'CouponController@receive'); // 优惠券领取
+});
 
 //Route::any('home/index', ''); //首页数据接口
 //Route::any('cart/index', ''); //获取购物车的数据
@@ -68,9 +74,5 @@ Route::prefix('goods')->group(function () {
 //Route::any('order/confirm', ''); //确认收货
 //Route::any('feedback/submit', ''); //添加反馈
 //Route::any('groupon/list', ''); //团购列表
-//Route::any('coupon/list', ''); //优惠券列表
-//Route::any('coupon/mylist', ''); //我的优惠券列表
-//Route::any('coupon/selectlist', ''); //当前订单可用优惠券列表
-//Route::any('coupon/receive', ''); //优惠券领取
 //Route::any('user/index', ''); //个人页面用户相关信息
 //Route::any('issue/list', ''); //帮助信息any

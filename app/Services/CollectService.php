@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\Collect\Type;
+use App\Enums\Collect\CollectType;
 use App\Models\Collect;
 
 class CollectService extends BaseService
@@ -24,7 +24,7 @@ class CollectService extends BaseService
         return Collect::query()
             ->where('user_id', $userId)
             ->where('value_id', $goodsId)
-            ->where('type', Type::Goods)
+            ->where('type', CollectType::Goods)
             ->count('id');
     }
 }

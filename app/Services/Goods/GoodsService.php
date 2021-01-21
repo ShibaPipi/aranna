@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Goods;
 
-use App\Inputs\Goods\ListInput;
+use App\Inputs\Goods\GoodsListInput;
 use App\Models\Goods\Footprint;
 use App\Models\Goods\Goods;
 use App\Models\Goods\GoodsAttribute;
@@ -108,11 +108,11 @@ class GoodsService extends BaseService
     }
 
     /**
-     * @param  ListInput  $input
+     * @param  GoodsListInput  $input
      * @param  array  $columns
      * @return LengthAwarePaginator
      */
-    public function list(ListInput $input, array $columns = ['*']): LengthAwarePaginator
+    public function list(GoodsListInput $input, array $columns = ['*']): LengthAwarePaginator
     {
         return Goods::query()
             ->where('deleted', 0)
@@ -124,7 +124,7 @@ class GoodsService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function l2CategoryList(ListInput $input)
+    public function l2CategoryList(GoodsListInput $input)
     {
         $categoryIds = Goods::query()
             ->commonFilter($input)
