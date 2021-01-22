@@ -4,6 +4,7 @@
  * Created By 皮神
  * Date: 2020/12/21
  */
+
 namespace Tests\Feature;
 
 use App\Services\User\UserService;
@@ -69,6 +70,10 @@ class AuthTest extends TestCase
     public function testLogin()
     {
         $response = $this->post('wechat/auth/login', ['username' => 'syp', 'password' => 123456]);
+        self::assertEquals(700, $response['errno']);
+        $response = $this->post('wechat/auth/login', ['username' => 'syp2', 'password' => 123456]);
+        self::assertEquals(710, $response['errno']);
+        $response = $this->post('wechat/auth/login', ['username' => 'syp', 'password' => 'user123']);
         $token = $response->getOriginalContent()['data']['token'] ?? '';
         echo $token;
         self::assertNotEmpty($token);
@@ -113,7 +118,7 @@ class AuthTest extends TestCase
     public function testReset()
     {
         $mobile = '13012271786';
-        $password = '123456';
+        $password = 'user123';
         $code = UserService::getInstance()->setCaptcha($mobile);
         $this->post('wechat/auth/reset', compact('mobile', 'password', 'code'))->assertJson(['errno' => 0]);
         self::assertTrue(Hash::check($password, UserService::getInstance()->getByMobile($mobile)->password));

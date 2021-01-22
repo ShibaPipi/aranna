@@ -3,9 +3,18 @@
 namespace App\Models;
 
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+/**
+ * App\Models\BaseModel
+ *
+ * @method static Builder|BaseModel newModelQuery()
+ * @method static Builder|BaseModel newQuery()
+ * @method static Builder|BaseModel query()
+ * @mixin \Eloquent
+ */
 class BaseModel extends Model
 {
     public const CREATED_AT = 'add_time';
@@ -19,9 +28,16 @@ class BaseModel extends Model
      */
     protected $fillable = [];
 
-    protected $casts = [
+    protected $defaultCasts = [
         'deleted' => 'boolean'
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->mergeCasts($this->defaultCasts);
+    }
 
     /**
      * @param  DateTimeInterface  $date
@@ -44,5 +60,13 @@ class BaseModel extends Model
         }, $keys);
 
         return array_combine($keys, array_values($items));
+    }
+
+    /**
+     * @return static
+     */
+    public static function new()
+    {
+        return new static;
     }
 }

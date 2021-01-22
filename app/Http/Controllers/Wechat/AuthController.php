@@ -195,7 +195,7 @@ class AuthController extends BaseController
         // 验证账号是否存在
         $user = UserService::getInstance()->getByUsername($username);
         if (is_null($user)) {
-            return $this->fail(CodeResponse::AUTH_NAME_REGISTERED);
+            return $this->fail(CodeResponse::AUTH_NAME_UNREGISTERED);
         }
         // 对密码进行验证
         if (!Hash::check($password, $user->getAuthPassword())) {

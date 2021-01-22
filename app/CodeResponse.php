@@ -29,6 +29,7 @@ class CodeResponse
     const AUTH_INVALID_MOBILE = [707, '手机号格式不正确'];
     const AUTH_OPENID_UNACCESS = [708, ''];
     const AUTH_OPENID_BINDED = [709, ''];
+    const AUTH_NAME_UNREGISTERED = [710, '用户未注册'];
 
     const GOODS_UNSHELVE = [710, ''];
     const GOODS_NO_STOCK = [711, ''];
@@ -54,7 +55,7 @@ class CodeResponse
     const COUPON_RECEIVE_FAIL = [741, '优惠券领取失败'];
     const COUPON_CODE_INVALID = [742, ''];
 
-    const AFTERSALE_UNALLOWED = [750, ''];
-    const AFTERSALE_INVALID_AMOUNT = [751, ''];
-    const AFTERSALE_INVALID_STATUS = [752, ''];
+    const AFTER_SALE_UNALLOWED = [750, ''];
+    const AFTER_SALE_INVALID_AMOUNT = [751, ''];
+    const AFTER_SALE_INVALID_STATUS = [752, ''];
 }

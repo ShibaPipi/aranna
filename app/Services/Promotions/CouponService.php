@@ -21,6 +21,7 @@ use App\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 class CouponService extends BaseService
 {
@@ -142,7 +143,6 @@ class CouponService extends BaseService
             $this->throwBusinessException(CodeResponse::COUPON_RECEIVE_FAIL, '优惠券已过期，不能领取');
         }
 
-        $couponUser = new CouponUser;
         if ($coupon->time_type == CouponTimeType::TIME) {
             $startTime = $coupon->start_time;
             $endTime = $coupon->end_time;
@@ -151,7 +151,7 @@ class CouponService extends BaseService
             $endTime = $startTime->copy()->addDays($coupon->days);
         }
 
-        return $couponUser->fill([
+        return CouponUser::new()->fill([
             'coupon_id' => $couponId,
             'user_id' => $userId,
             'start_time' => $startTime,
