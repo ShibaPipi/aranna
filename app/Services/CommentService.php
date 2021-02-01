@@ -33,7 +33,6 @@ class CommentService extends BaseService
         return Comment::query()
             ->where('value_id', $goodsId)
             ->where('type', CollectType::Goods)
-            ->where('deleted', 0)
             ->orderBy($sort, $order)
             ->paginate($limit, ['*'], 'page', $page);
     }

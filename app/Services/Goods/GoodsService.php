@@ -41,7 +41,6 @@ class GoodsService extends BaseService
     {
         return GoodsAttribute::query()
             ->where('goods_id', $goodsId)
-            ->where('deleted', 0)
             ->get();
     }
 
@@ -53,7 +52,6 @@ class GoodsService extends BaseService
     {
         $specs = GoodsSpecification::query()
             ->where('goods_id', $goodsId)
-            ->where('deleted', 0)
             ->get();
 
         return $specs->groupBy('specification')
@@ -67,7 +65,6 @@ class GoodsService extends BaseService
     {
         return GoodsProduct::query()
             ->where('goods_id', $goodsId)
-            ->where('deleted', 0)
             ->get();
     }
 
@@ -103,7 +100,6 @@ class GoodsService extends BaseService
     {
         return Goods::query()
             ->where('is_on_sale', 1)
-            ->where('deleted', 0)
             ->count('id');
     }
 
@@ -115,7 +111,6 @@ class GoodsService extends BaseService
     public function list(GoodsListInput $input, array $columns = ['*']): LengthAwarePaginator
     {
         return Goods::query()
-            ->where('deleted', 0)
             ->when(!empty($input->categoryId), function (Builder $query) use ($input) {
                 $query->where('category_id', $input->categoryId);
             })

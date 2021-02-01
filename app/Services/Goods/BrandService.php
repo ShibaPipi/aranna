@@ -28,7 +28,6 @@ class BrandService extends BaseService
     public function getList(int $page, int $limit, string $sort, string $order, array $columns = ['*'])
     {
         return Brand::query()
-            ->where('deleted', 0)
             ->when(!empty($sort) && !empty($order), function (Builder $query) use ($sort, $order) {
                 return $query->orderBy($sort, $order);
             })->paginate($limit, $columns, 'page', $page);

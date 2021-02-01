@@ -35,7 +35,6 @@ class UserService extends BaseService
 
         return User::query()
             ->whereIn('id', $ids)
-            ->where('deleted', 0)
             ->get();
     }
 
@@ -47,7 +46,6 @@ class UserService extends BaseService
     {
         return User::query()
             ->where('username', $username)
-            ->where('deleted', 0)
             ->first();
     }
 
@@ -59,7 +57,6 @@ class UserService extends BaseService
     {
         return User::query()
             ->where('mobile', $mobile)
-            ->where('deleted', 0)
             ->first();
     }
 

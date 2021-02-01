@@ -18,6 +18,8 @@ use Illuminate\Support\Str;
  */
 class BaseModel extends Model
 {
+    use BooleanSoftDeletes;
+
     public const CREATED_AT = 'add_time';
 
     public const UPDATED_AT = 'update_time';

@@ -25,7 +25,6 @@ class AddressService extends BaseService
     {
         return Address::query()
             ->where('user_id', $userId)
-            ->where('deleted', 0)
             ->get();
     }
 
@@ -34,7 +33,6 @@ class AddressService extends BaseService
         return Address::query()
             ->where('user_id', $userId)
             ->where('id', $addressId)
-            ->where('deleted', 0)
             ->first();
     }
 

@@ -5,6 +5,7 @@
  * Created By 皮神
  * Date: 2021/1/11
  */
+
 //declare(strict_types=1);
 
 namespace App\Services\Goods;
@@ -36,7 +37,6 @@ class CategoryService extends BaseService
     {
         return Category::query()
             ->where('level', 'L1')
-            ->where('deleted', 0)
             ->get();
     }
 
@@ -51,7 +51,6 @@ class CategoryService extends BaseService
         return Category::query()
             ->where('level', 'L2')
             ->where(compact('pid'))
-            ->where('deleted', 0)
             ->get();
     }
 
@@ -66,7 +65,6 @@ class CategoryService extends BaseService
         return Category::query()
             ->where('level', 'L1')
             ->where(compact('id'))
-            ->where('deleted', 0)
             ->first();
     }
 
@@ -82,7 +80,6 @@ class CategoryService extends BaseService
         return Category::query()
             ->whereIn('id', $ids)
             ->where('level', 'L2')
-            ->where('deleted', 0)
             ->get();
     }
 }

@@ -21,7 +21,6 @@ use App\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
 
 class CouponService extends BaseService
 {
@@ -35,7 +34,6 @@ class CouponService extends BaseService
         return Coupon::query()
             ->where('type', CouponType::COMMON)
             ->where('status', CouponStatus::NORMAL)
-            ->where('deleted', 0)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
@@ -69,7 +67,6 @@ class CouponService extends BaseService
     public function getByIds(array $ids, array $columns = ['*'])
     {
         return Coupon::query()
-            ->where('deleted', 0)
             ->whereIn('id', $ids)
             ->get($columns);
     }
@@ -77,7 +74,6 @@ class CouponService extends BaseService
     public function getById(int $id, array $columns = ['*'])
     {
         return Coupon::query()
-            ->where('deleted', 0)
             ->find($id, $columns);
     }
 
@@ -91,14 +87,12 @@ class CouponService extends BaseService
     {
         return CouponUser::query()
             ->where('coupon_id', $couponId)
-            ->where('deleted', 0)
             ->count('id');
     }
 
     public function countReceivedByUserId(int $userId, int $couponId): int
     {
         return CouponUser::query()
-            ->where('deleted', 0)
             ->where('coupon_id', $couponId)
             ->where('user_id', $userId)
             ->count('id');
