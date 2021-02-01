@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models\Goods;
 
 use App\Models\BaseModel;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -29,7 +30,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|GoodsSpecification whereSpecification($value)
  * @method static Builder|GoodsSpecification whereUpdateTime($value)
  * @method static Builder|GoodsSpecification whereValue($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class GoodsSpecification extends BaseModel
 {

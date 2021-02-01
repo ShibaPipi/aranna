@@ -3,6 +3,7 @@
 namespace App\Models\Promotions;
 
 use App\Models\BaseModel;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -52,7 +53,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Coupon whereTotal($value)
  * @method static Builder|Coupon whereType($value)
  * @method static Builder|Coupon whereUpdateTime($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Coupon extends BaseModel
 {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -25,7 +26,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|SearchHistory whereKeyword($value)
  * @method static Builder|SearchHistory whereUpdateTime($value)
  * @method static Builder|SearchHistory whereUserId($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class SearchHistory extends BaseModel
 {

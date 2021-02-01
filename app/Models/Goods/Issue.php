@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models\Goods;
 
 use App\Models\BaseModel;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -25,7 +26,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Issue whereId($value)
  * @method static Builder|Issue whereQuestion($value)
  * @method static Builder|Issue whereUpdateTime($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Issue extends BaseModel
 {

@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use App\Models\BaseModel;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -40,7 +41,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Address whereTel($value)
  * @method static Builder|Address whereUpdateTime($value)
  * @method static Builder|Address whereUserId($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Address extends BaseModel
 {

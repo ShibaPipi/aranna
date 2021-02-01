@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use App\Models\BaseModel;
+use Eloquent;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -55,7 +56,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @method static Builder|User whereUserLevel($value)
  * @method static Builder|User whereUsername($value)
  * @method static Builder|User whereWeixinOpenid($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class User extends BaseModel implements
     AuthenticatableContract,

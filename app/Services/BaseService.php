@@ -37,6 +37,7 @@ class BaseService
             return static::$instance;
         }
         static::$instance = new static;
+
         return static::$instance;
     }
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -36,7 +37,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Comment whereUpdateTime($value)
  * @method static Builder|Comment whereUserId($value)
  * @method static Builder|Comment whereValueId($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Comment extends BaseModel
 {

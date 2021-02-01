@@ -5,7 +5,9 @@ namespace App\Models\Goods;
 
 use App\Inputs\Goods\GoodsListInput;
 use App\Models\BaseModel;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Goods\Goods
@@ -28,8 +30,8 @@ use Illuminate\Database\Eloquent\Builder;
  * @property float|null $counter_price 专柜价格
  * @property float|null $retail_price 零售价格
  * @property string|null $detail 商品详细介绍，是富文本格式
- * @property \Illuminate\Support\Carbon|null $add_time 创建时间
- * @property \Illuminate\Support\Carbon|null $update_time 更新时间
+ * @property Carbon|null $add_time 创建时间
+ * @property Carbon|null $update_time 更新时间
  * @property bool|null $deleted 逻辑删除
  * @method static Builder|Goods commonFilter(\App\Inputs\Goods\GoodsListInput $input)
  * @method static Builder|Goods newModelQuery()
@@ -56,7 +58,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|Goods whereSortOrder($value)
  * @method static Builder|Goods whereUnit($value)
  * @method static Builder|Goods whereUpdateTime($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Goods extends BaseModel
 {

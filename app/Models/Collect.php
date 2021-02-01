@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -26,7 +27,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Collect whereUpdateTime($value)
  * @method static Builder|Collect whereUserId($value)
  * @method static Builder|Collect whereValueId($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Collect extends BaseModel
 {

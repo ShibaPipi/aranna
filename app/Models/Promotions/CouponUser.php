@@ -3,6 +3,7 @@
 namespace App\Models\Promotions;
 
 use App\Models\BaseModel;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -34,7 +35,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|CouponUser whereUpdateTime($value)
  * @method static Builder|CouponUser whereUsedTime($value)
  * @method static Builder|CouponUser whereUserId($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class CouponUser extends BaseModel
 {
