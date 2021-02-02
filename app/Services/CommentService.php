@@ -21,6 +21,8 @@ class CommentService extends BaseService
      * @param  int  $goodsId
      * @param  int  $page
      * @param  int  $limit
+     * @param  string  $sort
+     * @param  string  $order
      * @return LengthAwarePaginator
      */
     public function getByGoodsId(
