@@ -14,6 +14,13 @@ class GrouponController extends BaseController
 {
     protected $middlewareOnly = [];
 
+    public function test()
+    {
+        $rule = GrouponService::getInstance()->getRulesById(1);
+
+        return response(GrouponService::getInstance()->createShareImage($rule));
+    }
+
     /**
      * 团购列表
      *

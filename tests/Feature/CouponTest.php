@@ -29,8 +29,10 @@ class CouponTest extends TestCase
     {
         $response = $this->get('wechat/coupon/myList', $this->getAuthHeader());
         self::assertEquals(0, $response['errno']);
-//        dd($response->getOriginalContent());
         self::assertCount(2, $response['data']['list']);
+        $response = $this->get('wechat/coupon/myList?status=0', $this->getAuthHeader());
+        self::assertEquals(0, $response['errno']);
+        self::assertCount(1, $response['data']['list']);
         $response = $this->get('wechat/coupon/myList?status=1', $this->getAuthHeader());
         self::assertEquals(0, $response['errno']);
         self::assertCount(1, $response['data']['list']);

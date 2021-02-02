@@ -14351,6 +14351,210 @@
      
 }
 
+    namespace Intervention\Image\Facades { 
+            /**
+     * 
+     *
+     */ 
+        class Image {
+                    /**
+         * Overrides configuration settings
+         *
+         * @param array $config
+         * @return self 
+         * @static 
+         */ 
+        public static function configure($config = [])
+        {
+                        /** @var \Intervention\Image\ImageManager $instance */
+                        return $instance->configure($config);
+        }
+                    /**
+         * Initiates an Image instance from different input types
+         *
+         * @param mixed $data
+         * @return \Intervention\Image\Image 
+         * @static 
+         */ 
+        public static function make($data)
+        {
+                        /** @var \Intervention\Image\ImageManager $instance */
+                        return $instance->make($data);
+        }
+                    /**
+         * Creates an empty image canvas
+         *
+         * @param int $width
+         * @param int $height
+         * @param mixed $background
+         * @return \Intervention\Image\Image 
+         * @static 
+         */ 
+        public static function canvas($width, $height, $background = null)
+        {
+                        /** @var \Intervention\Image\ImageManager $instance */
+                        return $instance->canvas($width, $height, $background);
+        }
+                    /**
+         * Create new cached image and run callback
+         * (requires additional package intervention/imagecache)
+         *
+         * @param \Closure $callback
+         * @param int $lifetime
+         * @param boolean $returnObj
+         * @return \Image 
+         * @static 
+         */ 
+        public static function cache($callback, $lifetime = null, $returnObj = false)
+        {
+                        /** @var \Intervention\Image\ImageManager $instance */
+                        return $instance->cache($callback, $lifetime, $returnObj);
+        }
+         
+    }
+     
+}
+
+    namespace SimpleSoftwareIO\QrCode\Facades { 
+            /**
+     * 
+     *
+     */ 
+        class QrCode {
+                    /**
+         * Generates a QrCode.
+         *
+         * @param string $text The text to be converted into a QrCode
+         * @param null|string $filename The filename and path to save the QrCode file
+         * @return string|void Returns a QrCode string depending on the format, or saves to a file.
+         * @static 
+         */ 
+        public static function generate($text, $filename = null)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->generate($text, $filename);
+        }
+                    /**
+         * Merges an image with the center of the QrCode.
+         *
+         * @param $filepath string The filepath to an image
+         * @param $percentage float The amount that the merged image should be placed over the qrcode.
+         * @param $absolute boolean Whether to use an absolute filepath or not.
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function merge($filepath, $percentage = 0.2, $absolute = false)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->merge($filepath, $percentage, $absolute);
+        }
+                    /**
+         * Merges an image string with the center of the QrCode, does not check for correct format.
+         *
+         * @param $content string The string contents of an image.
+         * @param $percentage float The amount that the merged image should be placed over the qrcode.
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function mergeString($content, $percentage = 0.2)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->mergeString($content, $percentage);
+        }
+                    /**
+         * Switches the format of the outputted QrCode or defaults to SVG.
+         *
+         * @param string $format The desired format.
+         * @throws \InvalidArgumentException
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function format($format)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->format($format);
+        }
+                    /**
+         * Changes the size of the QrCode.
+         *
+         * @param int $pixels The size of the QrCode in pixels
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function size($pixels)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->size($pixels);
+        }
+                    /**
+         * Changes the foreground color of a QrCode.
+         *
+         * @param int $red
+         * @param int $green
+         * @param int $blue
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function color($red, $green, $blue)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->color($red, $green, $blue);
+        }
+                    /**
+         * Changes the background color of a QrCode.
+         *
+         * @param int $red
+         * @param int $green
+         * @param int $blue
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function backgroundColor($red, $green, $blue)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->backgroundColor($red, $green, $blue);
+        }
+                    /**
+         * Changes the error correction level of a QrCode.
+         *
+         * @param string $level Desired error correction level.  L = 7% M = 15% Q = 25% H = 30%
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function errorCorrection($level)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->errorCorrection($level);
+        }
+                    /**
+         * Creates a margin around the QrCode.
+         *
+         * @param int $margin The desired margin in pixels around the QrCode
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function margin($margin)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->margin($margin);
+        }
+                    /**
+         * Sets the Encoding mode.
+         *
+         * @param string $encoding
+         * @return \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator 
+         * @static 
+         */ 
+        public static function encoding($encoding)
+        {
+                        /** @var \SimpleSoftwareIO\QrCode\BaconQrCodeGenerator $instance */
+                        return $instance->encoding($encoding);
+        }
+         
+    }
+     
+}
+
     namespace Tymon\JWTAuth\Facades { 
             /**
      * 
@@ -17867,6 +18071,8 @@ namespace  {
             class Validator extends \Illuminate\Support\Facades\Validator {}
             class View extends \Illuminate\Support\Facades\View {}
             class Flare extends \Facade\Ignition\Facades\Flare {}
+            class Image extends \Intervention\Image\Facades\Image {}
+            class QrCode extends \SimpleSoftwareIO\QrCode\Facades\QrCode {}
             class JWTAuth extends \Tymon\JWTAuth\Facades\JWTAuth {}
             class JWTFactory extends \Tymon\JWTAuth\Facades\JWTFactory {}
      

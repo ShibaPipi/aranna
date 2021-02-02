@@ -50,7 +50,12 @@ Route::prefix('coupon')->group(function () {
 });
 
 Route::prefix('groupon')->group(function () {
+    Route::get('test', 'GrouponController@test'); // 团购图片测试
     Route::get('list', 'GrouponController@list'); // 团购列表
+});
+
+Route::prefix('home')->name('home.')->group(function () {
+    Route::get('shareUrl', 'HomeController@redirectShareUrl')->name('redirectShareUrl');
 });
 
 //Route::any('home/index', ''); //首页数据接口
