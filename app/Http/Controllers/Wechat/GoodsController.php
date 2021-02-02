@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
-use App\Enums\SearchHistory\SearchHistoryFrom;
+use App\Enums\SearchHistories\SearchHistoryFrom;
 use App\Exceptions\BusinessException;
 use App\Inputs\Goods\GoodsListInput;
 use App\Services\CollectService;
@@ -81,7 +81,7 @@ class GoodsController extends BaseController
     public function detail(): JsonResponse
     {
         $id = $this->verifyRequiredId('id');
-        if (empty($info = GoodsService::getInstance()->getById($id))) {
+        if (empty($info = GoodsService::getInstance()->getListById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
 

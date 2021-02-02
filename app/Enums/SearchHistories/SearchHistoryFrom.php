@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace App\Enums\SearchHistory;
+namespace App\Enums\SearchHistories;
 
 class SearchHistoryFrom
 {

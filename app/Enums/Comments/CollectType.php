@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace App\Enums\Comment;
+namespace App\Enums\Comments;
 
 class CollectType
 {

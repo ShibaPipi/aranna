@@ -25,10 +25,22 @@ use Illuminate\Database\Eloquent\Model;
 class GoodsService extends BaseService
 {
     /**
+     * @param  array  $ids
+     * @return Goods[]|Collection|\Illuminate\Support\Collection
+     */
+    public function getListByIds(array $ids)
+    {
+        if (empty($ids)) {
+            return collect();
+        }
+        return Goods::query()->whereIn('id', $ids)->get();
+    }
+
+    /**
      * @param  int  $id
      * @return Goods|Model|null
      */
-    public function getById(int $id)
+    public function getListById(int $id)
     {
         return Goods::query()->find($id);
     }

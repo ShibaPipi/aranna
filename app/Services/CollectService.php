@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\Collect\CollectType;
+use App\Enums\Collects\CollectType;
 use App\Models\Collect;
 
 class CollectService extends BaseService

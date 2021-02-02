@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace App\Services\Promotions;
 
 use App\CodeResponse;
-use App\Enums\Coupon\CouponStatus;
-use App\Enums\Coupon\CouponTimeType;
-use App\Enums\Coupon\CouponType;
+use App\Enums\Coupons\CouponStatus;
+use App\Enums\Coupons\CouponTimeType;
+use App\Enums\Coupons\CouponType;
 use App\Exceptions\BusinessException;
 use App\Inputs\PageInput;
 use App\Models\Promotions\Coupon;

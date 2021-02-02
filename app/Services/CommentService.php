@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\Comment\CollectType;
+use App\Enums\Comments\CollectType;
 use App\Models\Comment;
 use App\Services\User\UserService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

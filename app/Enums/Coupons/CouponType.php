@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace App\Enums\Coupon;
+namespace App\Enums\Coupons;
 
 class CouponType
 {

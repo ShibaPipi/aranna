@@ -49,6 +49,10 @@ Route::prefix('coupon')->group(function () {
     Route::post('receive', 'CouponController@receive'); // 优惠券领取
 });
 
+Route::prefix('groupon')->group(function () {
+    Route::get('list', 'GrouponController@list'); // 团购列表
+});
+
 //Route::any('home/index', ''); //首页数据接口
 //Route::any('cart/index', ''); //获取购物车的数据
 //Route::any('cart/add', ''); //
@@ -73,6 +77,5 @@ Route::prefix('coupon')->group(function () {
 //Route::any('order/delete', ''); //删除订单
 //Route::any('order/confirm', ''); //确认收货
 //Route::any('feedback/submit', ''); //添加反馈
-//Route::any('groupon/list', ''); //团购列表
 //Route::any('user/index', ''); //个人页面用户相关信息
 //Route::any('issue/list', ''); //帮助信息any
