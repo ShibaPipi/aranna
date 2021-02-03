@@ -10,7 +10,7 @@ namespace App\Services\Users;
 
 use App\CodeResponse;
 use App\Exceptions\BusinessException;
-use App\Models\User\User;
+use App\Models\Users\User;
 use App\Notifications\VerificationCode;
 use App\Services\BaseService;
 use Exception;

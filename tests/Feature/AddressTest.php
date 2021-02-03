@@ -7,7 +7,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\User\Address;
+use App\Models\Users\Address;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 

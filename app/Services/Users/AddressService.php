@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Users;
 
-use App\Models\User\Address;
+use App\Models\Users\Address;
 use App\Services\BaseService;
 use Illuminate\Database\Eloquent\Collection;
 

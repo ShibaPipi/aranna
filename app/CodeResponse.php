@@ -29,11 +29,10 @@ class CodeResponse
     const AUTH_MOBILE_UNREGISTERED = [706, '手机号未注册'];
     const AUTH_INVALID_MOBILE = [707, '手机号格式不正确'];
     const AUTH_OPENID_UNACCESS = [708, ''];
-    const AUTH_OPENID_BINDED = [709, ''];
-    const AUTH_NAME_UNREGISTERED = [710, '用户未注册'];
+    const AUTH_NAME_UNREGISTERED = [709, '用户未注册'];
 
-    const GOODS_UNSHELVE = [710, ''];
-    const GOODS_NO_STOCK = [711, ''];
+    const GOODS_UNSHELVE = [710, '商品已下架'];
+    const GOODS_NO_STOCK = [711, '库存不足'];
     const GOODS_UNKNOWN = [712, ''];
     const GOODS_INVALID = [713, ''];
 
