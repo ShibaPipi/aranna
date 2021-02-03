@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\CodeResponse;
 use App\Exceptions\BusinessException;
-use App\Services\User\UserService;
+use App\Services\Users\UserService;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Wechat;
 use App\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Models\User\User;
-use App\Services\User\UserService;
+use App\Services\Users\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -11,7 +11,7 @@ namespace App\Services;
 
 use App\Enums\Comments\CollectType;
 use App\Models\Comment;
-use App\Services\User\UserService;
+use App\Services\Users\UserService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 

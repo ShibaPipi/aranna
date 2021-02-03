@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace App\Services\User;
+namespace App\Services\Users;
 
 use App\Models\User\Address;
 use App\Services\BaseService;

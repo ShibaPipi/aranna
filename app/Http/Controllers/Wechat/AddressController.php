@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
-use App\Services\User\AddressService;
+use App\Services\Users\AddressService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

@@ -7,7 +7,7 @@
 
 namespace Tests\Feature;
 
-use App\Services\User\UserService;
+use App\Services\Users\UserService;
 use Exception;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
