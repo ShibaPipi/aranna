@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
 use App\Http\Controllers\Controller;
-use App\Models\User\User;
+use App\Models\Users\User;
 use App\VerifyRequestInput;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -155,6 +155,48 @@ class BaseController extends Controller
     protected function fail(array $codeResponse = CodeResponse::FAIL, string $info = ''): JsonResponse
     {
         return $this->codeReturn($codeResponse, null, $info);
+    }
+
+    /**
+     * 表单验证错误返回结果，400
+     *
+     * @param  array  $codeResponse
+     * @param  string  $info
+     * @return JsonResponse
+     */
+    protected function validationFailed(
+        array $codeResponse = CodeResponse::PARAM_VALIDATION_ERROR,
+        string $info = ''
+    ): JsonResponse {
+        return $this->fail($codeResponse, $info);
+    }
+
+    /**
+     * 参数非法错误返回结果，401
+     *
+     * @param  array  $codeResponse
+     * @param  string  $info
+     * @return JsonResponse
+     */
+    protected function invalidParam(
+        array $codeResponse = CodeResponse::INVALID_PARAM,
+        string $info = ''
+    ): JsonResponse {
+        return $this->fail($codeResponse, $info);
+    }
+
+    /**
+     * 参数值非法错误返回结果，402
+     *
+     * @param  array  $codeResponse
+     * @param  string  $info
+     * @return JsonResponse
+     */
+    protected function invalidParamValue(
+        array $codeResponse = CodeResponse::INVALID_PARAM_VALUE,
+        string $info = ''
+    ): JsonResponse {
+        return $this->fail($codeResponse, $info);
     }
 
     /**
