@@ -129,7 +129,7 @@ trait VerifyRequestInput
         if (is_null($value) && is_null($default)) {
             return null;
         }
-        dump($key, $default);
+
         $validator = Validator::make([$key => $value], [$key => $rules]);
 
         if ($validator->fails()) {
