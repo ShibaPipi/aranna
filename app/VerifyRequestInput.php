@@ -15,30 +15,8 @@ use Illuminate\Validation\Rule;
 trait VerifyRequestInput
 {
     /**
-     * @param  string  $key
-     * @return mixed
+     * 验证是否为 id
      *
-     * @throws BusinessException
-     */
-    public function verifyRequiredId(string $key)
-    {
-        $this->verifyRequired($key);
-
-        return $this->verifyId($key);
-    }
-
-    /**
-     * @param  string  $key
-     * @return mixed|null
-     *
-     * @throws BusinessException
-     */
-    public function verifyRequired(string $key)
-    {
-        return $this->verifyData($key, '', 'required');
-    }
-
-    /**
      * @param  string  $key
      * @param  null  $default
      * @return mixed
@@ -51,6 +29,8 @@ trait VerifyRequestInput
     }
 
     /**
+     * 验证是否为整型
+     *
      * @param  string  $key
      * @param  null  $default
      * @return mixed|null
@@ -63,6 +43,22 @@ trait VerifyRequestInput
     }
 
     /**
+     * 验证是否为正整型
+     *
+     * @param  string  $key
+     * @param  null  $default
+     * @return mixed|null
+     *
+     * @throws BusinessException
+     */
+    public function verifyPositiveInteger(string $key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'integer|min:1', 'intval');
+    }
+
+    /**
+     * 验证是否为字符串
+     *
      * @param  string  $key
      * @param  null  $default
      * @return mixed|null
@@ -75,6 +71,8 @@ trait VerifyRequestInput
     }
 
     /**
+     * 验证布尔值
+     *
      * @param  string  $key
      * @param  null  $default
      * @return mixed|null
@@ -87,6 +85,8 @@ trait VerifyRequestInput
     }
 
     /**
+     * 验证是值否在数组中
+     *
      * @param  string  $key
      * @param  null  $default
      * @param  array  $enum
@@ -97,6 +97,20 @@ trait VerifyRequestInput
     public function verifyEnum(string $key, $default = null, array $enum = [])
     {
         return $this->verifyData($key, $default, Rule::in($enum));
+    }
+
+    /**
+     * 验证非空数组
+     *
+     * @param  string  $key
+     * @param  null  $default
+     * @return mixed|null
+     *
+     * @throws BusinessException
+     */
+    public function verifyNotEmptyArray(string $key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'array|min:1');
     }
 
     /**
@@ -115,7 +129,7 @@ trait VerifyRequestInput
         if (is_null($value) && is_null($default)) {
             return null;
         }
-
+        dump($key, $default);
         $validator = Validator::make([$key => $value], [$key => $rules]);
 
         if ($validator->fails()) {

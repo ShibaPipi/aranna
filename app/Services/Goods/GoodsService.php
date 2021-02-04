@@ -25,6 +25,16 @@ use Illuminate\Database\Eloquent\Model;
 class GoodsService extends BaseService
 {
     /**
+     * @param  int  $goodsId
+     * @param  array|string[]  $columns
+     * @return Goods|Model|null
+     */
+    public function getInfoById(int $goodsId, array $columns = ['*'])
+    {
+        return Goods::query()->find($goodsId, $columns);
+    }
+
+    /**
      * @param  array  $ids
      * @return Goods[]|Collection|\Illuminate\Support\Collection
      */
@@ -33,16 +43,8 @@ class GoodsService extends BaseService
         if (empty($ids)) {
             return collect();
         }
-        return Goods::query()->whereIn('id', $ids)->get();
-    }
 
-    /**
-     * @param  int  $id
-     * @return Goods|Model|null
-     */
-    public function getListById(int $id)
-    {
-        return Goods::query()->find($id);
+        return Goods::query()->whereIn('id', $ids)->get();
     }
 
     /**
@@ -71,6 +73,16 @@ class GoodsService extends BaseService
                 return ['name' => $key, 'valueList' => $item];
             })
             ->values();
+    }
+
+    /**
+     * @param $productId
+     * @param  array|string[]  $columns
+     * @return GoodsProduct|Model|null
+     */
+    public function getProductByProductId($productId, array $columns = ['*'])
+    {
+        return GoodsProduct::query()->find($productId, $columns);
     }
 
     public function getProducts(int $goodsId)

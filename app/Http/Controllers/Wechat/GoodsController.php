@@ -57,7 +57,7 @@ class GoodsController extends BaseController
      */
     public function category(): JsonResponse
     {
-        $id = $this->verifyRequiredId('id');
+        $id = $this->verifyId('id', 0);
         if (empty($currentCategory = CategoryService::getInstance()->getById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
@@ -80,8 +80,8 @@ class GoodsController extends BaseController
      */
     public function detail(): JsonResponse
     {
-        $id = $this->verifyRequiredId('id');
-        if (empty($info = GoodsService::getInstance()->getListById($id))) {
+        $id = $this->verifyId('id', 0);
+        if (empty($info = GoodsService::getInstance()->getInfoById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
 
