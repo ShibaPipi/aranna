@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Tests;
 
@@ -8,27 +9,25 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
-    protected $username;
-    protected $password;
     protected $mobile;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    protected function setUp(): void
     {
-        $this->username = 'user123';
-        $this->password = 'user123';
-        $this->mobile = '13000000001';
+        parent::setUp();
 
-        parent::__construct($name, $data, $dataName);
+        $this->mobile = '13000000001';
     }
 
     /**
      * 获取 token
      *
+     * @param  string  $username
+     * @param  string  $password
      * @return mixed|string
      */
-    protected function getToken()
+    protected function getToken(string $username = 'user123', string $password = 'user123'): string
     {
-        $response = $this->post('wechat/auth/login', ['username' => $this->username, 'password' => $this->password]);
+        $response = $this->post('wechat/auth/login', compact('username', 'password'));
 
         return $response->getOriginalContent()['data']['token'] ?? '';
     }
@@ -38,8 +37,8 @@ abstract class TestCase extends BaseTestCase
      *
      * @return array string[]
      */
-    protected function getAuthHeader(): array
+    protected function getAuthHeader(string $username = 'user123', string $password = 'user123'): array
     {
-        return ['Authorization' => 'Bearer '.$this->getToken()];
+        return ['Authorization' => 'Bearer '.$this->getToken($username, $password)];
     }
 }

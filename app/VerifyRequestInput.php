@@ -19,11 +19,11 @@ trait VerifyRequestInput
      *
      * @param  string  $key
      * @param  null  $default
-     * @return mixed
+     * @return int|null
      *
      * @throws BusinessException
      */
-    public function verifyId(string $key, $default = null)
+    public function verifyId(string $key, $default = null): ?int
     {
         return $this->verifyData($key, $default, 'integer|digits_between:1,20|min:1', 'intval');
     }
@@ -33,11 +33,11 @@ trait VerifyRequestInput
      *
      * @param  string  $key
      * @param  null  $default
-     * @return mixed|null
+     * @return int|null
      *
      * @throws BusinessException
      */
-    public function verifyInteger(string $key, $default = null)
+    public function verifyInteger(string $key, $default = null): ?int
     {
         return $this->verifyData($key, $default, 'integer', 'intval');
     }
@@ -47,11 +47,11 @@ trait VerifyRequestInput
      *
      * @param  string  $key
      * @param  null  $default
-     * @return mixed|null
+     * @return int|null
      *
      * @throws BusinessException
      */
-    public function verifyPositiveInteger(string $key, $default = null)
+    public function verifyPositiveInteger(string $key, $default = null): ?int
     {
         return $this->verifyData($key, $default, 'integer|min:1', 'intval');
     }
@@ -61,11 +61,11 @@ trait VerifyRequestInput
      *
      * @param  string  $key
      * @param  null  $default
-     * @return mixed|null
+     * @return string|null
      *
      * @throws BusinessException
      */
-    public function verifyString(string $key, $default = null)
+    public function verifyString(string $key, $default = null): ?string
     {
         return $this->verifyData($key, $default, 'string');
     }
@@ -75,11 +75,11 @@ trait VerifyRequestInput
      *
      * @param  string  $key
      * @param  null  $default
-     * @return mixed|null
+     * @return int|null
      *
      * @throws BusinessException
      */
-    public function verifyBoolean(string $key, $default = null)
+    public function verifyBoolean(string $key, $default = null): ?int
     {
         return $this->verifyData($key, $default, 'boolean', 'intval');
     }
@@ -114,15 +114,17 @@ trait VerifyRequestInput
     }
 
     /**
+     * 执行验证，成功返回被验证的值，失败抛出异常
+     *
      * @param  string  $key
-     * @param $default
+     * @param  int|string|array|mixed  $default
      * @param  string|array  $rules
      * @param  string|null  $handler
      * @return mixed|null
      *
      * @throws BusinessException
      */
-    public function verifyData(string $key, $default, $rules, ?string $handler = null)
+    protected function verifyData(string $key, $default, $rules, ?string $handler = null)
     {
         $value = request()->input($key, $default);
 

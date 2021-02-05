@@ -15,11 +15,6 @@ class AddressTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     public function testList()
     {
         $response = $this->get('wechat/address/list', $this->getAuthHeader());
@@ -34,6 +29,10 @@ class AddressTest extends TestCase
         $response = $this->post('wechat/address/delete', ['id' => $address->id], $this->getAuthHeader());
         $response->assertJson(['errno' => 0]);
         $address = Address::query()->find($address->id);
-        self::assertEmpty($address);
+        self::assertNull($address);
+        $response = $this->post('wechat/address/delete', ['id' => 0], $this->getAuthHeader());
+        $response->assertJson(['errno' => 400, 'errmsg' => '参数验证错误']);
+        $response = $this->post('wechat/address/delete', [], $this->getAuthHeader());
+        $response->assertJson(['errno' => 400, 'errmsg' => '参数验证错误']);
     }
 }

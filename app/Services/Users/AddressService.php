@@ -9,9 +9,12 @@ declare(strict_types=1);
 
 namespace App\Services\Users;
 
+use App\Exceptions\BusinessException;
 use App\Models\Users\Address;
 use App\Services\BaseService;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class AddressService extends BaseService
 {
@@ -28,7 +31,14 @@ class AddressService extends BaseService
             ->get();
     }
 
-    public function getAddress($userId, $addressId)
+    /**
+     * 根据 id 获取地址信息
+     *
+     * @param $userId
+     * @param $addressId
+     * @return Address|Model|null
+     */
+    public function getAddress(int $userId, int $addressId)
     {
         return Address::query()
             ->where('user_id', $userId)
@@ -36,7 +46,17 @@ class AddressService extends BaseService
             ->first();
     }
 
-    public function delete($userId, $addressId)
+    /**
+     * 根据 id 删除地址信息
+     *
+     * @param $userId
+     * @param $addressId
+     * @return bool|null
+     *
+     * @throws BusinessException
+     * @throws Exception
+     */
+    public function delete(int $userId,int $addressId): ?bool
     {
         $address = $this->getAddress($userId, $addressId);
 

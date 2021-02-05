@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Wechat;
 
-use App\CodeResponse;
+use App\Exceptions\BusinessException;
 use App\Services\Users\AddressService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class AddressController extends BaseController
 {
@@ -16,9 +15,9 @@ class AddressController extends BaseController
      */
     public function list(): JsonResponse
     {
-        $list = AddressService::getInstance()->getListByUserId($this->user()->id);
-
-        return $this->successPaginate($list);
+        return $this->successPaginate(
+            AddressService::getInstance()->getListByUserId($this->user()->id)
+        );
     }
 
     public function detail()
@@ -34,16 +33,16 @@ class AddressController extends BaseController
     /**
      * 删除地址
      *
-     * @param  Request  $request
      * @return JsonResponse
+     *
+     * @throws BusinessException
      */
-    public function delete(Request $request): JsonResponse
+    public function delete(): JsonResponse
     {
-        $id = $request->input('id');
-        if (empty($id) || !is_numeric($id)) {
-            $this->fail(CodeResponse::INVALID_PARAM);
-        }
-        AddressService::getInstance()->delete($this->user()->id, $id);
+        AddressService::getInstance()->delete(
+            $this->user()->id,
+            $this->verifyId('id', 0)
+        );
 
         return $this->success();
     }
