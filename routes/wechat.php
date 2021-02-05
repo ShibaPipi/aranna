@@ -50,7 +50,7 @@ Route::prefix('coupon')->group(function () {
 });
 
 Route::prefix('groupon')->group(function () {
-    Route::get('test', 'GrouponController@test'); // 团购图片测试
+//    Route::get('test', 'GrouponController@test'); // 团购图片测试
     Route::get('list', 'GrouponController@list'); // 团购列表
 });
 
@@ -58,15 +58,18 @@ Route::prefix('home')->name('home.')->group(function () {
     Route::get('shareUrl', 'HomeController@redirectShareUrl')->name('redirectShareUrl');
 });
 
+Route::prefix('cart')->group(function () {
+    Route::post('index', 'CartController@index'); //获取购物车的数据
+    Route::post('add', 'CartController@add');
+    Route::post('fastAdd', 'CartController@fastAdd');
+    Route::post('update', 'CartController@update');
+    Route::post('delete', 'CartController@delete');
+    Route::post('checked', 'CartController@checked');
+    Route::get('goods_count', 'CartController@goodsCount');
+    Route::post('checkout', 'CartController@checkout');
+});
+
 //Route::any('home/index', ''); //首页数据接口
-//Route::any('cart/index', ''); //获取购物车的数据
-//Route::any('cart/add', ''); //
-//Route::any('cart/fastadd', ''); //
-//Route::any('cart/update', ''); //
-//Route::any('cart/delete', ''); //
-//Route::any('cart/checked', ''); //
-//Route::any('cart/goodscount', ''); //
-//Route::any('cart/checkout', ''); //
 //Route::any('collect/list', ''); //收藏列表
 //Route::any('collect/addordelete', ''); //添加或取消收藏
 //Route::any('topic/list', ''); //专题列表

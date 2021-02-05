@@ -14,15 +14,10 @@ class GrouponTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     public function testList()
     {
         $response = $this->get('wechat/groupon/list');
-
+//        dd($response->getOriginalContent());
         self::assertEquals(0, $response['errno']);
         self::assertCount(1, $response['data']['list']);
     }

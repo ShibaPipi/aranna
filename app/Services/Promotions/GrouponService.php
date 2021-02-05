@@ -42,7 +42,7 @@ class GrouponService extends BaseService
             return;
         }
 
-        $rule = $this->getRulesById($groupon->rules_id);
+        $rule = $this->getRuleByRuleId($groupon->rules_id);
         if (0 == $groupon->groupon_id) {
             $groupon->share_url = $this->createShareImage($rule);
         }
@@ -124,7 +124,7 @@ class GrouponService extends BaseService
      * @param  int|null  $linkId
      * @return int|null 开团 id
      */
-    public function openOrJoin(int $userId, int $orderId, int $ruleId, int $linkId = null)
+    public function openOrJoin(int $userId, int $orderId, int $ruleId, int $linkId = null): ?int
     {
         if (is_null($ruleId) || $ruleId <= 0) {
             return null;
@@ -165,7 +165,7 @@ class GrouponService extends BaseService
     }
 
     /**
-     * 校验用户是否可以参与活着开始某个团购活动
+     * 校验用户是否可以参与或者开始某个团购活动
      *
      * @param  int  $userId
      * @param  int  $ruleId
@@ -180,7 +180,7 @@ class GrouponService extends BaseService
             return;
         }
 
-        if (is_null($rule = $this->getRulesById($ruleId))) {
+        if (is_null($rule = $this->getRuleByRuleId($ruleId))) {
             $this->throwBusinessException();
         }
 
@@ -192,7 +192,7 @@ class GrouponService extends BaseService
             $this->throwBusinessException(CodeResponse::GROUPON_OFFLINE);
         }
 
-        if (is_null($linkId) || $linkId <= 0) {
+        if ($linkId <= 0) {
             return;
         }
 
@@ -239,13 +239,13 @@ class GrouponService extends BaseService
     }
 
     /**
-     * 根据 id 获取团购规则
+     * 根据规则 id 获取团购规则
      *
      * @param  int  $id
      * @param  array|string[]  $columns
      * @return GrouponRule|Model|null
      */
-    public function getRulesById(int $id, array $columns = ['*'])
+    public function getRuleByRuleId(int $id, array $columns = ['*'])
     {
         return GrouponRule::query()->find($id, $columns);
     }

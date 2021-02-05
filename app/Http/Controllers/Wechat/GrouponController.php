@@ -16,7 +16,7 @@ class GrouponController extends BaseController
 
     public function test()
     {
-        $rule = GrouponService::getInstance()->getRulesById(1);
+        $rule = GrouponService::getInstance()->getRuleByRuleId(1);
 
         return response(GrouponService::getInstance()->createShareImage($rule));
     }
