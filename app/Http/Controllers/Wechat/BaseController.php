@@ -7,6 +7,7 @@ use App\CodeResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Users\User;
 use App\VerifyRequestInput;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
@@ -38,9 +39,9 @@ class BaseController extends Controller
     }
 
     /**
-     * 获取正在当前的用户
+     * 获取当前正在登录的用户
      *
-     * @return User|null
+     * @return Authenticatable|User|null
      */
     public function user()
     {
@@ -138,6 +139,7 @@ class BaseController extends Controller
      * 成功返回结果
      *
      * @param  array|null  $data
+     * @param  string  $info
      * @return JsonResponse
      */
     protected function success(array $data = null, string $info = ''): JsonResponse

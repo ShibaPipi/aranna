@@ -14,10 +14,35 @@ use App\Models\Users\Address;
 use App\Services\BaseService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 
 class AddressService extends BaseService
 {
+    /**
+     * 获取地址，若不传地址 id 则获取用户默认地址
+     *
+     * @param  int  $userId
+     * @param  int|null  $id
+     * @return Address|null
+     */
+    public function getInfoOrDefault(int $userId, int $id = null): ?Address
+    {
+        return $id ? $this->getInfoById($userId, $id) : $this->getDefault($userId);
+    }
+
+    /**
+     * 获取默认地址
+     *
+     * @param  int  $userId
+     * @return Address|null
+     */
+    public function getDefault(int $userId): ?Address
+    {
+        return Address::query()
+            ->whereUserId($userId)
+            ->whereIsDefault(1)
+            ->first();
+    }
+
     /**
      * 获取地址列表
      *
@@ -32,21 +57,6 @@ class AddressService extends BaseService
     }
 
     /**
-     * 根据 id 获取地址信息
-     *
-     * @param $userId
-     * @param $addressId
-     * @return Address|Model|null
-     */
-    public function getAddress(int $userId, int $addressId)
-    {
-        return Address::query()
-            ->where('user_id', $userId)
-            ->where('id', $addressId)
-            ->first();
-    }
-
-    /**
      * 根据 id 删除地址信息
      *
      * @param $userId
@@ -56,12 +66,27 @@ class AddressService extends BaseService
      * @throws BusinessException
      * @throws Exception
      */
-    public function delete(int $userId,int $addressId): ?bool
+    public function delete(int $userId, int $addressId): ?bool
     {
-        $address = $this->getAddress($userId, $addressId);
-
-        is_null($address) && $this->throwBusinessException();
+        if (is_null($address = $this->getInfoById($userId, $addressId))) {
+            $this->throwBusinessException();
+        }
 
         return $address->delete();
+    }
+
+    /**
+     * 根据 id 获取地址信息
+     *
+     * @param $userId
+     * @param $addressId
+     * @return Address|null
+     */
+    public function getInfoById(int $userId, int $addressId): ?Address
+    {
+        return Address::query()
+            ->where('user_id', $userId)
+            ->where('id', $addressId)
+            ->first();
     }
 }
