@@ -19,7 +19,6 @@ use App\Models\Promotions\GrouponRule;
 use App\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\AbstractFont;
@@ -38,11 +37,11 @@ class GrouponService extends BaseService
      */
     public function handlePaymentSucceed(int $orderId): void
     {
-        if (is_null($groupon = $this->getInfoByOrderId($orderId))) {
+        if (is_null($groupon = $this->getGrouponByOrderId($orderId))) {
             return;
         }
 
-        $rule = $this->getRuleByRuleId($groupon->rules_id);
+        $rule = $this->getGrouponRuleItsId($groupon->rules_id);
         if (0 == $groupon->groupon_id) {
             $groupon->share_url = $this->createShareImage($rule);
         }
@@ -108,9 +107,9 @@ class GrouponService extends BaseService
      * 根据订单 id 获取团购信息
      *
      * @param  int  $orderId
-     * @return Groupon|Model|null
+     * @return Groupon|null
      */
-    public function getInfoByOrderId(int $orderId)
+    public function getGrouponByOrderId(int $orderId): ?Groupon
     {
         return Groupon::query()->whereOrderId($orderId)->first();
     }
@@ -124,7 +123,7 @@ class GrouponService extends BaseService
      * @param  int|null  $linkId
      * @return int|null 开团 id
      */
-    public function openOrJoin(int $userId, int $orderId, int $ruleId, int $linkId = null): ?int
+    public function openOrJoinGroupon(int $userId, int $orderId, int $ruleId, int $linkId = null): ?int
     {
         if (is_null($ruleId) || $ruleId <= 0) {
             return null;
@@ -145,7 +144,7 @@ class GrouponService extends BaseService
             return $groupon->id;
         }
 
-        $openGroupon = $this->getInfo($linkId);
+        $openGroupon = $this->getGroupon($linkId);
         $groupon->creator_user_id = $openGroupon->creator_user_id;
         $groupon->groupon_id = $linkId;
         $groupon->share_url = $openGroupon->share_url;
@@ -157,9 +156,9 @@ class GrouponService extends BaseService
     /**
      * @param  int  $id
      * @param  array|string[]  $columns
-     * @return Groupon|Model|null
+     * @return Groupon|null
      */
-    public function getInfo(int $id, array $columns = ['*'])
+    public function getGroupon(int $id, array $columns = ['*']): ?Groupon
     {
         return Groupon::query()->find($id, $columns);
     }
@@ -174,13 +173,13 @@ class GrouponService extends BaseService
      *
      * @throws BusinessException
      */
-    public function checkValid(int $userId, int $ruleId, int $linkId = null): void
+    public function checkValidToOpenOrJoin(int $userId, int $ruleId, int $linkId = null): void
     {
         if (is_null($linkId) || $ruleId <= 0) {
             return;
         }
 
-        if (is_null($rule = $this->getRuleByRuleId($ruleId))) {
+        if (is_null($rule = $this->getGrouponRuleItsId($ruleId))) {
             $this->throwBusinessException();
         }
 
@@ -243,9 +242,9 @@ class GrouponService extends BaseService
      *
      * @param  int|null  $id
      * @param  array|string[]  $columns
-     * @return GrouponRule|Model|null
+     * @return GrouponRule|null
      */
-    public function getRuleByRuleId(?int $id, array $columns = ['*'])
+    public function getGrouponRuleItsId(?int $id, array $columns = ['*']): ?GrouponRule
     {
         return GrouponRule::query()->find($id, $columns);
     }
@@ -257,8 +256,7 @@ class GrouponService extends BaseService
      * @param  string[]  $columns
      * @return LengthAwarePaginator
      */
-
-    public function getRules(PageInput $input, array $columns = ['*']): LengthAwarePaginator
+    public function getGrouponRules(PageInput $input, array $columns = ['*']): LengthAwarePaginator
     {
         return GrouponRule::query()
             ->whereStatus(GrouponRuleStatus::ON)

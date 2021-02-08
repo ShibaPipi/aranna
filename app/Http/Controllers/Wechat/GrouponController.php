@@ -16,7 +16,7 @@ class GrouponController extends BaseController
 
     public function test()
     {
-        $rule = GrouponService::getInstance()->getRuleByRuleId(1);
+        $rule = GrouponService::getInstance()->getGrouponRuleItsId(1);
 
         return response(GrouponService::getInstance()->createShareImage($rule));
     }
@@ -32,7 +32,7 @@ class GrouponController extends BaseController
     {
         $pageInput = PageInput::new();
 
-        $rulesList = GrouponService::getInstance()->getRules($pageInput);
+        $rulesList = GrouponService::getInstance()->getGrouponRules($pageInput);
 
         $rules = collect($rulesList->items());
         $goodsIds = $rules->pluck('goods_id')->toArray();

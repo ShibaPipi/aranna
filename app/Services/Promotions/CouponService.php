@@ -58,7 +58,7 @@ class CouponService extends BaseService
     }
 
     /**
-     * 获取优惠力度最大的用户优惠券，并按照优惠价格从高到低排序
+     * 获取用户此订单可用的、优惠力度最大的用户优惠券，并按照优惠价格从高到低排序
      *
      * @param  int  $userId
      * @param  string  $price
@@ -107,10 +107,10 @@ class CouponService extends BaseService
      * @param  array|string[]  $columns
      * @return CouponUser|null
      */
-//    public function getCouponUserById(int $id, array $columns = ['*']): ?CouponUser
-//    {
-//        return CouponUser::query()->find($id, $columns);
-//    }
+    public function getCouponUserById(int $id, array $columns = ['*']): ?CouponUser
+    {
+        return CouponUser::query()->find($id, $columns);
+    }
 
     /**
      * 验证订单价格是否可以使用优惠券
