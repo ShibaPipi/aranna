@@ -14,11 +14,6 @@ class CategoryTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     public function testIndex()
     {
         $response = $this->get('wechat/category/index', $this->getAuthHeader());

@@ -56,4 +56,17 @@ class BaseService
     ): void {
         throw new BusinessException($codeResponse, $message);
     }
+
+    /**
+     * 抛出非法参数值异常
+     *
+     * @param  string  $message
+     * @return void
+     *
+     * @throws BusinessException
+     */
+    public function throwInvalidParamValueException(string $message = ''): void
+    {
+        $this->throwBusinessException(CodeResponse::INVALID_PARAM_VALUE, $message);
+    }
 }

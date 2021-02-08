@@ -36,7 +36,7 @@ class CouponController extends BaseController
 
         $couponUserList = collect($list->items());
         $couponIds = $couponUserList->pluck('coupon_id')->toArray();
-        $coupons = CouponService::getInstance()->getByIds($couponIds)->keyBy('id');
+        $coupons = CouponService::getInstance()->getInfoByIds($couponIds)->keyBy('id');
         $myList = $couponUserList->map(function (CouponUser $item) use ($coupons) {
             /** @var Coupon $coupon */
             $coupon = $coupons->get($item->coupon_id);

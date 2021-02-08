@@ -62,6 +62,10 @@ use Illuminate\Support\Carbon;
  */
 class Goods extends BaseModel
 {
+    protected $fillable = [
+        'is_on_sale',
+    ];
+
     protected $casts = [
         'counter_price' => 'float',
         'retail_price' => 'float',

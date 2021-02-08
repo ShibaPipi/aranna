@@ -13,7 +13,8 @@ use App\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;
-use App\Services\Promotions\GrouponService;
+use App\Services\Promotions\CouponService;
+use App\Services\SystemService;
 use App\Services\Users\AddressService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -172,7 +173,7 @@ class CartController extends BaseController
     }
 
     /**
-     * 生成预订单
+     * 生成预订单（下单前信息确认）
      *     收货地址ID：
      *         如果收货地址ID是空，则查询当前用户的默认地址。
      *     购物车商品ID：
@@ -180,26 +181,75 @@ class CartController extends BaseController
      *         如果购物车商品ID非空，则只下单当前购物车商品。
      *     优惠券ID：
      *         如果优惠券ID是空，则自动选择合适的优惠券。
+     *
+     * @return JsonResponse
+     * @throws BusinessException
      */
-    public function checkout()
+    public function checkout(): JsonResponse
     {
         $cartId = $this->verifyInteger('cartId');
         $addressId = $this->verifyInteger('addressId');
         $couponId = $this->verifyInteger('couponId');
-        $userGrouponId = $this->verifyInteger('userGrouponId');
+//        $couponUserId = $this->verifyInteger('couponUserId');
         $grouponRuleId = $this->verifyInteger('grouponRuleId');
 
-        if ($address = AddressService::getInstance()->getInfoOrDefault($this->userId(), $addressId)) {
+        if (!$checkedAddress = AddressService::getInstance()->getInfoOrDefault($this->userId(), $addressId)) {
             return $this->invalidParamValue();
         }
 
-        $cartList = $cartId
-            ? collect([CartService::getInstance()->getInfoById($this->userId(), $cartId)])
-            : CartService::getInstance()->getCheckedList($this->userId());
-        if ($cartList->isEmpty()) {
-            return $this->invalidParamValue();
+        $addressId = $checkedAddress->id ?? 0;
+
+        // 获取待下单的商品列表
+        $checkedGoodsList = CartService::getInstance()->getCheckoutList($this->userId(), $cartId);
+
+        // 获取订单总价
+        $grouponPrice = 0;
+        $goodsTotalPrice = CartService::getInstance()
+            ->getCheckoutPriceSubGroupon($checkedGoodsList, $grouponRuleId, $grouponPrice);
+
+        // 获取优惠券信息
+        $availableCouponCount = 0;
+        $couponUser = CouponService::getInstance()
+            ->getMeetest($this->userId(), $couponId, $goodsTotalPrice,$availableCouponCount);
+        if (!$couponUser) {
+            $couponId = -1;
+            $couponUserId = -1;
+            $couponPrice = '0';
+        } else {
+            $couponId = $couponUser->coupon_id ?? 0;
+            $couponUserId = $couponUser->id ?? 0;
+            $couponPrice = CouponService::getInstance()->getInfoById($couponId)->discount ?? '0';
         }
 
-        $grouponRules = GrouponService::getInstance()->getRuleByRuleId($grouponRuleId);
+        // 获取运费信息
+        $freightPrice = '0';
+        $freightMin = SystemService::getInstance()->getExpressFreightMin();
+        if (1 == bccomp($freightMin, $goodsTotalPrice)) {
+            $freightPrice = SystemService::getInstance()->getExpressFreightValue();
+        }
+
+        // 获取订单总金额：商品总金额 + 运费 - 优惠券金额
+        $orderTotalPrice = bcsub(bcadd($goodsTotalPrice, $freightPrice, 2), $couponPrice, 2);
+        $actualPrice = $orderTotalPrice;
+
+        $checkedAddress = $checkedAddress->toArray();
+        $checkedGoodsList = $checkedGoodsList->toArray();
+
+        return $this->success(compact(
+            'addressId',
+            'couponId',
+            'couponUserId',
+            'cartId',
+            'grouponRuleId',
+            'grouponPrice',
+            'checkedAddress',
+            'availableCouponCount',
+            'goodsTotalPrice',
+            'freightPrice',
+            'couponPrice',
+            'orderTotalPrice',
+            'actualPrice',
+            'checkedGoodsList'
+        ));
     }
 }

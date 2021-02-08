@@ -14,11 +14,6 @@ class BrandTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     public function testDetail()
     {
         $response = $this->get('wechat/brand/detail');

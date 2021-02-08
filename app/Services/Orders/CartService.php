@@ -16,13 +16,67 @@ use App\Models\Goods\GoodsProduct;
 use App\Models\Orders\Cart;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
+use App\Services\Promotions\GrouponService;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class CartService extends BaseService
 {
+    /**
+     * 获取待下单的商品总价（减去团购价格的）
+     *
+     * @param  Collection  $checkedGoodsList
+     * @param  int|null  $grouponRuleId
+     * @param $grouponPrice
+     * @return string
+     */
+    public function getCheckoutPriceSubGroupon(
+        Collection $checkedGoodsList,
+        ?int $grouponRuleId,
+        &$grouponPrice
+    ): string {
+        $grouponRule = GrouponService::getInstance()->getRuleByRuleId($grouponRuleId);
+        $goodsTotalPrice = '0';
+
+        /** @var Cart $cart */
+        foreach ($checkedGoodsList as $cart) {
+            if ($grouponRule && $grouponRule->goods_id == $cart->goods_id) {
+                $grouponPrice = bcmul($grouponRule->discount, strval($cart->number), 2);
+                $price = bcsub($cart->price, $grouponRule->discount, 2);
+            } else {
+                $price = $cart->price;
+            }
+            $price = bcmul($price, strval($cart->number), 2);
+            $goodsTotalPrice = bcadd($goodsTotalPrice, $price, 2);
+        }
+
+        return $goodsTotalPrice;
+    }
+
+    /**
+     * 获取待下单的商品列表
+     *     如果传入 cartId，则为立即购买
+     *     否则，获取已选择的购物车商品列表
+     *
+     * @param  int  $userId
+     * @param  int|null  $cartId
+     * @return Cart[]|Collection
+     *
+     * @throws BusinessException
+     */
+    public function getCheckoutList(int $userId, int $cartId = null): Collection
+    {
+        $checkedGoodsList = $cartId
+            ? collect([CartService::getInstance()->getInfoById($userId, $cartId)])
+            : CartService::getInstance()->getCheckedList($userId);
+
+        if ($checkedGoodsList->isEmpty()) {
+            $this->throwInvalidParamValueException();
+        }
+
+        return $checkedGoodsList;
+    }
+
     /**
      * 更新商品勾选状态
      *
@@ -45,7 +99,7 @@ class CartService extends BaseService
      * @param  int  $userId
      * @return Cart[]|Collection
      */
-    public function getCheckedList(int $userId)
+    public function getCheckedList(int $userId): Collection
     {
         return Cart::query()
             ->whereUserId($userId)
@@ -61,7 +115,7 @@ class CartService extends BaseService
      *
      * @throws Exception
      */
-    public function getValidList(int $userId)
+    public function getValidList(int $userId): Collection
     {
         $invalidCartIds = [];
         $list = $this->getList($userId);
@@ -92,9 +146,9 @@ class CartService extends BaseService
      * 获取购物车列表
      *
      * @param  int  $userId
-     * @return Cart[]|Builder[]|Collection
+     * @return Cart[]|Collection
      */
-    public function getList(int $userId)
+    public function getList(int $userId): Collection
     {
         return Cart::query()
             ->whereUserId($userId)
@@ -143,9 +197,9 @@ class CartService extends BaseService
      * @param  int  $userId
      * @param  int  $id
      * @param  array|string[]  $columns
-     * @return Cart|Model|null
+     * @return Cart|null
      */
-    public function getInfoById(int $userId, int $id, array $columns = ['*'])
+    public function getInfoById(int $userId, int $id, array $columns = ['*']): ?Cart
     {
         return Cart::query()->whereUserId($userId)->find($id, $columns);
     }
@@ -269,9 +323,9 @@ class CartService extends BaseService
      * @param  int  $userId
      * @param  int  $goodsId
      * @param  int  $productId
-     * @return Cart|Model|null
+     * @return Cart|null
      */
-    public function getInfoByProductId(int $userId, int $goodsId, int $productId)
+    public function getInfoByProductId(int $userId, int $goodsId, int $productId): ?Cart
     {
         return Cart::query()
             ->whereUserId($userId)

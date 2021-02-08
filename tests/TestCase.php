@@ -3,11 +3,17 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Models\Users\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
+
+    /**
+     * @var User $user
+     */
+    protected $user;
 
     protected $mobile;
 
@@ -15,6 +21,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        $this->user = factory(User::class)->create();
         $this->mobile = '13000000001';
     }
 

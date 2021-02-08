@@ -23,10 +23,18 @@ class AddressService extends BaseService
      * @param  int  $userId
      * @param  int|null  $id
      * @return Address|null
+     *
+     * @throws BusinessException
      */
     public function getInfoOrDefault(int $userId, int $id = null): ?Address
     {
-        return $id ? $this->getInfoById($userId, $id) : $this->getDefault($userId);
+        $address = $id ? $this->getInfoById($userId, $id) : $this->getDefault($userId);
+
+        if (!$address) {
+            $this->throwInvalidParamValueException();
+        }
+
+        return $address;
     }
 
     /**
@@ -37,6 +45,10 @@ class AddressService extends BaseService
      */
     public function getDefault(int $userId): ?Address
     {
+//        dd(Address::query()
+//            ->whereUserId($userId)
+//            ->whereIsDefault(1)
+//            ->first());
         return Address::query()
             ->whereUserId($userId)
             ->whereIsDefault(1)

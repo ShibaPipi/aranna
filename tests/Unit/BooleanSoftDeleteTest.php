@@ -10,7 +10,6 @@ class BooleanSoftDeleteTest extends TestCase
 {
     use DatabaseTransactions;
 
-
     public $goodsId;
 
     protected function setUp(): void

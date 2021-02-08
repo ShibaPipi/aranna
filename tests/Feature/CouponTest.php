@@ -14,11 +14,6 @@ class CouponTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     public function testList()
     {
         $response = $this->get('wechat/coupon/list');

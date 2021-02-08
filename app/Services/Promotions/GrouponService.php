@@ -241,11 +241,11 @@ class GrouponService extends BaseService
     /**
      * 根据规则 id 获取团购规则
      *
-     * @param  int  $id
+     * @param  int|null  $id
      * @param  array|string[]  $columns
      * @return GrouponRule|Model|null
      */
-    public function getRuleByRuleId(int $id, array $columns = ['*'])
+    public function getRuleByRuleId(?int $id, array $columns = ['*'])
     {
         return GrouponRule::query()->find($id, $columns);
     }

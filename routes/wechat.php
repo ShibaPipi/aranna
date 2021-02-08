@@ -66,7 +66,7 @@ Route::prefix('cart')->group(function () {
     Route::post('delete', 'CartController@delete');
     Route::post('checked', 'CartController@checked');
     Route::get('goods_count', 'CartController@goodsCount');
-    Route::post('checkout', 'CartController@checkout');
+    Route::get('checkout', 'CartController@checkout');
 });
 
 //Route::any('home/index', ''); //首页数据接口

@@ -20,11 +20,6 @@ class CartTest extends TestCase
     use DatabaseTransactions;
 
     /**
-     * @var User
-     */
-    private $user;
-
-    /**
      * @var GoodsProduct
      */
     private $product;
@@ -35,7 +30,6 @@ class CartTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
         $this->product = factory(GoodsProduct::class)->create(
             ['number' => 10]);
         $this->authHeader = $this->getAuthHeader($this->user->username, '123456');
@@ -255,5 +249,12 @@ class CartTest extends TestCase
         $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertNull($cart);
+    }
+
+    public function testCheckout()
+    {
+        $this->authHeader = $this->getAuthHeader();
+        $response = $this->get('wechat/cart/checkout', $this->authHeader);
+        dd($response->getOriginalContent());
     }
 }
