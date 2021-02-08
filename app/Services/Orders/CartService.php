@@ -23,22 +23,43 @@ use Illuminate\Support\Collection;
 class CartService extends BaseService
 {
     /**
+     * 删除购物车商品
+     *
+     * @param  int  $userId
+     * @param  int|null  $cartId
+     * @return bool|mixed|null
+     *
+     * @throws Exception
+     */
+    public function clearCartGoods(int $userId, int $cartId = null)
+    {
+        return empty($cartId)
+            ? Cart::query()
+                ->whereUserId($userId)
+                ->whereChecked(1)
+                ->delete()
+            : Cart::query()
+                ->whereUserId($userId)
+                ->find($cartId)
+                ->delete();
+    }
+
+    /**
      * 获取待下单的商品总价（减去团购价格的）
      *
-     * @param  Collection  $checkedGoodsList
+     * @param  Cart[]|Collection  $checkedGoodsList
      * @param  int|null  $grouponRuleId
      * @param $grouponPrice
      * @return string
      */
-    public function getCheckoutPriceSubGroupon(
+    public function getCheckoutCartPriceSubGroupon(
         Collection $checkedGoodsList,
         ?int $grouponRuleId,
         &$grouponPrice
     ): string {
-        $grouponRule = GrouponService::getInstance()->getRuleByRuleId($grouponRuleId);
+        $grouponRule = GrouponService::getInstance()->getGrouponRuleItsId($grouponRuleId);
         $goodsTotalPrice = '0';
 
-        /** @var Cart $cart */
         foreach ($checkedGoodsList as $cart) {
             if ($grouponRule && $grouponRule->goods_id == $cart->goods_id) {
                 $grouponPrice = bcmul($grouponRule->discount, strval($cart->number), 2);
@@ -64,11 +85,11 @@ class CartService extends BaseService
      *
      * @throws BusinessException
      */
-    public function getCheckoutList(int $userId, int $cartId = null): Collection
+    public function getCheckoutGoodsList(int $userId, int $cartId = null): Collection
     {
         $checkedGoodsList = $cartId
-            ? collect([CartService::getInstance()->getInfoById($userId, $cartId)])
-            : CartService::getInstance()->getCheckedList($userId);
+            ? collect([CartService::getInstance()->getCartById($userId, $cartId)])
+            : CartService::getInstance()->getCheckedCartList($userId);
 
         if ($checkedGoodsList->isEmpty()) {
             $this->throwInvalidParamValueException();
@@ -99,7 +120,7 @@ class CartService extends BaseService
      * @param  int  $userId
      * @return Cart[]|Collection
      */
-    public function getCheckedList(int $userId): Collection
+    public function getCheckedCartList(int $userId): Collection
     {
         return Cart::query()
             ->whereUserId($userId)
@@ -115,10 +136,10 @@ class CartService extends BaseService
      *
      * @throws Exception
      */
-    public function getValidList(int $userId): Collection
+    public function getValidCartList(int $userId): Collection
     {
         $invalidCartIds = [];
-        $list = $this->getList($userId);
+        $list = $this->getCartList($userId);
 
         $goodsList = GoodsService::getInstance()->getListByIds(
             $list->pluck('goods_id')->toArray()
@@ -137,7 +158,7 @@ class CartService extends BaseService
         });
 
         // TODO: 让用户自行删除购物车商品，更符合产品层的用户体验
-        $this->listDelete($invalidCartIds);
+        $this->deleteCartByIds($invalidCartIds);
 
         return $list;
     }
@@ -148,7 +169,7 @@ class CartService extends BaseService
      * @param  int  $userId
      * @return Cart[]|Collection
      */
-    public function getList(int $userId): Collection
+    public function getCartList(int $userId): Collection
     {
         return Cart::query()
             ->whereUserId($userId)
@@ -163,7 +184,7 @@ class CartService extends BaseService
      *
      * @throws Exception
      */
-    public function listDelete(array $ids)
+    public function deleteCartByIds(array $ids)
     {
         if (empty($ids)) {
             return 0;
@@ -183,7 +204,7 @@ class CartService extends BaseService
      *
      * @throws Exception
      */
-    public function delete(int $userId, array $productIds)
+    public function deleteCart(int $userId, array $productIds)
     {
         return Cart::query()
             ->whereUserId($userId)
@@ -199,7 +220,7 @@ class CartService extends BaseService
      * @param  array|string[]  $columns
      * @return Cart|null
      */
-    public function getInfoById(int $userId, int $id, array $columns = ['*']): ?Cart
+    public function getCartById(int $userId, int $id, array $columns = ['*']): ?Cart
     {
         return Cart::query()->whereUserId($userId)->find($id, $columns);
     }
@@ -210,7 +231,7 @@ class CartService extends BaseService
      * @param  int  $userId
      * @return mixed
      */
-    public function countProducts(int $userId)
+    public function countCartProducts(int $userId)
     {
         return Cart::query()
             ->whereUserId($userId)
@@ -232,8 +253,8 @@ class CartService extends BaseService
     {
         [$goods, $product] = $this->getGoodsAndProduct($goodsId, $productId);
 
-        if (is_null($cart = $this->getInfoByProductId($userId, $goodsId, $productId))) {
-            return $this->newRecord($userId, $goods, $product, $number);
+        if (is_null($cart = $this->getCartByProductId($userId, $goodsId, $productId))) {
+            return $this->newCartRecord($userId, $goods, $product, $number);
         }
 
         return $this->edit($cart, $product, $number);
@@ -254,8 +275,8 @@ class CartService extends BaseService
     {
         [$goods, $product] = $this->getGoodsAndProduct($goodsId, $productId);
 
-        if (is_null($cart = $this->getInfoByProductId($userId, $goodsId, $productId))) {
-            return $this->newRecord($userId, $goods, $product, $number);
+        if (is_null($cart = $this->getCartByProductId($userId, $goodsId, $productId))) {
+            return $this->newCartRecord($userId, $goods, $product, $number);
         }
 
         $number += $cart->number;
@@ -295,7 +316,7 @@ class CartService extends BaseService
      *
      * @throws BusinessException
      */
-    public function newRecord(int $userId, Goods $goods, GoodsProduct $product, int $number): Cart
+    public function newCartRecord(int $userId, Goods $goods, GoodsProduct $product, int $number): Cart
     {
         if ($number > $product->number) {
             $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
@@ -325,7 +346,7 @@ class CartService extends BaseService
      * @param  int  $productId
      * @return Cart|null
      */
-    public function getInfoByProductId(int $userId, int $goodsId, int $productId): ?Cart
+    public function getCartByProductId(int $userId, int $goodsId, int $productId): ?Cart
     {
         return Cart::query()
             ->whereUserId($userId)

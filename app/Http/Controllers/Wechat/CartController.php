@@ -13,6 +13,7 @@ use App\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;
+use App\Services\Orders\OrderService;
 use App\Services\Promotions\CouponService;
 use App\Services\SystemService;
 use App\Services\Users\AddressService;
@@ -28,7 +29,7 @@ class CartController extends BaseController
      */
     public function index(): JsonResponse
     {
-        $list = CartService::getInstance()->getValidList($this->userId());
+        $list = CartService::getInstance()->getValidCartList($this->userId());
 
         // PHP bcmath 库函数需要传入字符串，由于开启严格模式，因此初始值赋予 '0'
         $goodsCount = 0;
@@ -67,7 +68,7 @@ class CartController extends BaseController
         $productId = $this->verifyId('productId', 0);
         $number = $this->verifyPositiveInteger('number');
 
-        if (is_null($cart = CartService::getInstance()->getInfoById($this->userId(), $id))) {
+        if (is_null($cart = CartService::getInstance()->getCartById($this->userId(), $id))) {
             return $this->invalidParamValue();
         }
 
@@ -98,7 +99,7 @@ class CartController extends BaseController
     {
         $productIds = $this->verifyNotEmptyArray('productIds', []);
 
-        CartService::getInstance()->delete($this->userId(), $productIds);
+        CartService::getInstance()->deleteCart($this->userId(), $productIds);
 
         return $this->index();
     }
@@ -130,7 +131,7 @@ class CartController extends BaseController
     public function goodsCount(): JsonResponse
     {
         return $this->success(
-            CartService::getInstance()->countProducts($this->userId())
+            CartService::getInstance()->countCartProducts($this->userId())
         );
     }
 
@@ -168,7 +169,7 @@ class CartController extends BaseController
         CartService::getInstance()->add($this->userId(), $goodsId, $productId, $number);
 
         return $this->success(
-            (array) CartService::getInstance()->countProducts($this->userId())
+            (array) CartService::getInstance()->countCartProducts($this->userId())
         );
     }
 
@@ -200,21 +201,21 @@ class CartController extends BaseController
         $addressId = $checkedAddress->id ?? 0;
 
         // 获取待下单的商品列表
-        $checkedGoodsList = CartService::getInstance()->getCheckoutList($this->userId(), $cartId);
+        $checkedGoodsList = CartService::getInstance()->getCheckoutGoodsList($this->userId(), $cartId);
 
         // 获取订单总价
         $grouponPrice = 0;
         $goodsTotalPrice = CartService::getInstance()
-            ->getCheckoutPriceSubGroupon($checkedGoodsList, $grouponRuleId, $grouponPrice);
+            ->getCheckoutCartPriceSubGroupon($checkedGoodsList, $grouponRuleId, $grouponPrice);
 
         // 获取优惠券信息
         $availableCouponCount = 0;
+        $couponPrice = '0';
         $couponUser = CouponService::getInstance()
             ->getMeetest($this->userId(), $couponId, $goodsTotalPrice,$availableCouponCount);
         if (!$couponUser) {
             $couponId = -1;
             $couponUserId = -1;
-            $couponPrice = '0';
         } else {
             $couponId = $couponUser->coupon_id ?? 0;
             $couponUserId = $couponUser->id ?? 0;
@@ -222,11 +223,7 @@ class CartController extends BaseController
         }
 
         // 获取运费信息
-        $freightPrice = '0';
-        $freightMin = SystemService::getInstance()->getExpressFreightMin();
-        if (1 == bccomp($freightMin, $goodsTotalPrice)) {
-            $freightPrice = SystemService::getInstance()->getExpressFreightValue();
-        }
+        $freightPrice = OrderService::getInstance()->getFreight($goodsTotalPrice);
 
         // 获取订单总金额：商品总金额 + 运费 - 优惠券金额
         $orderTotalPrice = bcsub(bcadd($goodsTotalPrice, $freightPrice, 2), $couponPrice, 2);

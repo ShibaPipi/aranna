@@ -60,7 +60,7 @@ class CartTest extends TestCase
             'data' => ['5']
         ]);
 
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertEquals(5, $cart->number);
     }
@@ -84,7 +84,7 @@ class CartTest extends TestCase
             'productId' => $this->product->id,
             'number' => 5
         ], $this->authHeader);
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertEquals($cart->id, $response['data'][0]);
         self::assertEquals(5, $cart->number);
@@ -103,7 +103,7 @@ class CartTest extends TestCase
             'data' => ['3']
         ]);
 
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         $response = $this->post('wechat/cart/update', [
             'id' => $cart->id,
@@ -142,14 +142,14 @@ class CartTest extends TestCase
             'errmsg' => '成功',
             'data' => ['3']
         ]);
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertNotNull($cart);
 
         $this->post('wechat/cart/delete', [
             'productIds' => [$this->product->id,],
         ], $this->authHeader);
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertNull($cart);
 
@@ -172,7 +172,7 @@ class CartTest extends TestCase
             'data' => ['3']
         ]);
 
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertTrue($cart->checked);
 
@@ -180,7 +180,7 @@ class CartTest extends TestCase
             'productIds' => [$this->product->id,],
             'checked' => 0
         ], $this->authHeader);
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertFalse($cart->checked);
 
@@ -188,7 +188,7 @@ class CartTest extends TestCase
             'productIds' => [$this->product->id,],
             'checked' => 1
         ], $this->authHeader);
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertTrue($cart->checked);
 
@@ -246,7 +246,7 @@ class CartTest extends TestCase
                 ]
             ]
         ]);
-        $cart = CartService::getInstance()->getInfoByProductId($this->user->id, $this->product->goods_id,
+        $cart = CartService::getInstance()->getCartByProductId($this->user->id, $this->product->goods_id,
             $this->product->id);
         self::assertNull($cart);
     }

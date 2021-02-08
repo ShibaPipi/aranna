@@ -23,7 +23,7 @@ class CartTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testGetCheckoutPriceSubGrouponSimple()
+    public function testgetCheckoutCartPriceSubGrouponSimple()
     {
         /** @var GoodsProduct $product1 */
         $product1 = factory(GoodsProduct::class)->create(['number' => 10, 'price' => 11.3]);
@@ -36,14 +36,14 @@ class CartTest extends TestCase
         CartService::getInstance()->add($this->user->id, $product1->goods_id, $product1->id, 2);
         CartService::getInstance()->add($this->user->id, $product2->goods_id, $product2->id, 1);
 
-        $checkedGoodsList = CartService::getInstance()->getCheckedList($this->user->id);
+        $checkedGoodsList = CartService::getInstance()->getCheckedCartList($this->user->id);
         $grouponPrice = 0;
         $goodsTotalPrice = CartService::getInstance()
-            ->getCheckoutPriceSubGroupon($checkedGoodsList, null, $grouponPrice);
+            ->getCheckoutCartPriceSubGroupon($checkedGoodsList, null, $grouponPrice);
         self::assertEquals(43.16, $goodsTotalPrice);
     }
 
-    public function testGetCheckoutPriceSubGroupon()
+    public function testgetCheckoutCartPriceSubGroupon()
     {
         /** @var GoodsProduct $product1 */
         $product1 = factory(GoodsProduct::class)->create(['number' => 10, 'price' => 11.3]);
@@ -57,11 +57,11 @@ class CartTest extends TestCase
         CartService::getInstance()->add($this->user->id, $product2->goods_id, $product2->id, 5);
         CartService::getInstance()->add($this->user->id, $product3->goods_id, $product3->id, 3);
 
-        $checkedGoodsList = CartService::getInstance()->getCheckedList($this->user->id);
+        $checkedGoodsList = CartService::getInstance()->getCheckedCartList($this->user->id);
         $grouponPrice = 0;
         $grouponRuleId = GrouponRule::query()->whereGoodsId($product2->goods_id)->first()->id ?? null;
         $goodsTotalPrice = CartService::getInstance()
-            ->getCheckoutPriceSubGroupon($checkedGoodsList, $grouponRuleId, $grouponPrice);
+            ->getCheckoutCartPriceSubGroupon($checkedGoodsList, $grouponRuleId, $grouponPrice);
         self::assertEquals(5, $grouponPrice);
         self::assertEquals(129.6, $goodsTotalPrice);
     }
