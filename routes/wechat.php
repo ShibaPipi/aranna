@@ -69,21 +69,25 @@ Route::prefix('cart')->group(function () {
     Route::get('checkout', 'CartController@checkout');
 });
 
+Route::prefix('order')->group(function () {
+    Route::any('submit', 'OrderController@submit'); //
+    Route::any('prepay', 'OrderController@prepay'); //
+    Route::any('h5pay', 'OrderController@h5pay'); //
+    Route::any('list', 'OrderController@list'); //订单列表
+    Route::any('detail', 'OrderController@detail'); //订单详情
+    Route::any('cancel', 'OrderController@cancel'); //取消订单
+    Route::any('refund', 'OrderController@refund'); //退款取消订单
+    Route::any('delete', 'OrderController@delete'); //删除订单
+    Route::any('confirm', 'OrderController@confirm'); //确认收货
+});
+
+
 //Route::any('home/index', ''); //首页数据接口
 //Route::any('collect/list', ''); //收藏列表
 //Route::any('collect/addordelete', ''); //添加或取消收藏
 //Route::any('topic/list', ''); //专题列表
 //Route::any('topic/detail', ''); //专题详情
 //Route::any('topic/related', ''); //相关专题
-//Route::any('order/submit', ''); //
-//Route::any('order/prepay', ''); //
-//Route::any('order/h5pay', ''); //
-//Route::any('order/list', ''); //订单列表
-//Route::any('order/detail', ''); //订单详情
-//Route::any('order/cancel', ''); //取消订单
-//Route::any('order/refund', ''); //退款取消订单
-//Route::any('order/delete', ''); //删除订单
-//Route::any('order/confirm', ''); //确认收货
 //Route::any('feedback/submit', ''); //添加反馈
 //Route::any('user/index', ''); //个人页面用户相关信息
 //Route::any('issue/list', ''); //帮助信息any
