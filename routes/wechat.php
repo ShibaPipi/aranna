@@ -70,12 +70,12 @@ Route::prefix('cart')->group(function () {
 });
 
 Route::prefix('order')->group(function () {
-    Route::any('submit', 'OrderController@submit'); //
+    Route::post('submit', 'OrderController@submit'); //
     Route::any('prepay', 'OrderController@prepay'); //
     Route::any('h5pay', 'OrderController@h5pay'); //
     Route::any('list', 'OrderController@list'); //订单列表
     Route::any('detail', 'OrderController@detail'); //订单详情
-    Route::any('cancel', 'OrderController@cancel'); //取消订单
+    Route::post('cancel', 'OrderController@cancel'); //取消订单
     Route::any('refund', 'OrderController@refund'); //退款取消订单
     Route::any('delete', 'OrderController@delete'); //删除订单
     Route::any('confirm', 'OrderController@confirm'); //确认收货

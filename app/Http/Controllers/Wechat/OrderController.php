@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers\Wechat;
 
+use App\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Inputs\Orders\OrderSubmitInput;
 use App\Services\Orders\OrderService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class OrderController extends BaseController
 {
+    public function cancel()
+    {
+
+    }
+
     /**
      * 提交订单
      *
@@ -22,6 +29,12 @@ class OrderController extends BaseController
     public function submit(): JsonResponse
     {
         $input = OrderSubmitInput::new();
+
+        $lockKey = sprintf('order_submit_%s_%s'.$this->userId(), md5(serialize($input)));
+        $lock = Cache::lock($lockKey, 5);
+        if (!$lock->get()) {
+            return $this->fail(CodeResponse::FAIL, '请勿重复下单');
+        }
 
         $order = DB::transaction(function () use ($input) {
             return OrderService::getInstance()->submit($this->userId(), $input);

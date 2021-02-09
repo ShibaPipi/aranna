@@ -7153,7 +7153,7 @@ LOCK TABLES `systems` WRITE;
 
 INSERT INTO `systems` (`id`, `key_name`, `key_value`, `add_time`, `update_time`, `deleted`)
 VALUES
-	(1,'order_unpaid','30','2019-12-08 19:11:18','2019-12-08 19:11:18',0),
+	(1,'order_unpaid_timeout','30','2019-12-08 19:11:18','2019-12-08 19:11:18',0),
 	(2,'wx_index_new','6','2019-12-08 19:11:18','2019-12-08 19:11:18',0),
 	(3,'mall_latitude','31.201900','2019-12-08 19:11:18','2019-12-08 19:11:18',0),
 	(4,'order_unconfirmed','7','2019-12-08 19:11:18','2019-12-08 19:11:18',0),

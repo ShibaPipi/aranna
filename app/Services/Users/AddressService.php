@@ -28,7 +28,7 @@ class AddressService extends BaseService
      */
     public function getInfoOrDefault(int $userId, int $id = null): ?Address
     {
-        $address = $id ? $this->getInfoById($userId, $id) : $this->getDefault($userId);
+        $address = $id ? $this->getAddressById($userId, $id) : $this->getDefaultAddress($userId);
 
         if (!$address) {
             $this->throwInvalidParamValueException();
@@ -43,7 +43,7 @@ class AddressService extends BaseService
      * @param  int  $userId
      * @return Address|null
      */
-    public function getDefault(int $userId): ?Address
+    public function getDefaultAddress(int $userId): ?Address
     {
 //        dd(Address::query()
 //            ->whereUserId($userId)
@@ -80,7 +80,7 @@ class AddressService extends BaseService
      */
     public function delete(int $userId, int $addressId): ?bool
     {
-        if (is_null($address = $this->getInfoById($userId, $addressId))) {
+        if (is_null($address = $this->getAddressById($userId, $addressId))) {
             $this->throwBusinessException();
         }
 
@@ -94,7 +94,7 @@ class AddressService extends BaseService
      * @param $addressId
      * @return Address|null
      */
-    public function getInfoById(int $userId, int $addressId): ?Address
+    public function getAddressById(int $userId, int $addressId): ?Address
     {
         return Address::query()
             ->where('user_id', $userId)

@@ -13,27 +13,45 @@ use App\CodeResponse;
 use App\Enums\Orders\OrderStatus;
 use App\Exceptions\BusinessException;
 use App\Inputs\Orders\OrderSubmitInput;
+use App\Jobs\OrderUnpaidTimeoutJob;
 use App\Models\Orders\Cart;
 use App\Models\Orders\Order;
 use App\Models\Orders\OrderGoods;
 use App\Services\BaseService;
+use App\Services\Goods\GoodsService;
 use App\Services\Promotions\CouponService;
 use App\Services\Promotions\GrouponService;
 use App\Services\SystemService;
 use App\Services\Users\AddressService;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class OrderService extends BaseService
 {
+    public function cancel(int $userId, int $orderId)
+    {
+        return;
+    }
+
+    /**
+     * 提交订单
+     *
+     * @param  int  $userId
+     * @param  OrderSubmitInput  $input
+     * @return Order|null
+     *
+     * @throws BusinessException
+     * @throws Exception
+     */
     public function submit(int $userId, OrderSubmitInput $input): ?Order
     {
         if (!empty($input->grouponRuleId)) {
             GrouponService::getInstance()->checkValidToOpenOrJoin($userId, $input->grouponRuleId);
         }
 
-        if (empty($address = AddressService::getInstance()->getInfoById($userId, $input->addressId))) {
+        if (empty($address = AddressService::getInstance()->getAddressById($userId, $input->addressId))) {
             $this->throwInvalidParamValueException();
         }
 
@@ -46,7 +64,7 @@ class OrderService extends BaseService
             $input->grouponRuleId, $grouponPrice);
 
         // 获取优惠券优惠金额
-        $couponPrice = 0;
+        $couponPrice = '0';
         if ($input->couponId > 0) {
             $coupon = CouponService::getInstance()->getInfoById($input->couponId);
             $couponUser = CouponService::getInstance()->getCouponUserById($input->couponUserId);
@@ -58,23 +76,30 @@ class OrderService extends BaseService
         // 获取运费信息
         $freightPrice = $this->getFreight($goodsTotalPrice);
 
-        // 获取订单总金额：商品总金额 + 运费 - 优惠券金额
-        $orderTotalPrice = bcsub(bcadd($goodsTotalPrice, $freightPrice, 2), $couponPrice, 2);
+        // 积分减免金额
+        $integralPrice = '0';
+
+        // 获取订单总金额：商品总金额 + 运费 - 优惠券金额 - 积分减免金额
+        $orderTotalPrice = bcadd($goodsTotalPrice, $freightPrice, 2);
+        $orderTotalPrice = bcsub($orderTotalPrice, $couponPrice, 2);
+        $orderTotalPrice = bcsub($orderTotalPrice, $integralPrice, 2);
         // 订单金额最小为 0
         $orderTotalPrice = max('0', $orderTotalPrice);
         $actualPrice = $orderTotalPrice;
 
         // 保存订单记录
         $order = Order::new();
+        $order->user_id = $userId;
         $order->order_sn = $this->generateSn();
         $order->order_status = OrderStatus::CREATED;
         $order->consignee = $address->name;
         $order->mobile = $address->tel;
         $order->address = $address->province.$address->city.$address->county.' '.$address->address_detail;
-        $order->message = $input->message;
+        $order->message = $input->message ?? '';
         $order->goods_price = $goodsTotalPrice;
         $order->freight_price = $freightPrice;
         $order->coupon_price = $couponPrice;
+        $order->integral_price = $integralPrice;
         $order->order_price = $orderTotalPrice;
         $order->actual_price = $actualPrice;
         $order->groupon_price = $grouponPrice;
@@ -87,35 +112,57 @@ class OrderService extends BaseService
         CartService::getInstance()->clearCartGoods($userId, $input->cartId);
 
         // 减库存
-        $this->reduceProductStock($checkedGoodsList);
+        $this->reduceProductsStock($checkedGoodsList);
 
         // 添加团购记录
         GrouponService::getInstance()->openOrJoinGroupon($userId, $order->id, $input->grouponRuleId,
             $input->grouponLinkId);
 
         // 设置超时任务
-        // TODO
+        dispatch(new OrderUnpaidTimeoutJob($userId, $order->id));
 
-        return null;
+        return $order;
     }
 
-    public function reduceProductStock(Collection $checkedGoodsList)
+    /**
+     * @param  Cart[]|Collection  $checkedGoodsList
+     *
+     * @throws BusinessException
+     */
+    public function reduceProductsStock(Collection $checkedGoodsList): void
     {
-        // TODO
+        $productIds = $checkedGoodsList->pluck('product_id')->toArray();
+        $products = GoodsService::getInstance()->getGoodsProductsByProductIds($productIds)->keyBy('id');
+
+        foreach ($checkedGoodsList as $cart) {
+            if (empty($product = $products->get($cart->product_id))) {
+                $this->throwInvalidParamValueException();
+            }
+
+            if ($product->number < $cart->number) {
+                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
+            }
+
+            if (0 === GoodsService::getInstance()->reduceStock($product->id, $cart->number)) {
+                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
+            }
+        }
     }
 
     /**
      * 生成订单编号
      *
      * @return string
+     *
      * @throws BusinessException
+     * @throws Exception
      */
     public function generateSn(): string
     {
         return retry(6, function () {
-            $orderSn = date('YmdHis').Str::random(6);
+            $orderSn = date('YmdHis').strtoupper(Str::random(6));
 
-            if (!$this->snAvailable($orderSn)) {
+            if ($this->snAvailable($orderSn)) {
                 Log::warning('订单号获取失败，orderSn：'.$orderSn);
 
                 $this->throwBusinessException(CodeResponse::FAIL, '订单编号获取失败');
