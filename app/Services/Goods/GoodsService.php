@@ -20,28 +20,44 @@ use App\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 
 class GoodsService extends BaseService
 {
     /**
+     * 减去商品货品库存
+     *
+     * @param  int  $productId
+     * @param  int  $number
+     * @return int
+     */
+    public function reduceStock(int $productId, int $number): int
+    {
+        return GoodsProduct::query()
+            ->whereId($productId)
+            ->where('number', '>', $number)
+            ->decrement('number', $number);
+    }
+
+    /**
+     * 根据 id 获取商品
+     *
      * @param  int  $goodsId
      * @param  array|string[]  $columns
-     * @return Goods|Model|null
+     * @return Goods|null
      */
-    public function getInfoById(int $goodsId, array $columns = ['*'])
+    public function getGoodsById(int $goodsId, array $columns = ['*']): ?Goods
     {
         return Goods::query()->find($goodsId, $columns);
     }
 
     /**
      * @param  array  $ids
-     * @return Goods[]|Collection|\Illuminate\Support\Collection
+     * @return Goods[]|Collection
      */
     public function getListByIds(array $ids)
     {
         if (empty($ids)) {
-            return collect();
+            return new Collection;
         }
 
         return Goods::query()->whereIn('id', $ids)->get();
@@ -60,9 +76,9 @@ class GoodsService extends BaseService
 
     /**
      * @param  int  $goodsId
-     * @return Collection|\Illuminate\Support\Collection
+     * @return Collection
      */
-    public function getSpecifications(int $goodsId)
+    public function getSpecifications(int $goodsId): Collection
     {
         $specs = GoodsSpecification::query()
             ->where('goods_id', $goodsId)
@@ -76,11 +92,28 @@ class GoodsService extends BaseService
     }
 
     /**
+     * 根据商品货品 id 数组获取商品货品
+     *
+     * @param  array  $productIds
+     * @return GoodsProduct[]|Collection
+     */
+    public function getGoodsProductsByProductIds(array $productIds): Collection
+    {
+        if (empty($productIds)) {
+            return new Collection;
+        }
+
+        return GoodsProduct::query()->whereIn('id', $productIds)->get();
+    }
+
+    /**
+     * 根据商品货品 id 获取商品货品
+     *
      * @param $productId
      * @param  array|string[]  $columns
-     * @return GoodsProduct|Model|null
+     * @return GoodsProduct|null
      */
-    public function getProductByProductId($productId, array $columns = ['*'])
+    public function getGoodsProductByProductId($productId, array $columns = ['*']): ?GoodsProduct
     {
         return GoodsProduct::query()->find($productId, $columns);
     }

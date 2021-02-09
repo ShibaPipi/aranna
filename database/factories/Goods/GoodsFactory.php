@@ -70,7 +70,7 @@ $factory->define(GrouponRule::class, function () {
 $factory->state(GoodsProduct::class, 'groupon', function () {
     return [];
 })->afterCreatingState(GoodsProduct::class, 'groupon', function (GoodsProduct $product) {
-    $goods = GoodsService::getInstance()->getInfoById($product->goods_id);
+    $goods = GoodsService::getInstance()->getGoodsById($product->goods_id);
     factory(GrouponRule::class)->create([
         'goods_id' => $product->goods_id,
         'goods_name' => $goods->name,

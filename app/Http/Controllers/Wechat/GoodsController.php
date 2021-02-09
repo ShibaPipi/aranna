@@ -81,7 +81,7 @@ class GoodsController extends BaseController
     public function detail(): JsonResponse
     {
         $id = $this->verifyId('id', 0);
-        if (empty($info = GoodsService::getInstance()->getInfoById($id))) {
+        if (empty($info = GoodsService::getInstance()->getGoodsById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
 

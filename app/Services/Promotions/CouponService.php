@@ -88,10 +88,9 @@ class CouponService extends BaseService
      *
      * @param  int  $userId
      * @param  int  $couponId
-     * @param  array|string[]  $columns
      * @return CouponUser|null
      */
-    public function getCouponUserByCouponId(int $userId, int $couponId, array $columns = ['*']): ?CouponUser
+    public function getCouponUserByCouponId(int $userId, int $couponId): ?CouponUser
     {
         return CouponUser::query()
             ->whereUserId($userId)
@@ -117,13 +116,13 @@ class CouponService extends BaseService
      *
      * @param  Coupon  $coupon
      * @param  CouponUser  $couponUser
-     * @param  float  $price
+     * @param  string  $price
      * @return bool
      */
     public function checkUsableWithPrice(Coupon $coupon, CouponUser $couponUser, string $price): bool
     {
-        if (!$coupon
-            || !$couponUser
+        if (empty($coupon)
+            || empty($couponUser)
             || $coupon->id != $couponUser->coupon_id
             || CouponStatus::NORMAL != $coupon->status
             || CouponGoodsType::ALL != $coupon->goods_type

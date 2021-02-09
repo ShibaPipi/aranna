@@ -45,5 +45,7 @@ use Illuminate\Support\Carbon;
  */
 class OrderGoods extends BaseModel
 {
-    //
+    protected $casts = [
+        'specifications' => 'array'
+    ];
 }
