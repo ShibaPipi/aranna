@@ -4,32 +4,46 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Wechat;
 
 use App\CodeResponse;
+use App\Exceptions\BusinessException;
+use App\Inputs\PageInput;
 use App\Services\Goods\BrandService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BrandController extends BaseController
 {
     protected $middlewareOnly = [];
 
-    public function list(Request $request)
+    /**
+     * 获取品牌列表
+     *
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     */
+    public function list(): JsonResponse
     {
-        $page = $request->input('page', 1);
-        $limit = $request->input('limit', 10);
-        $sort = $request->input('sort', 'add_time');
-        $order = $request->input('order', 'desc');
+        $input = PageInput::new();
 
         $columns = ['id', 'name', 'desc', 'pic_url', 'floor_price'];
-        $list = BrandService::getInstance()->getList(intval($page), intval($limit), $sort, $order, $columns);
+        $list = BrandService::getInstance()->getBrands($input, $columns);
 
         return $this->successPaginate($list);
     }
 
-    public function detail(Request $request)
+    /**
+     * 获取品牌详情
+     *
+     * @param  Request  $request
+     * @return JsonResponse
+     */
+    public function detail(): JsonResponse
     {
-        if (empty($id = $request->input('id'))) {
+        if (empty($id = $this->verifyId('id'))) {
             return $this->fail(CodeResponse::INVALID_PARAM);
         }
-        if (is_null($brand = BrandService::getInstance()->getDetail(intval($id)))) {
+
+        if (is_null($brand = BrandService::getInstance()->getBrand($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
 

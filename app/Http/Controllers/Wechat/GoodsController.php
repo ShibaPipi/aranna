@@ -89,7 +89,7 @@ class GoodsController extends BaseController
         $specificationList = GoodsService::getInstance()->getSpecifications($id);
         $productList = GoodsService::getInstance()->getProducts($id);
         $issue = GoodsService::getInstance()->getIssues();
-        $brand = $info->brand_id ? BrandService::getInstance()->getDetail($info->brand_id) : new stdClass();
+        $brand = $info->brand_id ? BrandService::getInstance()->getBrand($info->brand_id) : new stdClass();
         $comment = CommentService::getInstance()->getWithUserInfo($id);
         // TODO：团购
         $groupon = [];
