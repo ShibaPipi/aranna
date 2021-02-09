@@ -12,28 +12,30 @@ class CategoryController extends BaseController
 {
     protected $middlewareOnly = [];
 
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $categoryList = CategoryService::getInstance()->getL1List();
-        if (empty($id = $request->input('id'))) {
+        $categoryList = CategoryService::getInstance()->getL1Categories();
+        if (empty($id = $this->verifyId())) {
             $currentCategory = $categoryList->first();
         } else {
             $currentCategory = $categoryList->where('id', $id)->first();
         }
-        $currentSubCategory = !is_null($currentCategory) ? CategoryService::getInstance()->getL2ListByPid($currentCategory->id) : null;
+        $currentSubCategory = !is_null($currentCategory) ? CategoryService::getInstance()->getL2CategoriesByPid($currentCategory->id) : null;
 
         return $this->success(compact('categoryList', 'currentCategory', 'currentSubCategory'));
     }
 
-    public function current(Request $request): JsonResponse
+    public function current(): JsonResponse
     {
-        if (empty($id = $request->input('id'))) {
+        if (empty($id = $this->verifyId())) {
             $this->fail(CodeResponse::INVALID_PARAM);
         }
-        if (is_null($currentCategory = CategoryService::getInstance()->getL1ById(intval($id)))) {
+
+        if (is_null($currentCategory = CategoryService::getInstance()->getL1CategoryById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
-        $currentSubCategory = CategoryService::getInstance()->getL2ListByPid($currentCategory->id);
+
+        $currentSubCategory = CategoryService::getInstance()->getL2CategoriesByPid($currentCategory->id);
 
         return $this->success(compact('currentCategory', 'currentSubCategory'));
     }

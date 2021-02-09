@@ -58,16 +58,16 @@ class GoodsController extends BaseController
     public function category(): JsonResponse
     {
         $id = $this->verifyId('id', 0);
-        if (empty($currentCategory = CategoryService::getInstance()->getById($id))) {
+        if (empty($currentCategory = CategoryService::getInstance()->getCategoryById($id))) {
             return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
         }
         if (0 === $currentCategory->pid) {
             $parentCategory = $currentCategory;
-            $brotherCategory = CategoryService::getInstance()->getL2ListByPid($currentCategory->id);
+            $brotherCategory = CategoryService::getInstance()->getL2CategoriesByPid($currentCategory->id);
             $currentCategory = $brotherCategory->first() ?? $currentCategory;
         } else {
-            $parentCategory = CategoryService::getInstance()->getL1ById($currentCategory->pid);
-            $brotherCategory = CategoryService::getInstance()->getL2ListByPid($currentCategory->pid);
+            $parentCategory = CategoryService::getInstance()->getL1CategoryById($currentCategory->pid);
+            $brotherCategory = CategoryService::getInstance()->getL2CategoriesByPid($currentCategory->pid);
         }
 
         return $this->success(compact('currentCategory', 'parentCategory', 'brotherCategory'));

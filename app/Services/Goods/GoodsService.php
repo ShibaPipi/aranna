@@ -185,6 +185,6 @@ class GoodsService extends BaseService
             ->unique()
             ->toArray();
 
-        return CategoryService::getInstance()->getL2ListByIds($categoryIds);
+        return CategoryService::getInstance()->getL2CategoriesByIds($categoryIds);
     }
 }

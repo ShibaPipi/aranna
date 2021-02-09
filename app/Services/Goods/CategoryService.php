@@ -6,14 +6,13 @@
  * Date: 2021/1/11
  */
 
-//declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Services\Goods;
 
 use App\Models\Goods\Category;
 use App\Services\BaseService;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 
 class CategoryService extends BaseService
 {
@@ -21,9 +20,9 @@ class CategoryService extends BaseService
      * 根据 id 获取分类详情
      *
      * @param  int  $id
-     * @return Category|Model|null
+     * @return Category|null
      */
-    public function getById(int $id)
+    public function getCategoryById(int $id): ?Category
     {
         return Category::query()->find($id);
     }
@@ -33,11 +32,9 @@ class CategoryService extends BaseService
      *
      * @return Category[]|Collection
      */
-    public function getL1List()
+    public function getL1Categories(): Collection
     {
-        return Category::query()
-            ->where('level', 'L1')
-            ->get();
+        return Category::query()->whereLevel('L1')->get();
     }
 
     /**
@@ -46,11 +43,11 @@ class CategoryService extends BaseService
      * @param  int  $pid
      * @return Category[]|Collection
      */
-    public function getL2ListByPid(int $pid)
+    public function getL2CategoriesByPid(int $pid): Collection
     {
         return Category::query()
-            ->where('level', 'L2')
-            ->where(compact('pid'))
+            ->whereLevel('L2')
+            ->wherePid($pid)
             ->get();
     }
 
@@ -58,28 +55,26 @@ class CategoryService extends BaseService
      * 根据 id 获取一级类目
      *
      * @param  int  $id
-     * @return Category|Model|null
+     * @return Category|null
      */
-    public function getL1ById(int $id)
+    public function getL1CategoryById(int $id): ?Category
     {
-        return Category::query()
-            ->where('level', 'L1')
-            ->where(compact('id'))
-            ->first();
+        return Category::query()->whereLevel('L1')->find($id);
     }
 
     /**
      * @param  array  $ids
      * @return Category[]|Collection
      */
-    public function getL2ListByIds(array $ids)
+    public function getL2CategoriesByIds(array $ids): Collection
     {
         if (empty($ids)) {
-            return collect();
+            return new Collection();
         }
+
         return Category::query()
             ->whereIn('id', $ids)
-            ->where('level', 'L2')
+            ->whereLevel('L2')
             ->get();
     }
 }

@@ -23,7 +23,7 @@ trait VerifyRequestInput
      *
      * @throws BusinessException
      */
-    public function verifyId(string $key, $default = null): ?int
+    public function verifyId(string $key = 'id', $default = null): ?int
     {
         return $this->verifyData($key, $default, 'integer|digits_between:1,20|min:1', 'intval');
     }

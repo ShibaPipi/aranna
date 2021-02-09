@@ -39,7 +39,7 @@ class BrandController extends BaseController
      */
     public function detail(): JsonResponse
     {
-        if (empty($id = $this->verifyId('id'))) {
+        if (empty($id = $this->verifyId())) {
             return $this->fail(CodeResponse::INVALID_PARAM);
         }
 
