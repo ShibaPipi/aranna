@@ -24,7 +24,7 @@ class SystemService extends BaseService
     const EXPRESS_FREIGHT_VALUE = 'express_freight_value';
     const EXPRESS_FREIGHT_MIN = 'express_freight_min';
     // 订单相关配置
-    const ORDER_UNPAID = 'order_unpaid';
+    const ORDER_UNPAID_TIMEOUT = 'order_unpaid_timeout';
     const ORDER_UNCONFIRMED = 'order_unconfirmed';
     const ORDER_COMMENT = 'order_comment';
     // 商场相关配置
@@ -34,6 +34,11 @@ class SystemService extends BaseService
     const MALL_QQ = 'mall_qq';
     const MALL_LONGITUDE = 'mall_longitude';
     const MALL_Latitude = 'mall_latitude';
+
+    public function getOrderUnpaidTimeoutValue()
+    {
+        return $this->getInfo(self::ORDER_UNPAID_TIMEOUT);
+    }
 
     public function getExpressFreightValue()
     {

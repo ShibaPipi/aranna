@@ -231,7 +231,7 @@ class CartTest extends TestCase
             ]
         ]);
 
-        $goods = GoodsService::getInstance()->getInfoById($this->product->goods_id);
+        $goods = GoodsService::getInstance()->getGoodsById($this->product->goods_id);
         $goods->fill(['is_on_sale' => false])->save();
         $response = $this->post('wechat/cart/index', [], $this->authHeader);
         $response->assertJson([

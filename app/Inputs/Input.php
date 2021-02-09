@@ -22,7 +22,7 @@ class Input
      *
      * @throws BusinessException
      */
-    public function fill(array $data = null)
+    public function fill(array $data = null): Input
     {
         if (is_null($data)) {
             $data = request()->input();
@@ -57,7 +57,7 @@ class Input
      *
      * @throws BusinessException
      */
-    public static function new(array $data = null)
+    public static function new(array $data = null): Input
     {
         return (new static)->fill($data);
     }

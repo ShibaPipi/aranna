@@ -76,11 +76,11 @@ class CartController extends BaseController
             return $this->invalidParamValue();
         }
 
-        if (is_null($goods = GoodsService::getInstance()->getInfoById($goodsId)) || !$goods->is_on_sale) {
+        if (is_null($goods = GoodsService::getInstance()->getGoodsById($goodsId)) || !$goods->is_on_sale) {
             return $this->fail(CodeResponse::GOODS_UNSHELVE);
         }
 
-        if (is_null($product = GoodsService::getInstance()->getProductByProductId($productId)) || $product->number < $number) {
+        if (is_null($product = GoodsService::getInstance()->getGoodsProductByProductId($productId)) || $product->number < $number) {
             return $this->fail(CodeResponse::GOODS_NO_STOCK);
         }
 

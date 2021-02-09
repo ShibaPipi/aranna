@@ -1,16 +1,8 @@
 <?php
 
-use App\Models\Goods\GoodsProduct;
-
-/**
- * 购物车功能测试
- *
- * Created By 皮神
- * Date: 2020/12/21
- */
-
 namespace Tests\Unit;
 
+use App\Exceptions\BusinessException;
 use App\Models\Goods\GoodsProduct;
 use App\Models\Promotions\Coupon;
 use App\Models\Promotions\GrouponRule;
@@ -23,7 +15,12 @@ class CartTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testgetCheckoutCartPriceSubGrouponSimple()
+    /**
+     * 测试待下单的商品总金额减去团购优惠的金额，无团购活动
+     *
+     * @throws BusinessException
+     */
+    public function testGetCheckoutCartPriceSubGrouponSimple()
     {
         /** @var GoodsProduct $product1 */
         $product1 = factory(GoodsProduct::class)->create(['number' => 10, 'price' => 11.3]);
@@ -43,7 +40,12 @@ class CartTest extends TestCase
         self::assertEquals(43.16, $goodsTotalPrice);
     }
 
-    public function testgetCheckoutCartPriceSubGroupon()
+    /**
+     * 测试待下单的商品总金额减去团购优惠的金额，有团购活动
+     *
+     * @throws BusinessException
+     */
+    public function testGetCheckoutCartPriceSubGroupon()
     {
         /** @var GoodsProduct $product1 */
         $product1 = factory(GoodsProduct::class)->create(['number' => 10, 'price' => 11.3]);
@@ -52,10 +54,11 @@ class CartTest extends TestCase
         /** @var GoodsProduct $product3 */
         $product3 = factory(GoodsProduct::class)->create(['number' => 10, 'price' => 10.6]);
 
-        CartService::getInstance()->updateChecked($this->user->id, [$product1->id], false);
-
+        CartService::getInstance()->add($this->user->id, $product1->goods_id, $product1->id, 1);
         CartService::getInstance()->add($this->user->id, $product2->goods_id, $product2->id, 5);
         CartService::getInstance()->add($this->user->id, $product3->goods_id, $product3->id, 3);
+
+        CartService::getInstance()->updateChecked($this->user->id, [$product1->id], false);
 
         $checkedGoodsList = CartService::getInstance()->getCheckedCartList($this->user->id);
         $grouponPrice = 0;
@@ -66,6 +69,11 @@ class CartTest extends TestCase
         self::assertEquals(129.6, $goodsTotalPrice);
     }
 
+    /**
+     * 测试获取用户优惠力度最大的优惠券，或者返回用户自己选择的优惠券
+     *
+     * @throws BusinessException
+     */
     public function testGetMeetest()
     {
         $goodsTotalPrice = '1000.50';

@@ -366,11 +366,11 @@ class CartService extends BaseService
      */
     public function getGoodsAndProduct(int $goodsId, int $productId): array
     {
-        if (is_null($goods = GoodsService::getInstance()->getInfoById($goodsId)) || !$goods->is_on_sale) {
+        if (is_null($goods = GoodsService::getInstance()->getGoodsById($goodsId)) || !$goods->is_on_sale) {
             $this->throwBusinessException(CodeResponse::GOODS_UNSHELVE);
         }
 
-        if (is_null($product = GoodsService::getInstance()->getProductByProductId($productId))) {
+        if (is_null($product = GoodsService::getInstance()->getGoodsProductByProductId($productId))) {
             $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
         }
 
