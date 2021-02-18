@@ -111,4 +111,19 @@ class User extends BaseModel implements
             'userId' => $this->getKey()
         ];
     }
+
+    protected static function booted()
+    {
+        static::casing(function (User $user) {
+            //
+        });
+        static::cased(function (User $user) {
+            //
+        });
+    }
+
+    public function routeNotificationForEasySms()
+    {
+        return $this->mobile;
+    }
 }

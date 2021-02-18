@@ -14,7 +14,6 @@ use App\Models\Users\User;
 use App\Notifications\VerificationCode;
 use App\Services\BaseService;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
@@ -24,10 +23,23 @@ use Overtrue\EasySms\PhoneNumber;
 class UserService extends BaseService
 {
     /**
+     * 根据 id 获取用户
+     *
+     * @param  int  $userId
+     * @return User|null
+     */
+    public function getUserById(int $userId): ?User
+    {
+        return User::query()->find($userId);
+    }
+
+    /**
+     * 根据 id 查询多个用户
+     *
      * @param  array  $ids
      * @return User[]|Collection
      */
-    public function getByIds(array $ids)
+    public function getByIds(array $ids): Collection
     {
         if (empty($ids)) {
             return collect();
@@ -39,10 +51,12 @@ class UserService extends BaseService
     }
 
     /**
+     * 根据用户名查询用户
+     *
      * @param  string  $username
-     * @return User|Model|null
+     * @return User|null
      */
-    public function getByUsername(string $username)
+    public function getByUsername(string $username): ?User
     {
         return User::query()
             ->where('username', $username)
@@ -50,10 +64,12 @@ class UserService extends BaseService
     }
 
     /**
+     * 根据手机号查询用户
+     *
      * @param  string  $mobile
-     * @return User|Model|null
+     * @return User|null
      */
-    public function getByMobile(string $mobile)
+    public function getByMobile(string $mobile): ?User
     {
         return User::query()
             ->where('mobile', $mobile)
@@ -61,6 +77,8 @@ class UserService extends BaseService
     }
 
     /**
+     * 发送短信验证码
+     *
      * @param  string  $mobile
      * @return void
      *
@@ -73,6 +91,8 @@ class UserService extends BaseService
     }
 
     /**
+     * 验证一天内获取的验证码是否超过 10 次
+     *
      * @param  string  $mobile
      * @return bool
      */
@@ -122,11 +142,11 @@ class UserService extends BaseService
     {
         $key = 'sms_captcha_'.$mobile;
 
-        if ($code === Cache::get($key)) {
-            Cache::forget($key);
-        } else {
+        if ($code !== Cache::get($key)) {
             throw new BusinessException(CodeResponse::AUTH_CAPTCHA_MISMATCH);
         }
+
+        Cache::forget($key);
 
         return true;
     }
@@ -141,11 +161,8 @@ class UserService extends BaseService
      */
     public function setCaptcha(string $mobile): string
     {
-        if ('production' !== app()->environment()) {
-            $code = '111111';
-        } else {
-            $code = strval(random_int(100000, 999999));
-        }
+        $code = 'production' === app()->environment()
+            ? strval(random_int(100000, 999999)) : '111111';
         Cache::put('sms_captcha_'.$mobile, $code, 600);
 
         return $code;

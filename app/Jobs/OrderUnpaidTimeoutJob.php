@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\BusinessException;
 use App\Services\Orders\OrderService;
-use App\Services\SystemService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,12 +28,11 @@ class OrderUnpaidTimeoutJob implements ShouldQueue
         $this->userId = $userId;
         $this->orderId = $orderId;
 
-//        $this->delay(
-//            now()->addMinutes(
-//                intval(SystemService::getInstance()->getOrderUnpaidTimeoutValue())
-//            )
+        $delayTime = now()->addSeconds(5);
+//        $delayTime = now()->addMinutes(
+//            intval(SystemService::getInstance()->getOrderUnpaidTimeoutValue())
 //        );
-        $this->delay(now()->addSeconds(5));
+        $this->delay($delayTime);
     }
 
     /**
@@ -41,8 +40,11 @@ class OrderUnpaidTimeoutJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
-        OrderService::getInstance()->cancel($this->userId, $this->orderId);
+        try {
+            OrderService::getInstance()->systemCancel($this->userId, $this->orderId);
+        } catch (BusinessException $e) {
+        }
     }
 }

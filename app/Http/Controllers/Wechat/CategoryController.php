@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Wechat;
 use App\CodeResponse;
 use App\Services\Goods\CategoryService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class CategoryController extends BaseController
 {

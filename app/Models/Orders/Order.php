@@ -79,5 +79,5 @@ use Illuminate\Support\Carbon;
  */
 class Order extends BaseModel
 {
-    //
+    use OrderStatusTrait;
 }

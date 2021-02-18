@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
@@ -13,9 +14,20 @@ use Throwable;
 
 class OrderController extends BaseController
 {
-    public function cancel()
+    /**
+     * 用户主动取消订单
+     *
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function cancel(): JsonResponse
     {
+        $orderId = $this->verifyId('orderId');
+        OrderService::getInstance()->userCancel($this->userId(), $orderId);
 
+        return $this->success();
     }
 
     /**

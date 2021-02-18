@@ -24,6 +24,21 @@ use Illuminate\Database\Eloquent\Collection;
 class GoodsService extends BaseService
 {
     /**
+     * 增加商品货品库存
+     *
+     * @param  int  $productId
+     * @param  int  $number
+     * @return int
+     */
+    public function addStock(int $productId, int $number): int
+    {
+        $product = $this->getGoodsProductByProductId($productId);
+        $product->number += $number;
+
+        return $product->cas();
+    }
+
+    /**
      * 减去商品货品库存
      *
      * @param  int  $productId
@@ -32,10 +47,10 @@ class GoodsService extends BaseService
      */
     public function reduceStock(int $productId, int $number): int
     {
-        return GoodsProduct::query()
-            ->whereId($productId)
-            ->where('number', '>', $number)
-            ->decrement('number', $number);
+        $product = $this->getGoodsProductByProductId($productId);
+        $product->number -= $number;
+
+        return $product->cas();
     }
 
     /**

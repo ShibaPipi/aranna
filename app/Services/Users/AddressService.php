@@ -45,10 +45,6 @@ class AddressService extends BaseService
      */
     public function getDefaultAddress(int $userId): ?Address
     {
-//        dd(Address::query()
-//            ->whereUserId($userId)
-//            ->whereIsDefault(1)
-//            ->first());
         return Address::query()
             ->whereUserId($userId)
             ->whereIsDefault(1)

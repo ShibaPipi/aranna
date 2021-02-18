@@ -69,4 +69,17 @@ class BaseService
     {
         $this->throwBusinessException(CodeResponse::INVALID_PARAM_VALUE, $message);
     }
+
+    /**
+     * 抛出数据更新失败异常
+     *
+     * @param  string  $message
+     * @return void
+     *
+     * @throws BusinessException
+     */
+    public function throwUpdateFailedException(string $message = ''): void
+    {
+        $this->throwBusinessException(CodeResponse::UPDATE_FAILED, $message);
+    }
 }

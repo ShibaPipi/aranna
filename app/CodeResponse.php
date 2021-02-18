@@ -36,20 +36,20 @@ class CodeResponse
     const GOODS_UNKNOWN = [712, ''];
     const GOODS_INVALID = [713, ''];
 
-    const ORDER_UNKNOWN = [720, ''];
+    const ORDER_UNKNOWN = [720, '未知订单'];
     const ORDER_INVALID = [721, ''];
     const ORDER_CHECKOUT_FAIL = [722, ''];
-    const ORDER_CANCEL_FAIL = [723, ''];
-    const ORDER_PAY_FAIL = [724, ''];
+    const ORDER_CANCEL_FAIL = [723, '订单取消失败'];
+    const ORDER_PAY_FAIL = [724, '订单支付失败'];
     // 订单当前状态下不支持用户的操作，例如商品未发货状态用户执行确认收货是不可能的。
-    const ORDER_INVALID_OPERATION = [725, ''];
-    const ORDER_COMMENTED = [726, ''];
+    const ORDER_INVALID_OPERATION = [725, '订单非法操作'];
+    const ORDER_COMMENTED = [726, '订单已评价'];
     const ORDER_COMMENT_EXPIRED = [727, ''];
 
     const GROUPON_EXPIRED = [730, '团购已过期'];
     const GROUPON_OFFLINE = [731, '团购已下线！'];
-    const GROUPON_FULL = [732, '团购活动人数已满！'];
-    const GROUPON_JOIN = [733, '团购活动已经参加！'];
+    const GROUPON_FULL = [732, '团购活动人数已满'];
+    const GROUPON_JOIN = [733, '团购活动已经参加'];
 
     const COUPON_EXCEED_LIMIT = [740, '优惠券已领完'];
     const COUPON_RECEIVE_FAIL = [741, '优惠券领取失败'];

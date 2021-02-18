@@ -17,22 +17,334 @@ use App\Jobs\OrderUnpaidTimeoutJob;
 use App\Models\Orders\Cart;
 use App\Models\Orders\Order;
 use App\Models\Orders\OrderGoods;
+use App\Notifications\NewOrderEmailNotify;
+use App\Notifications\NewOrderSMSNotify;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotions\CouponService;
 use App\Services\Promotions\GrouponService;
 use App\Services\SystemService;
 use App\Services\Users\AddressService;
+use App\Services\Users\UserService;
 use Exception;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
+use Throwable;
 
 class OrderService extends BaseService
 {
-    public function cancel(int $userId, int $orderId)
+    /**
+     * 确认收货
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     * @param  bool  $auto
+     * @return Order|null
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function confirm(int $userId, int $orderId, bool $auto = false): ?Order
     {
-        return;
+        $order = Order::query()->whereUserId($userId)->find($orderId);
+        if (empty($order)) {
+            $this->throwInvalidParamValueException();
+        }
+
+        if (!$order->handleCanConfirm()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能确认收货');
+        }
+
+        $order->comments = $this->countOrderGoods($orderId);
+        $order->order_status = $auto ? OrderStatus::AUTO_CONFIRMED : OrderStatus::CONFIRMED;
+        $order->confirm_time = now()->toDateTimeString();
+
+        if (0 === $order->cas()) {
+            $this->throwUpdateFailedException();
+        }
+
+        return $order;
+    }
+
+    /**
+     * 计算待评价的订单商品数量
+     *
+     * @param  int  $orderId
+     * @return int
+     */
+    public function countOrderGoods(int $orderId): int
+    {
+        return OrderGoods::query()->whereOrderId($orderId)->count('id');
+    }
+
+    /**
+     * 执行退款
+     *
+     * @param  Order  $order
+     * @param $refundType
+     * @param $refundContent
+     * @return Order
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function executeRefund(Order $order, $refundType, $refundContent): Order
+    {
+        if (!$order->handleCanExecuteRefund()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能执行退款');
+        }
+
+        $now = now()->toDateTimeString();
+
+        $order->order_status = OrderStatus::REFUND_CONFIRMED;
+        $order->end_time = $now;
+        $order->refund_amount = $order->actual_price;
+        $order->refund_type = $refundType;
+        $order->refund_content = $refundContent;
+        $order->refund_time = $now;
+
+        if (0 === $order->cas()) {
+            $this->throwUpdateFailedException();
+        }
+
+        // 回滚库存
+        $this->rollbackStock($order->id);
+
+        return $order;
+    }
+
+    /**
+     * 订单发货
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     * @return Order|null
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function applyRefund(int $userId, int $orderId): ?Order
+    {
+        $order = $this->getOrderById($userId, $orderId);
+
+        if (empty($order)) {
+            $this->throwInvalidParamValueException();
+        }
+
+        if (!$order->handleCanRefund()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能申请退款');
+        }
+
+        $order->order_status = OrderStatus::REFUNDING;
+
+        if (0 === $order->cas()) {
+            $this->throwUpdateFailedException();
+        }
+
+        // TODO: 通知用户已经申请退款
+
+        return $order;
+    }
+
+    /**
+     * 订单发货
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     * @param  string  $shipSn
+     * @param  string  $shipChannel
+     * @return Order|null
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function ship(int $userId, int $orderId, string $shipSn, string $shipChannel): ?Order
+    {
+        $order = $this->getOrderById($userId, $orderId);
+
+        if (empty($order)) {
+            $this->throwInvalidParamValueException();
+        }
+
+        if (!$order->handleCanShip()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能发货');
+        }
+
+        $order->order_status = OrderStatus::SHIPPING;
+        $order->ship_sn = $shipSn;
+        $order->ship_channel = $shipChannel;
+        $order->ship_time = now()->toDateTimeString();
+
+        if (0 === $order->cas()) {
+            $this->throwUpdateFailedException();
+        }
+
+        // TODO: 通知用户已经发货
+
+        return $order;
+    }
+
+    /**
+     * @param  Order  $order
+     * @param  string  $payId
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function paymentSucceed(Order $order, string $payId)
+    {
+        if (!$order->handleCanPay()) {
+            $this->throwBusinessException(CodeResponse::ORDER_PAY_FAIL, '订单不能支付');
+        }
+
+        $order->pay_id = $payId;
+        $order->pay_time = now()->toDateTimeString();
+        $order->order_status = OrderStatus::PAID;
+
+        if (0 === $order->cas()) {
+            $this->throwBusinessException(CodeResponse::UPDATE_FAILED);
+        }
+
+        // 更新支付成功的团购信息
+        GrouponService::getInstance()->handlePaymentSucceed($order->id);
+
+        // 发送邮件通知
+        Notification::route('mail', config('mail.from.address'))->notify(new NewOrderEmailNotify($order->id));
+
+        // 发送短信通知
+        $user = UserService::getInstance()->getUserById($order->user_id);
+        $user->notify(new NewOrderSMSNotify);
+    }
+
+    /**
+     * 用户取消订单
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     *
+     * @throws Throwable
+     */
+    public function userCancel(int $userId, int $orderId)
+    {
+        DB::transaction(function () use ($orderId, $userId) {
+            $this->cancel($userId, $orderId);
+        });
+    }
+
+    /**
+     * 管理员取消订单
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     *
+     * @throws Throwable
+     */
+    public function adminCancel(int $userId, int $orderId)
+    {
+        DB::transaction(function () use ($orderId, $userId) {
+            $this->cancel($userId, $orderId, 'admin');
+        });
+    }
+
+    /**
+     * 系统自动取消订单
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     *
+     * @throws Throwable
+     */
+    public function systemCancel(int $userId, int $orderId)
+    {
+        DB::transaction(function () use ($orderId, $userId) {
+            $this->cancel($userId, $orderId, 'system');
+        });
+    }
+
+    /**
+     * 取消订单，回滚库存
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     * @param  string  $role  user|admin|system
+     * @return bool
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    private function cancel(int $userId, int $orderId, string $role = 'user'): bool
+    {
+        $order = $this->getOrderById($userId, $orderId);
+
+        if (is_null($order)) {
+            $this->throwInvalidParamValueException();
+        }
+
+        if (!$order->handleCanCancel()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
+        }
+
+        switch ($role) {
+            case 'system':
+                $order->order_status = OrderStatus::AUTO_CANCELED;
+                break;
+            case 'admin':
+                $order->order_status = OrderStatus::ADMIN_CANCELED;
+                break;
+            default:
+                $order->order_status = OrderStatus::CANCELED;
+                break;
+        }
+
+        if (0 === $order->cas()) {
+            $this->throwBusinessException(CodeResponse::UPDATE_FAILED);
+        }
+
+        $this->rollbackStock($orderId);
+
+        return true;
+    }
+
+    /**
+     * 回滚订单商品库存
+     *
+     * @param  int  $orderId
+     * @return void
+     *
+     * @throws BusinessException
+     */
+    private function rollbackStock(int $orderId): void
+    {
+        $this->getOrderGoodsByOrderId($orderId)->each(function (OrderGoods $goods) {
+            if (0 === GoodsService::getInstance()->addStock($goods->product_id, $goods->number)) {
+                $this->throwUpdateFailedException();
+            }
+        });
+    }
+
+    /**
+     * 根据订单 id 获取订单商品
+     *
+     * @param  int  $orderId
+     * @return OrderGoods[]|Collection
+     */
+    public function getOrderGoodsByOrderId(int $orderId): Collection
+    {
+        return OrderGoods::query()->whereOrderId($orderId)->get();
+    }
+
+    /**
+     * 根据订单 id 和用户 id 获取订单信息
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     * @return Order|null
+     */
+    public function getOrderById(int $userId, int $orderId): ?Order
+    {
+        return Order::query()->whereUserId($userId)->find($orderId);
     }
 
     /**
@@ -106,7 +418,7 @@ class OrderService extends BaseService
         $order->save();
 
         // 保存订单商品记录
-        $this->saveGoods($checkedGoodsList, $order->id);
+        $this->saveOrderGoods($checkedGoodsList, $order->id);
 
         // 删除购物车商品记录
         CartService::getInstance()->clearCartGoods($userId, $input->cartId);
@@ -125,7 +437,10 @@ class OrderService extends BaseService
     }
 
     /**
+     * 减库存
+     *
      * @param  Cart[]|Collection  $checkedGoodsList
+     * @return void
      *
      * @throws BusinessException
      */
@@ -202,10 +517,12 @@ class OrderService extends BaseService
     }
 
     /**
+     * 保存订单商品信息
+     *
      * @param  Cart[]|Collection  $checkedGoodsList
      * @param  int  $orderId
      */
-    private function saveGoods(Collection $checkedGoodsList, int $orderId)
+    private function saveOrderGoods(Collection $checkedGoodsList, int $orderId)
     {
         foreach ($checkedGoodsList as $cart) {
             $orderGoods = OrderGoods::new();
@@ -218,6 +535,7 @@ class OrderService extends BaseService
             $orderGoods->price = $cart->price;
             $orderGoods->number = $cart->number;
             $orderGoods->specifications = $cart->specifications;
+
             $orderGoods->save();
         }
     }

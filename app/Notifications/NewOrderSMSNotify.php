@@ -4,29 +4,23 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Leonis\Notifications\EasySms\Channels\EasySmsChannel;
 use Leonis\Notifications\EasySms\Messages\EasySmsMessage;
 
-class VerificationCode extends Notification
+class NewOrderSMSNotify extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
-     * @var string 验证码
-     */
-    private $code;
-
-    /**
      * Create a new notification instance.
      *
-     * @param  string  $code
      * @return void
      */
-    public function __construct(string $code)
+    public function __construct()
     {
-        $this->code = $code;
+        //
     }
 
     /**
@@ -40,26 +34,14 @@ class VerificationCode extends Notification
     }
 
     /**
+     * @param  mixed  $notifiable
      * @return EasySmsMessage
      */
-    public function toEasySms(): EasySmsMessage
+    public function toEasySms($notifiable): EasySmsMessage
     {
         return (new EasySmsMessage)
-            ->setTemplate(config('aranna.sms.aliyun.captcha_template_code'))
-            ->setData(['code' => $this->code]);
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @return MailMessage
-     */
-    public function toMail(): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+            ->setTemplate('SMS_6792543')
+            ->setData(['customer' => $notifiable->username ?? '']);
     }
 
     /**

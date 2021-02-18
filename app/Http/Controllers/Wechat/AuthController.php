@@ -206,7 +206,6 @@ class AuthController extends BaseController
         $user->last_login_ip = $request->getClientIp();
         if (!$user->save()) {
             return $this->fail(CodeResponse::UPDATE_FAILED);
-
         }
         // 获取 token
         $token = auth('wechat')->login($user);

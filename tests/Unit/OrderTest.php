@@ -2,28 +2,85 @@
 
 namespace Tests\Unit;
 
+use App\Enums\Orders\OrderStatus;
 use App\Exceptions\BusinessException;
 use App\Inputs\Orders\OrderSubmitInput;
 use App\Jobs\OrderUnpaidTimeoutJob;
 use App\Models\Goods\GoodsProduct;
+use App\Models\Orders\Order;
 use App\Models\Orders\OrderGoods;
 use App\Models\Promotions\GrouponRule;
 use App\Models\Users\User;
+use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;
 use App\Services\Orders\OrderService;
 use App\Services\Users\AddressService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
+use Throwable;
 
 class OrderTest extends TestCase
 {
     use DatabaseTransactions;
+
+    public function testPaymentSucceed()
+    {
+        $order = $this->getOrder()->refresh();
+
+        OrderService::getInstance()->paymentSucceed($order, 'pay_id');
+
+        $order->refresh();
+
+        self::assertEquals(OrderStatus::PAID, $order->order_status);
+    }
+
+    /**
+     * 测试 cas 乐观锁
+     *
+     * @throws Throwable
+     */
+    public function testCas()
+    {
+        $user = $this->user->refresh();
+        $user->nickname = 'test1';
+        $user->mobile = '15000000000';
+        $ret = $user->cas();
+        self::assertEquals(1, $ret);
+        self::assertEquals('test1', User::find($this->user->id)->nickname);
+
+        User::query()->where('id', $this->user->id)->update(['nickname' => 'test2']);
+        $ret = $user->cas();
+        self::assertEquals(0, $ret);
+        self::assertEquals('test2', User::find($this->user->id)->nickname);
+    }
+
+    /**
+     * 测试取消订单
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function testCancel()
+    {
+        $order = $this->getOrder();
+
+        OrderService::getInstance()->userCancel($this->user->id, $order->id);
+        self::assertEquals(OrderStatus::CANCELED, $order->refresh()->order_status);
+
+        $goodsList = OrderService::getInstance()->getOrderGoodsByOrderId($order->id);
+        $productIds = $goodsList->pluck('product_id')->toArray();
+        $products = GoodsService::getInstance()->getGoodsProductsByProductIds($productIds);
+        self::assertEquals([10, 10], $products->pluck('number')->toArray());
+    }
 
     public function testJob()
     {
         dispatch(new OrderUnpaidTimeoutJob(1, 2));
     }
 
+    /**
+     * @throws BusinessException
+     */
     public function testReduceStock()
     {
         /** @var GoodsProduct $product1 */
@@ -96,5 +153,43 @@ class OrderTest extends TestCase
 //        dd($list);
         $productIds = CartService::getInstance()->getCartList($this->user->id)->pluck('product_id')->toArray();
         self::assertEquals([$product1->id], $productIds);
+    }
+
+    /**
+     * 插入一条订单记录并返回
+     *
+     * @return Order|null
+     *
+     * @throws BusinessException
+     */
+    private function getOrder(): ?Order
+    {
+        $this->user = factory(User::class)->state('default_address')->create(['mobile' => '13012271786']);
+        $address = AddressService::getInstance()->getDefaultAddress($this->user->id);
+
+        /** @var GoodsProduct $product1 */
+        $product1 = factory(GoodsProduct::class)->create(['number' => 10, 'price' => 11.3]);
+        /** @var GoodsProduct $product2 */
+        $product2 = factory(GoodsProduct::class)->state('groupon')->create(['number' => 10, 'price' => 20.56]);
+        /** @var GoodsProduct $product3 */
+        $product3 = factory(GoodsProduct::class)->create(['number' => 10, 'price' => 10.6]);
+
+        CartService::getInstance()->add($this->user->id, $product1->goods_id, $product1->id, 1);
+        CartService::getInstance()->add($this->user->id, $product2->goods_id, $product2->id, 5);
+        CartService::getInstance()->add($this->user->id, $product3->goods_id, $product3->id, 3);
+
+        CartService::getInstance()->updateChecked($this->user->id, [$product1->id], false);
+
+        $grouponRuleId = GrouponRule::query()->whereGoodsId($product2->goods_id)->first()->id ?? null;
+
+        $input = OrderSubmitInput::new([
+            'addressId' => $address->id,
+            'cartId' => 0,
+            'couponId' => 0,
+            'message' => '备注',
+            'grouponRuleId' => $grouponRuleId
+        ]);
+
+        return OrderService::getInstance()->submit($this->user->id, $input);
     }
 }
