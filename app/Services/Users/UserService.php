@@ -121,12 +121,10 @@ class UserService extends BaseService
      */
     public function sendCaptchaMsg(string $mobile, string $code): void
     {
-        if ('production' === app()->environment()) {
-            Notification::route(
-                EasySmsChannel::class,
-                new PhoneNumber($mobile, 86)
-            )->notify(new VerificationCode($code));
-        }
+        Notification::route(
+            EasySmsChannel::class,
+            new PhoneNumber($mobile, 86)
+        )->notify(new VerificationCode($code));
     }
 
     /**

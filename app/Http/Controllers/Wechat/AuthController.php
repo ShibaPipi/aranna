@@ -147,20 +147,13 @@ class AuthController extends BaseController
     /**
      * 发送短信验证码
      *
-     * @param  Request  $request
      * @return JsonResponse
      *
      * @throws Exception
      */
-    public function captcha(Request $request): JsonResponse
+    public function captcha(): JsonResponse
     {
-        if (empty($mobile = $request->input('mobile'))) {
-            return $this->fail(CodeResponse::INVALID_PARAM);
-        }
-        $validator = Validator::make(['mobile' => $mobile], ['mobile' => 'regex:/^1[0-9]{10}$/']);
-        if ($validator->fails()) {
-            return $this->fail(CodeResponse::AUTH_INVALID_MOBILE);
-        }
+        $mobile = $this->verifyMobile('mobile', 0);
         // 验证手机号是否被注册
         if (!is_null($user = UserService::getInstance()->getByMobile($mobile))) {
             return $this->fail(CodeResponse::AUTH_MOBILE_REGISTERED);
@@ -172,6 +165,7 @@ class AuthController extends BaseController
         if (!UserService::getInstance()->checkRegCaptchaCount($mobile)) {
             return $this->fail(CodeResponse::AUTH_CAPTCHA_FREQUENCY, '验证码一天只能获取10次');
         }
+
         UserService::getInstance()->sendCaptcha($mobile);
 
         return $this->success(null, '短信验证码发送成功');

@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Overtrue\EasySms\PhoneNumber;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
@@ -122,8 +123,13 @@ class User extends BaseModel implements
         });
     }
 
-    public function routeNotificationForEasySms()
+    /**
+     * 向已绑定手机号用户发送通知，设定发送短信的手机号
+     *
+     * @return PhoneNumber
+     */
+    public function routeNotificationForEasySms(): PhoneNumber
     {
-        return $this->mobile;
+        return new PhoneNumber($this->mobile, 86);
     }
 }

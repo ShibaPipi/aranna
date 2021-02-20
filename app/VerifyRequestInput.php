@@ -29,6 +29,21 @@ trait VerifyRequestInput
     }
 
     /**
+     * 验证是否为手机号
+     *
+     * @param  string  $key
+     * @param  null  $default
+     * @return string|null
+     *
+     * @throws BusinessException
+     */
+    public function verifyMobile(string $key, $default = null): ?string
+    {
+        return $this->verifyData($key, $default, 'string|regex:/^1[0-9]{10}$/', null,
+            CodeResponse::AUTH_INVALID_MOBILE);
+    }
+
+    /**
      * 验证是否为整型
      *
      * @param  string  $key
@@ -120,12 +135,18 @@ trait VerifyRequestInput
      * @param  int|string|array|mixed  $default
      * @param  string|array  $rules
      * @param  string|null  $handler
+     * @param  array  $codeResponse
      * @return mixed|null
      *
      * @throws BusinessException
      */
-    protected function verifyData(string $key, $default, $rules, ?string $handler = null)
-    {
+    protected function verifyData(
+        string $key,
+        $default,
+        $rules,
+        ?string $handler = null,
+        array $codeResponse = CodeResponse::PARAM_VALIDATION_ERROR
+    ) {
         $value = request()->input($key, $default);
 
         if (is_null($value) && is_null($default)) {
@@ -135,7 +156,7 @@ trait VerifyRequestInput
         $validator = Validator::make([$key => $value], [$key => $rules]);
 
         if ($validator->fails()) {
-            throw new BusinessException(CodeResponse::PARAM_VALIDATION_ERROR);
+            throw new BusinessException($codeResponse);
         }
 
         return $handler ? $handler($value) : $value;

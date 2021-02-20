@@ -7,6 +7,7 @@ use App\CodeResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Overtrue\EasySms\Exceptions\NoGatewayAvailableException as SmsSendFailedException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -55,6 +56,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof SmsSendFailedException) {
+            return response()->json([
+                'errno' => CodeResponse::AUTH_CAPTCHA_SEND_FAILED[0],
+                'errmsg' => CodeResponse::AUTH_CAPTCHA_SEND_FAILED[1]
+            ]);
+        }
         if ($exception instanceof ValidationException) {
             return response()->json([
                 'errno' => CodeResponse::PARAM_VALIDATION_ERROR[0],

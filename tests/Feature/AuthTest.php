@@ -7,6 +7,7 @@
 
 namespace Tests\Feature;
 
+use App\CodeResponse;
 use App\Services\Users\UserService;
 use Exception;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -61,9 +62,17 @@ class AuthTest extends TestCase
 
     public function testRegCaptcha()
     {
-        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => '13682169909']);
+        $response = $this->post('wechat/auth/regCaptcha');
+        $response->assertJson([
+            'errno' => CodeResponse::AUTH_INVALID_MOBILE[0], 'errmsg' => CodeResponse::AUTH_INVALID_MOBILE[1]
+        ]);
+        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => '1111zfaaaa']);
+        $response->assertJson([
+            'errno' => CodeResponse::AUTH_INVALID_MOBILE[0], 'errmsg' => CodeResponse::AUTH_INVALID_MOBILE[1]
+        ]);
+        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => '17627609061']);
         $response->assertJson(['errno' => 0, 'errmsg' => '短信验证码发送成功']);
-        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => '13682169909']);
+        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => '17627609061']);
         $response->assertJson(['errno' => 702, 'errmsg' => '验证码一分钟只能获取1次']);
     }
 

@@ -22,7 +22,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->user = factory(User::class)->create();
-        $this->mobile = '13000000001';
+        $this->mobile = '13012271786';
     }
 
     /**
