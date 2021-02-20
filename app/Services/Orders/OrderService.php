@@ -19,7 +19,6 @@ use App\Models\Orders\Order;
 use App\Models\Orders\OrderGoods;
 use App\Notifications\NewOrderEmailNotify;
 use App\Notifications\NewOrderSmsNotify;
-use App\Notifications\VerificationCode;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotions\CouponService;
@@ -29,6 +28,7 @@ use App\Services\Users\AddressService;
 use App\Services\Users\UserService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -38,19 +38,126 @@ use Throwable;
 class OrderService extends BaseService
 {
     /**
-     * 确认收货
+     * 订单详情
      *
      * @param  int  $userId
      * @param  int  $orderId
+     * @return array
+     *
+     * @throws BusinessException
+     */
+    public function detail(int $userId, int $orderId): array
+    {
+        if (empty($order = $this->getOrderById($userId, $orderId))) {
+            $this->throwInvalidParamValueException();
+        }
+
+        $orderInfo = Arr::only($order->toArray(), [
+            'id',
+            'orderSn',
+            'message',
+            'addTime',
+            'consignee',
+            'mobile',
+            'address',
+            'goodsPrice',
+            'couponPrice',
+            'freightPrice',
+            'actualPrice',
+            'afterSaleStatus',
+        ]);
+
+        $orderInfo['orderStatusText'] = OrderStatus::STATUS_TEXT_MAP[$order->order_status] ?? '';
+        $orderInfo['handleOption'] = $order->getAvailableHandleOptions();
+
+        $expressInfo = [];
+
+        if ($order->isShippingStatus()) {
+            $orderInfo['expCode'] = $order->ship_channel;
+            $orderInfo['expNo'] = $order->ship_sn;
+            $orderInfo['expName'] = ExpressService::getInstance()->getExpressName($order->ship_channel);
+            $expressInfo = []; // TODO
+        }
+
+        $orderGoods = $this->getOrderGoodsByOrderId($orderId);
+
+        return compact('orderInfo', 'orderGoods', 'expressInfo');
+    }
+
+    /**
+     * 自动确认收货
+     *
+     * @return void
+     *
+     * @throws Throwable
+     */
+    public function autoConfirm(): void
+    {
+        Log::info('Auto Confirm Start.');
+
+        $this->getConfirmTimeoutOrders()->each(function (Order $order) {
+            try {
+                $this->confirm($order, true);
+            } catch (BusinessException $e) {
+            } catch (Throwable $e) {
+                Log::error('Auto Confirm Error: '.$e->getMessage());
+            }
+        });
+    }
+
+    /**
+     * 获取 7-10 天内已发货但未确认收货的订单
+     *
+     * @return Order[]|Collection
+     */
+    public function getConfirmTimeoutOrders(): Collection
+    {
+        $days = SystemService::getInstance()->getOrderUnconfirmed();
+
+        return Order::query()
+            ->whereOrderStatus(OrderStatus::SHIPPING)
+            ->where('ship_time', '<=', now()->subDays($days))
+            ->where('ship_time', '>=', now()->subDays($days + 10))
+            ->get();
+    }
+
+    /**
+     * 删除订单
+     *
+     * @param  int  $userId
+     * @param  int  $orderId
+     * @return void
+     *
+     * @throws BusinessException
+     * @throws Exception
+     */
+    public function delete(int $userId, int $orderId): void
+    {
+        if (empty($order = $this->getOrderById($userId, $orderId))) {
+            $this->throwInvalidParamValueException();
+        }
+
+        if (!$order->handleCanDelete()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
+        }
+
+        $order->delete();
+
+        // TODO: 删除相应的售后单，售后状态机不够完善，没有退货退款、卖家寄回、平台确认收货等状态
+    }
+
+    /**
+     * 确认收货
+     *
+     * @param  Order  $order
      * @param  bool  $auto
      * @return Order|null
      *
      * @throws BusinessException
      * @throws Throwable
      */
-    public function confirm(int $userId, int $orderId, bool $auto = false): ?Order
+    public function confirm(Order $order, bool $auto = false): ?Order
     {
-        $order = Order::query()->whereUserId($userId)->find($orderId);
         if (empty($order)) {
             $this->throwInvalidParamValueException();
         }
@@ -59,7 +166,7 @@ class OrderService extends BaseService
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能确认收货');
         }
 
-        $order->comments = $this->countOrderGoods($orderId);
+        $order->comments = $this->countOrderGoods($order->id);
         $order->order_status = $auto ? OrderStatus::AUTO_CONFIRMED : OrderStatus::CONFIRMED;
         $order->confirm_time = now()->toDateTimeString();
 
@@ -118,7 +225,7 @@ class OrderService extends BaseService
     }
 
     /**
-     * 订单发货
+     * 申请退款
      *
      * @param  int  $userId
      * @param  int  $orderId
@@ -189,6 +296,8 @@ class OrderService extends BaseService
     }
 
     /**
+     * 支付成功
+     *
      * @param  Order  $order
      * @param  string  $payId
      * @throws BusinessException
@@ -216,7 +325,7 @@ class OrderService extends BaseService
 
         // 发送短信通知
         $user = UserService::getInstance()->getUserById($order->user_id);
-        $user->notify(new VerificationCode('121212'));
+        $user->notify(new NewOrderSmsNotify);
     }
 
     /**
@@ -298,6 +407,8 @@ class OrderService extends BaseService
                 $order->order_status = OrderStatus::CANCELED;
                 break;
         }
+
+        $order->end_time = now()->toDateTimeString();
 
         if (0 === $order->cas()) {
             $this->throwBusinessException(CodeResponse::UPDATE_FAILED);

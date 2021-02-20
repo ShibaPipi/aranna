@@ -35,6 +35,16 @@ class SystemService extends BaseService
     const MALL_LONGITUDE = 'mall_longitude';
     const MALL_Latitude = 'mall_latitude';
 
+    /**
+     * 获取订单自动确认收货的天数
+     *
+     * @return int
+     */
+    public function getOrderUnconfirmed(): int
+    {
+        return (int) $this->getInfo(self::ORDER_UNCONFIRMED);
+    }
+
     public function getOrderUnpaidTimeoutValue()
     {
         return $this->getInfo(self::ORDER_UNPAID_TIMEOUT);

@@ -15,6 +15,54 @@ use Throwable;
 class OrderController extends BaseController
 {
     /**
+     * 订单详情
+     *
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     */
+    public function detail(): JsonResponse
+    {
+        $orderId = $this->verifyId('orderId');
+        $detail = OrderService::getInstance()->detail($this->userId(), $orderId);
+
+        return $this->success($detail);
+    }
+
+    /**
+     * 确认收货
+     *
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function confirm(): JsonResponse
+    {
+        $orderId = $this->verifyId('orderId');
+        $order = OrderService::getInstance()->getOrderById($this->userId(), $orderId);
+        OrderService::getInstance()->confirm($order);
+
+        return $this->success();
+    }
+
+    /**
+     * 申请退款
+     *
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function applyRefund(): JsonResponse
+    {
+        $orderId = $this->verifyId('orderId');
+        OrderService::getInstance()->applyRefund($this->userId(), $orderId);
+
+        return $this->success();
+    }
+
+    /**
      * 用户主动取消订单
      *
      * @return JsonResponse

@@ -13,6 +13,7 @@ use App\Models\Promotions\GrouponRule;
 use App\Models\Users\User;
 use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;
+use App\Services\Orders\ExpressService;
 use App\Services\Orders\OrderService;
 use App\Services\Users\AddressService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -23,15 +24,71 @@ class OrderTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function testOrderStatusTrait()
+    {
+        $order = $this->getOrder();
+        self::assertEquals(true, $order->isCreatedStatus());
+        self::assertEquals(false, $order->isPaidStatus());
+        self::assertEquals(true, $order->handleCanCancel());
+        self::assertEquals(true, $order->handleCanPay());
+        self::assertEquals(false, $order->handleCanConfirm());
+    }
+
+    public function testExpress()
+    {
+        $res = ExpressService::getInstance()->getOrderTracesByJson('YTO', '12345678');
+        dd($res);
+    }
+
+    public function testRefundProcess()
+    {
+        $order = $this->getOrder()->refresh();
+        OrderService::getInstance()->paymentSucceed($order, 'pay_id');
+        self::assertEquals(OrderStatus::PAID, $order->refresh()->order_status);
+        self::assertEquals('pay_id', $order->pay_id);
+
+        OrderService::getInstance()->applyRefund($this->user->id, $order->id);
+        self::assertEquals(OrderStatus::REFUNDING, $order->refresh()->order_status);
+
+        $refundType = '微信退款接口';
+        $refundContent = '123456';
+        OrderService::getInstance()->executeRefund($order->refresh(), $refundType, $refundContent);
+        self::assertEquals(OrderStatus::REFUND_CONFIRMED, $order->refresh()->order_status);
+        self::assertEquals($refundType, $order->refresh()->refund_type);
+        self::assertEquals($refundContent, $order->refresh()->refund_content);
+
+        OrderService::getInstance()->delete($this->user->id, $order->id);
+        self::assertNull(OrderService::getInstance()->getOrderById($this->user->id, $order->id));
+    }
+
+    public function testBaseProcess()
+    {
+        $order = $this->getOrder()->refresh();
+        OrderService::getInstance()->paymentSucceed($order, 'pay_id');
+        self::assertEquals(OrderStatus::PAID, $order->refresh()->order_status);
+        self::assertEquals('pay_id', $order->pay_id);
+
+        $shipSn = 'SF019011235';
+        $shipChannel = 'SF';
+        OrderService::getInstance()->ship($this->user->id, $order->id, $shipSn, $shipChannel);
+        self::assertEquals(OrderStatus::SHIPPING, $order->refresh()->order_status);
+        self::assertEquals($shipSn, $order->ship_sn);
+        self::assertEquals($shipChannel, $order->ship_channel);
+
+        OrderService::getInstance()->confirm($order);
+        self::assertEquals(OrderStatus::CONFIRMED, $order->refresh()->order_status);
+        self::assertEquals(2, $order->comments);
+
+        OrderService::getInstance()->delete($this->user->id, $order->id);
+        self::assertNull(OrderService::getInstance()->getOrderById($this->user->id, $order->id));
+    }
+
     public function testPaymentSucceed()
     {
         $order = $this->getOrder()->refresh();
-
         OrderService::getInstance()->paymentSucceed($order, 'pay_id');
 
-        $order->refresh();
-
-        self::assertEquals(OrderStatus::PAID, $order->order_status);
+        self::assertEquals(OrderStatus::PAID, $order->refresh()->order_status);
     }
 
     /**
