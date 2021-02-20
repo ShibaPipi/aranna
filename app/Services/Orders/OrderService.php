@@ -18,7 +18,8 @@ use App\Models\Orders\Cart;
 use App\Models\Orders\Order;
 use App\Models\Orders\OrderGoods;
 use App\Notifications\NewOrderEmailNotify;
-use App\Notifications\NewOrderSMSNotify;
+use App\Notifications\NewOrderSmsNotify;
+use App\Notifications\VerificationCode;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotions\CouponService;
@@ -211,11 +212,11 @@ class OrderService extends BaseService
         GrouponService::getInstance()->handlePaymentSucceed($order->id);
 
         // 发送邮件通知
-        Notification::route('mail', config('mail.from.address'))->notify(new NewOrderEmailNotify($order->id));
+        Notification::route('mail', '906262260@qq.com')->notify(new NewOrderEmailNotify($order->id));
 
         // 发送短信通知
         $user = UserService::getInstance()->getUserById($order->user_id);
-        $user->notify(new NewOrderSMSNotify);
+        $user->notify(new VerificationCode('121212'));
     }
 
     /**

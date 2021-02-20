@@ -164,7 +164,7 @@ class OrderTest extends TestCase
      */
     private function getOrder(): ?Order
     {
-        $this->user = factory(User::class)->state('default_address')->create(['mobile' => '13012271786']);
+        $this->user = factory(User::class)->state('default_address')->create(['mobile' => '18222106346']);
         $address = AddressService::getInstance()->getDefaultAddress($this->user->id);
 
         /** @var GoodsProduct $product1 */
