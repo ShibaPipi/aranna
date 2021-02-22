@@ -34,9 +34,9 @@ return [
         ],
 
         'aliyun' => [
-            'access_key_id' => env('ACCESS_KEY_ID', ''),
-            'access_key_secret' => env('ACCESS_KEY_SECRET', ''),
-            'sign_name' => env('SIGN_NAME', ''),
+            'access_key_id' => env('ALI_SMS_ACCESS_KEY_ID', ''),
+            'access_key_secret' => env('ALI_SMS_ACCESS_KEY_SECRET', ''),
+            'sign_name' => env('ALI_SMS_SIGN_NAME', ''),
         ],
 
         // 云片

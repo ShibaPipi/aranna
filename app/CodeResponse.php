@@ -5,6 +5,7 @@
  * Created By 皮神
  * Date: 2020/12/22
  */
+declare(strict_types=1);
 
 namespace App;
 
@@ -41,8 +42,7 @@ class CodeResponse
     const ORDER_CHECKOUT_FAIL = [722, ''];
     const ORDER_CANCEL_FAIL = [723, '订单取消失败'];
     const ORDER_PAY_FAIL = [724, '订单支付失败'];
-    // 订单当前状态下不支持用户的操作，例如商品未发货状态用户执行确认收货是不可能的。
-    const ORDER_INVALID_OPERATION = [725, '订单非法操作'];
+    const ORDER_INVALID_OPERATION = [725, '订单非法操作']; // 订单当前状态下不支持用户的操作，例如商品未发货状态用户执行确认收货是不可能的。
     const ORDER_COMMENTED = [726, '订单已评价'];
     const ORDER_COMMENT_EXPIRED = [727, ''];
 
@@ -55,7 +55,7 @@ class CodeResponse
     const COUPON_RECEIVE_FAIL = [741, '优惠券领取失败'];
     const COUPON_CODE_INVALID = [742, ''];
 
-    const AFTER_SALE_NOT_ALLOWED = [750, ''];
-    const AFTER_SALE_INVALID_AMOUNT = [751, ''];
-    const AFTER_SALE_INVALID_STATUS = [752, ''];
+    const AFTER_SALE_NOT_ALLOWED = [750, '订单不允许申请售后'];
+    const AFTER_SALE_INVALID_AMOUNT = [751, '订单申请售后金额参数非法'];
+    const AFTER_SALE_INVALID_STATUS = [752, '订单售后状态参数非法'];
 }

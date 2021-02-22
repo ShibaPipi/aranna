@@ -129,7 +129,12 @@ class AuthTest extends TestCase
         $mobile = '13012271786';
         $password = 'user123';
         $code = UserService::getInstance()->setCaptcha($mobile);
-        $this->post('wechat/auth/reset', compact('mobile', 'password', 'code'))->assertJson(['errno' => 0]);
+        $this->post('wechat/auth/reset',
+            compact('mobile', 'password'))
+            ->assertJson(['errno' => 400]);
+        $this->post('wechat/auth/reset',
+            compact('mobile', 'password', 'code'))
+            ->assertJson(['errno' => 0]);
         self::assertTrue(Hash::check($password, UserService::getInstance()->getByMobile($mobile)->password));
     }
 

@@ -44,16 +44,15 @@ class AuthController extends BaseController
     /**
      * 重置密码
      *
-     * @param  Request  $request
      * @return JsonResponse
      *
      * @throws BusinessException
      */
-    public function reset(Request $request): JsonResponse
+    public function reset(): JsonResponse
     {
-        if (empty($password = $request->input('password')) || empty($mobile = $request->input('mobile')) || empty($code = $request->input('code'))) {
-            $this->fail(CodeResponse::INVALID_PARAM);
-        }
+        $password = $this->verifyRequiredString('password');
+        $mobile = $this->verifyMobile('mobile', 0);
+        $code = $this->verifyRequiredString('code');
         UserService::getInstance()->checkCaptcha($mobile, $code);
         if (is_null($user = UserService::getInstance()->getByMobile($mobile))) {
             return $this->fail(CodeResponse::AUTH_MOBILE_UNREGISTERED);

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models\Users;
 
@@ -9,6 +10,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -35,7 +37,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property Carbon|null $add_time 创建时间
  * @property Carbon|null $update_time 更新时间
  * @property bool|null $deleted 逻辑删除
- * @property-read DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
@@ -105,7 +107,7 @@ class User extends BaseModel implements
      *
      * @return array
      */
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
         return [
             'iss' => env('JWT_ISSUER', ''),

@@ -1,5 +1,6 @@
 <?php
 /**
+ * 自定义参数验证
  *
  * Created By 皮神
  * Date: 2021/1/15
@@ -11,6 +12,7 @@ namespace App;
 use App\Exceptions\BusinessException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Throwable;
 
 trait VerifyRequestInput
 {
@@ -21,7 +23,7 @@ trait VerifyRequestInput
      * @param  null  $default
      * @return int|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function verifyId(string $key = 'id', $default = null): ?int
     {
@@ -35,7 +37,7 @@ trait VerifyRequestInput
      * @param  null  $default
      * @return string|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function verifyMobile(string $key, $default = null): ?string
     {
@@ -50,7 +52,7 @@ trait VerifyRequestInput
      * @param  null  $default
      * @return int|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function verifyInteger(string $key, $default = null): ?int
     {
@@ -64,7 +66,7 @@ trait VerifyRequestInput
      * @param  null  $default
      * @return int|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function verifyPositiveInteger(string $key, $default = null): ?int
     {
@@ -78,11 +80,24 @@ trait VerifyRequestInput
      * @param  null  $default
      * @return string|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function verifyString(string $key, $default = null): ?string
     {
         return $this->verifyData($key, $default, 'string');
+    }
+
+    /**
+     * 验证是否为字符串且必传
+     *
+     * @param  string  $key
+     * @return string|null
+     *
+     * @throws Throwable
+     */
+    public function verifyRequiredString(string $key): ?string
+    {
+        return $this->verifyData($key, '', 'required|string');
     }
 
     /**
@@ -92,7 +107,7 @@ trait VerifyRequestInput
      * @param  null  $default
      * @return int|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function verifyBoolean(string $key, $default = null): ?int
     {
@@ -107,7 +122,7 @@ trait VerifyRequestInput
      * @param  array  $enum
      * @return mixed|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function verifyEnum(string $key, $default = null, array $enum = [])
     {
@@ -121,7 +136,7 @@ trait VerifyRequestInput
      * @param  null  $default
      * @return mixed|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function verifyNotEmptyArray(string $key, $default = null)
     {
@@ -138,7 +153,7 @@ trait VerifyRequestInput
      * @param  array  $codeResponse
      * @return mixed|null
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     protected function verifyData(
         string $key,
@@ -155,9 +170,7 @@ trait VerifyRequestInput
 
         $validator = Validator::make([$key => $value], [$key => $rules]);
 
-        if ($validator->fails()) {
-            throw new BusinessException($codeResponse);
-        }
+        throw_if($validator->fails(), BusinessException::class, $codeResponse);
 
         return $handler ? $handler($value) : $value;
     }
