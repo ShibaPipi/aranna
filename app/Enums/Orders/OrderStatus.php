@@ -5,6 +5,7 @@
  * Created By 皮神
  * Date: 2021/2/2
  */
+declare(strict_types=1);
 
 namespace App\Enums\Orders;
 

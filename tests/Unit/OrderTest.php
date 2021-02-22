@@ -13,7 +13,6 @@ use App\Models\Promotions\GrouponRule;
 use App\Models\Users\User;
 use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;
-use App\Services\Orders\ExpressService;
 use App\Services\Orders\OrderService;
 use App\Services\Users\AddressService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -24,6 +23,11 @@ class OrderTest extends TestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * 订单状态特性类测试
+     *
+     * @throws BusinessException
+     */
     public function testOrderStatusTrait()
     {
         $order = $this->getOrder();
@@ -36,10 +40,19 @@ class OrderTest extends TestCase
 
     public function testExpress()
     {
-        $res = ExpressService::getInstance()->getOrderTracesByJson('YTO', '12345678');
-        dd($res);
+        $order = Order::find(1);
+        $order->order_status = null;
+        dd($order->isPaidStatus());
+//        $res = ExpressService::getInstance()->getOrderTracesByJson('YTO', '12345678');
+//        dd($res);
     }
 
+    /**
+     * 退款申请测试
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
     public function testRefundProcess()
     {
         $order = $this->getOrder()->refresh();
@@ -61,6 +74,12 @@ class OrderTest extends TestCase
         self::assertNull(OrderService::getInstance()->getOrderById($this->user->id, $order->id));
     }
 
+    /**
+     * 订单基础功能测试
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
     public function testBaseProcess()
     {
         $order = $this->getOrder()->refresh();
@@ -83,6 +102,12 @@ class OrderTest extends TestCase
         self::assertNull(OrderService::getInstance()->getOrderById($this->user->id, $order->id));
     }
 
+    /**
+     * 支付成功测试
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
     public function testPaymentSucceed()
     {
         $order = $this->getOrder()->refresh();
@@ -136,6 +161,8 @@ class OrderTest extends TestCase
     }
 
     /**
+     * 减库存测试
+     *
      * @throws BusinessException
      */
     public function testReduceStock()

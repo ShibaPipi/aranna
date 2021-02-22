@@ -13,10 +13,6 @@ use App\Services\BaseService;
 
 class ExpressService extends BaseService
 {
-    const APP_ID = '1701630';
-    const APP_KEY = '4aa58d7f-bcd1-4e0b-bfe8-b5fa29d3fff2';
-    const APP_URL = 'https://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx';
-
     /**
      * Json方式 查询订单物流轨迹
      *
@@ -29,14 +25,14 @@ class ExpressService extends BaseService
         $requestData = "{'OrderCode':'','ShipperCode':'$shipChannel','LogisticCode':'$shipSn'}";
 
         $data = [
-            'EBusinessID' => self::APP_ID,
+            'EBusinessID' => config('aranna.express.kdniao.app_id'),
             'RequestType' => '1002',
             'RequestData' => urlencode($requestData),
             'DataType' => '2',
-            'DataSign' => $this->encrypt($requestData, self::APP_KEY),
+            'DataSign' => $this->encrypt($requestData, config('aranna.express.kdniao.app_key')),
         ];
 
-        return json_decode($this->sendPost(self::APP_URL, $data), true);
+        return json_decode($this->sendPost(config('aranna.express.kdniao.app_url'), $data), true);
     }
 
     /**

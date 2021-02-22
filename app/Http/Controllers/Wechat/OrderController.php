@@ -1,4 +1,10 @@
 <?php
+/**
+ * 订单控制器
+ *
+ * Created By 皮神
+ * Date: 2020/2/8
+ */
 declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
@@ -19,7 +25,7 @@ class OrderController extends BaseController
      *
      * @return JsonResponse
      *
-     * @throws BusinessException
+     * @throws BusinessException|Throwable
      */
     public function detail(): JsonResponse
     {
@@ -67,7 +73,6 @@ class OrderController extends BaseController
      *
      * @return JsonResponse
      *
-     * @throws BusinessException
      * @throws Throwable
      */
     public function cancel(): JsonResponse

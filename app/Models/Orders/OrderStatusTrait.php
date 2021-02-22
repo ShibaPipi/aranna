@@ -5,6 +5,7 @@
  * Created By 皮神
  * Date: 2021/2/18
  */
+declare(strict_types=1);
 
 namespace App\Models\Orders;
 
@@ -94,6 +95,21 @@ trait OrderStatusTrait
             OrderStatus::REFUNDING,
         ],
     ];
+
+    /**
+     * 判断订单是否已经支付
+     *
+     * @return bool
+     */
+    public function hasPaid(): bool
+    {
+        return !in_array($this->order_status, [
+            OrderStatus::CREATED,
+            OrderStatus::ADMIN_CANCELED,
+            OrderStatus::AUTO_CANCELED,
+            OrderStatus::CANCELED,
+        ]);
+    }
 
     /**
      * 获取订单现有的可操作的状态

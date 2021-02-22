@@ -17,26 +17,33 @@ use App\Jobs\OrderUnpaidTimeoutJob;
 use App\Models\Orders\Cart;
 use App\Models\Orders\Order;
 use App\Models\Orders\OrderGoods;
-use App\Notifications\NewOrderEmailNotify;
-use App\Notifications\NewOrderSmsNotify;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotions\CouponService;
 use App\Services\Promotions\GrouponService;
 use App\Services\SystemService;
 use App\Services\Users\AddressService;
-use App\Services\Users\UserService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Throwable;
 
 class OrderService extends BaseService
 {
+    /**
+     * 根据订单编号获取订单
+     *
+     * @param  string  $orderSn
+     * @return Order|null
+     */
+    public function getOrderBySn(string $orderSn): ?Order
+    {
+        return Order::query()->whereOrderSn($orderSn)->first();
+    }
+
     /**
      * 订单详情
      *
@@ -76,7 +83,7 @@ class OrderService extends BaseService
             $orderInfo['expCode'] = $order->ship_channel;
             $orderInfo['expNo'] = $order->ship_sn;
             $orderInfo['expName'] = ExpressService::getInstance()->getExpressName($order->ship_channel);
-            $expressInfo = []; // TODO
+            $expressInfo = ExpressService::getInstance()->getOrderTracesByJson($order->ship_channel, $order->ship_sn);
         }
 
         $orderGoods = $this->getOrderGoodsByOrderId($orderId);
@@ -293,39 +300,6 @@ class OrderService extends BaseService
         // TODO: 通知用户已经发货
 
         return $order;
-    }
-
-    /**
-     * 支付成功
-     *
-     * @param  Order  $order
-     * @param  string  $payId
-     * @throws BusinessException
-     * @throws Throwable
-     */
-    public function paymentSucceed(Order $order, string $payId)
-    {
-        if (!$order->handleCanPay()) {
-            $this->throwBusinessException(CodeResponse::ORDER_PAY_FAIL, '订单不能支付');
-        }
-
-        $order->pay_id = $payId;
-        $order->pay_time = now()->toDateTimeString();
-        $order->order_status = OrderStatus::PAID;
-
-        if (0 === $order->cas()) {
-            $this->throwBusinessException(CodeResponse::UPDATE_FAILED);
-        }
-
-        // 更新支付成功的团购信息
-        GrouponService::getInstance()->handlePaymentSucceed($order->id);
-
-        // 发送邮件通知
-        Notification::route('mail', '906262260@qq.com')->notify(new NewOrderEmailNotify($order->id));
-
-        // 发送短信通知
-        $user = UserService::getInstance()->getUserById($order->user_id);
-        $user->notify(new NewOrderSmsNotify);
     }
 
     /**

@@ -76,11 +76,17 @@ Route::prefix('order')->group(function () {
     Route::post('delete', 'OrderController@delete'); // 删除订单
     Route::post('confirm', 'OrderController@confirm'); // 确认收货
     Route::get('detail', 'OrderController@detail'); //订单详情
-//    Route::any('list', 'OrderController@list'); //订单列表
-//    Route::any('prepay', 'OrderController@prepay'); //
-//    Route::any('h5pay', 'OrderController@h5pay'); //
+    Route::get('list', 'OrderController@list'); //订单列表
 });
 
+Route::prefix('pay_order')->group(function () {
+//    Route::any('prepay', 'PayOrderController@prepay'); // jsapi，微信公众号支付
+    Route::post('h5wechat', 'PayOrderController@h5wechat'); // 微信手机浏览器支付
+    Route::post('wechatNotify', 'PayOrderController@wechatNotify'); // 微信手机浏览器支付
+    Route::post('h5alipay', 'PayOrderController@h5alipay'); // 支付宝支付 - h5
+    Route::post('alipayNotify', 'PayOrderController@alipayNotify'); // 支付宝异步回调
+    Route::get('alipayReturn', 'PayOrderController@alipayReturn'); // 支付宝同步回调
+});
 
 //Route::any('home/index', ''); //首页数据接口
 //Route::any('collect/list', ''); //收藏列表
