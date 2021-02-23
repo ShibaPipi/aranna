@@ -69,11 +69,9 @@ class UserService extends BaseService
      * @param  string  $mobile
      * @return User|null
      */
-    public function getByMobile(string $mobile): ?User
+    public function getUserByMobile(string $mobile): ?User
     {
-        return User::query()
-            ->where('mobile', $mobile)
-            ->first();
+        return User::query()->whereMobile($mobile)->first();
     }
 
     /**

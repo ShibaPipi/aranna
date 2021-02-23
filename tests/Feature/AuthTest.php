@@ -7,7 +7,6 @@
 
 namespace Tests\Feature;
 
-use App\CodeResponse;
 use App\Services\Users\UserService;
 use Exception;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -18,16 +17,25 @@ class AuthTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected $unregisteredMobile;
+
+    protected function setUp(): void
+    {
+        $this->unregisteredMobile = '13012121212';
+
+        parent::setUp();
+    }
+
     /**
      * @throws Exception
      */
     public function testRegister()
     {
-        $code = UserService::getInstance()->setCaptcha($this->mobile);
+        $code = UserService::getInstance()->setCaptcha($this->unregisteredMobile);
         $response = $this->post('wechat/auth/register', [
-            'username' => 'pipi',
-            'password' => 123456,
-            'mobile' => $this->mobile,
+            'username' => 'pipixia',
+            'password' => '123456',
+            'mobile' => $this->unregisteredMobile,
             'code' => $code
         ]);
         $response->assertStatus(200);
@@ -40,8 +48,8 @@ class AuthTest extends TestCase
     {
         $response = $this->post('wechat/auth/register', [
             'username' => 'pipi',
-            'password' => 123456,
-            'mobile' => $this->mobile,
+            'password' => '123456',
+            'mobile' => $this->unregisteredMobile,
             'code' => '1212'
         ]);
         $response->assertJson(['errno' => 703, 'errmsg' => '验证码错误']);
@@ -51,38 +59,33 @@ class AuthTest extends TestCase
     {
         $response = $this->post('wechat/auth/register', [
             'username' => 'pipi',
-            'password' => 123456,
-            'mobile' => 13012272221786,
-            'code' => 1234
+            'password' => '123456',
+            'mobile' => 'kdjfa;k23425',
+            'code' => '1234'
         ]);
         $response->assertStatus(200);
-        $result = $response->getOriginalContent();
-        self::assertEquals(707, $result['errno']);
+        $response->assertJson(["errno" => 400, "errmsg" => "手机号格式不正确"]);
     }
 
     public function testRegCaptcha()
     {
         $response = $this->post('wechat/auth/regCaptcha');
-        $response->assertJson([
-            'errno' => CodeResponse::AUTH_INVALID_MOBILE[0], 'errmsg' => CodeResponse::AUTH_INVALID_MOBILE[1]
-        ]);
+        $response->assertJson(["errno" => 400, "errmsg" => "手机 必须是一个字符串。 手机号格式不正确"]);
         $response = $this->post('wechat/auth/regCaptcha', ['mobile' => '1111zfaaaa']);
-        $response->assertJson([
-            'errno' => CodeResponse::AUTH_INVALID_MOBILE[0], 'errmsg' => CodeResponse::AUTH_INVALID_MOBILE[1]
-        ]);
-        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => '17627609061']);
+        $response->assertJson(["errno" => 400, "errmsg" => "手机号格式不正确"]);
+        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => $this->unregisteredMobile]);
         $response->assertJson(['errno' => 0, 'errmsg' => '短信验证码发送成功']);
-        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => '17627609061']);
+        $response = $this->post('wechat/auth/regCaptcha', ['mobile' => $this->unregisteredMobile]);
         $response->assertJson(['errno' => 702, 'errmsg' => '验证码一分钟只能获取1次']);
     }
 
     public function testLogin()
     {
-        $response = $this->post('wechat/auth/login', ['username' => 'syp', 'password' => 123456]);
+        $response = $this->post('wechat/auth/login', ['username' => $this->user->username, 'password' => '111111']);
         self::assertEquals(700, $response['errno']);
-        $response = $this->post('wechat/auth/login', ['username' => 'syp2', 'password' => 123456]);
+        $response = $this->post('wechat/auth/login', ['username' => 'syp2', 'password' => '123456']);
         self::assertEquals(709, $response['errno']);
-        $response = $this->post('wechat/auth/login', ['username' => 'syp', 'password' => 'user123']);
+        $response = $this->post('wechat/auth/login', ['username' => $this->user->username, 'password' => '123456']);
         $token = $response->getOriginalContent()['data']['token'] ?? '';
         echo $token;
         self::assertNotEmpty($token);
@@ -91,7 +94,7 @@ class AuthTest extends TestCase
     public function testInfo()
     {
         $res = $this->get('wechat/auth/info', $this->getAuthHeader());
-        $user = UserService::getInstance()->getByUsername($this->username);
+        $user = UserService::getInstance()->getByUsername($this->user->username);
         $res->assertJson([
             'data' => [
                 'nickname' => $user->nickname,
@@ -106,7 +109,7 @@ class AuthTest extends TestCase
     {
         $headers = $this->getAuthHeader();
         $res = $this->get('wechat/auth/info', $headers);
-        $user = UserService::getInstance()->getByUsername($this->username);
+        $user = UserService::getInstance()->getByUsername($this->user->username);
         $res->assertJson([
             'data' => [
                 'nickname' => $user->nickname,
@@ -126,8 +129,8 @@ class AuthTest extends TestCase
      */
     public function testReset()
     {
-        $mobile = '13012271786';
-        $password = 'user123';
+        $mobile = $this->user->mobile;
+        $password = '123456';
         $code = UserService::getInstance()->setCaptcha($mobile);
         $this->post('wechat/auth/reset',
             compact('mobile', 'password'))
@@ -135,7 +138,7 @@ class AuthTest extends TestCase
         $this->post('wechat/auth/reset',
             compact('mobile', 'password', 'code'))
             ->assertJson(['errno' => 0]);
-        self::assertTrue(Hash::check($password, UserService::getInstance()->getByMobile($mobile)->password));
+        self::assertTrue(Hash::check($password, UserService::getInstance()->getUserByMobile($mobile)->password));
     }
 
     public function testProfile()
@@ -143,7 +146,7 @@ class AuthTest extends TestCase
         $nickname = 'user1111';
         $this->post('wechat/auth/profile', ['nickname' => $nickname, 'gender' => 1, 'avatar' => ''],
             $this->getAuthHeader())->assertJson(['errno' => 0]);
-        $user = UserService::getInstance()->getByUsername($this->username);
+        $user = UserService::getInstance()->getByUsername($this->user->username);
         self::assertEquals($nickname, $user->nickname);
         self::assertEquals(1, $user->gender);
     }
