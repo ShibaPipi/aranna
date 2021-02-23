@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Services\Goods\CategoryService;
 use Illuminate\Http\JsonResponse;
 

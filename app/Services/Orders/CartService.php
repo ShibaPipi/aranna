@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Orders;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Models\Goods\Goods;
 use App\Models\Goods\GoodsProduct;

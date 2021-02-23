@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Enums\SearchHistories\SearchHistoryFrom;
 use App\Exceptions\BusinessException;
 use App\Inputs\Goods\GoodsListInput;

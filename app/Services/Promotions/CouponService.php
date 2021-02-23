@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Promotions;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Enums\Coupons\CouponGoodsType;
 use App\Enums\Coupons\CouponStatus;
 use App\Enums\Coupons\CouponTimeType;

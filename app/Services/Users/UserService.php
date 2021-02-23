@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\Users;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Models\Users\User;
 use App\Notifications\VerificationCode;

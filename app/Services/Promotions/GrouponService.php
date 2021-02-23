@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Promotions;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Enums\GrouponRules\GrouponRuleStatus;
 use App\Enums\Groupons\GrouponStatus;
 use App\Exceptions\BusinessException;

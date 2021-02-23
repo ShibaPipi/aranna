@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Services\Users\UserService;
 use Exception;
