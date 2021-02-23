@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\CodeResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Users\User;
-use App\VerifyRequestInput;
+use App\Utils\CodeResponse;
+use App\Utils\VerifyRequestInput;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -29,12 +29,15 @@ class BaseController extends Controller
     public function __construct()
     {
         $option = [];
+
         if (!is_null($this->middlewareOnly)) {
             $option['only'] = $this->middlewareOnly;
         }
+
         if (!is_null($this->middlewareExcept)) {
             $option['except'] = $this->middlewareExcept;
         }
+
         $this->middleware('auth:wechat', $option);
     }
 
@@ -86,9 +89,11 @@ class BaseController extends Controller
                 'list' => $list ?? $data['data']
             ];
         }
+
         if ($data instanceof Collection) {
             $data = $data->toArray();
         }
+
         if (is_array($data)) {
             $total = count($data);
 
@@ -115,6 +120,7 @@ class BaseController extends Controller
         [$errno, $errmsg] = $codeResponse;
         $errmsg = $info ?: $errmsg;
         $ret = compact('errno', 'errmsg');
+
         if ($data) {
             if (is_array($data)) {
                 $data = array_filter($data, function ($item) {
@@ -123,6 +129,7 @@ class BaseController extends Controller
             }
             $ret += compact('data');
         }
+
         return response()->json($ret);
     }
 

@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace App;
+namespace App\Utils;
 
 class CodeResponse
 {
@@ -21,14 +21,13 @@ class CodeResponse
     const UPDATE_FAILED = [505, '数据更新失败'];
 
     // 业务返回码
-    const AUTH_INVALID_ACCOUNT = [700, ''];
+    const AUTH_INVALID_ACCOUNT = [700, '账号非法'];
     const AUTH_CAPTCHA_SEND_FAILED = [701, '验证码发送失败'];
     const AUTH_CAPTCHA_FREQUENCY = [702, '验证码一分钟只能获取1次，一天只能获取10次'];
     const AUTH_CAPTCHA_MISMATCH = [703, '验证码错误'];
-    const AUTH_NAME_REGISTERED = [704, '用户已注册'];
+    const AUTH_NAME_REGISTERED = [704, '用户名已注册'];
     const AUTH_MOBILE_REGISTERED = [705, '手机号已注册'];
     const AUTH_MOBILE_UNREGISTERED = [706, '手机号未注册'];
-    const AUTH_INVALID_MOBILE = [707, '手机号格式不正确'];
     const AUTH_OPENID_UNAVAILABLE = [708, ''];
     const AUTH_NAME_UNREGISTERED = [709, '用户未注册'];
 

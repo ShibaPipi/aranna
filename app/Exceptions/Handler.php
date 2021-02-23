@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;

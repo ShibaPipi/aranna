@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace App;
+namespace App\Utils;
 
 use App\Exceptions\BusinessException;
 use Illuminate\Support\Facades\Validator;
@@ -27,7 +27,7 @@ trait VerifyRequestInput
      */
     public function verifyId(string $key = 'id', $default = null): ?int
     {
-        return $this->verifyData($key, $default, 'integer|digits_between:1,20|min:1', 'intval');
+        return $this->verifyData($key, $default, 'integer|digits_between:1,20|min:1', [], 'intval');
     }
 
     /**
@@ -41,8 +41,7 @@ trait VerifyRequestInput
      */
     public function verifyMobile(string $key, $default = null): ?string
     {
-        return $this->verifyData($key, $default, 'string|regex:/^1[0-9]{10}$/', null,
-            CodeResponse::AUTH_INVALID_MOBILE);
+        return $this->verifyData($key, $default, 'string|regex:/^1[0-9]{10}$/', ['regex' => '手机号格式不正确']);
     }
 
     /**
@@ -56,7 +55,7 @@ trait VerifyRequestInput
      */
     public function verifyInteger(string $key, $default = null): ?int
     {
-        return $this->verifyData($key, $default, 'integer', 'intval');
+        return $this->verifyData($key, $default, 'integer', [], 'intval');
     }
 
     /**
@@ -70,7 +69,7 @@ trait VerifyRequestInput
      */
     public function verifyPositiveInteger(string $key, $default = null): ?int
     {
-        return $this->verifyData($key, $default, 'integer|min:1', 'intval');
+        return $this->verifyData($key, $default, 'integer|min:1', [], 'intval');
     }
 
     /**
@@ -111,7 +110,7 @@ trait VerifyRequestInput
      */
     public function verifyBoolean(string $key, $default = null): ?int
     {
-        return $this->verifyData($key, $default, 'boolean', 'intval');
+        return $this->verifyData($key, $default, 'boolean', [], 'intval');
     }
 
     /**
@@ -159,8 +158,8 @@ trait VerifyRequestInput
         string $key,
         $default,
         $rules,
-        ?string $handler = null,
-        array $codeResponse = CodeResponse::PARAM_VALIDATION_ERROR
+        array $messages = [],
+        ?string $handler = null
     ) {
         $value = request()->input($key, $default);
 
@@ -168,9 +167,12 @@ trait VerifyRequestInput
             return null;
         }
 
-        $validator = Validator::make([$key => $value], [$key => $rules]);
+        $validator = Validator::make([$key => $value], [$key => $rules], $messages);
 
-        throw_if($validator->fails(), BusinessException::class, $codeResponse);
+        throwBusinessException_if($validator->fails(),
+            CodeResponse::PARAM_VALIDATION_ERROR,
+            implode('，', $validator->errors()->all())
+        );
 
         return $handler ? $handler($value) : $value;
     }

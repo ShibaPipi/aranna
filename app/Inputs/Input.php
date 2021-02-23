@@ -7,7 +7,7 @@
 
 namespace App\Inputs;
 
-use App\CodeResponse;
+use App\Utils\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\VerifyRequestInput;
 use Illuminate\Support\Facades\Validator;

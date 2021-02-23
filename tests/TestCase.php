@@ -15,14 +15,11 @@ abstract class TestCase extends BaseTestCase
      */
     protected $user;
 
-    protected $mobile;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->user = factory(User::class)->create();
-        $this->mobile = '13012271786';
     }
 
     /**
@@ -32,7 +29,7 @@ abstract class TestCase extends BaseTestCase
      * @param  string  $password
      * @return mixed|string
      */
-    protected function getToken(string $username = 'user123', string $password = 'user123'): string
+    protected function getToken(string $username, string $password): string
     {
         $response = $this->post('wechat/auth/login', compact('username', 'password'));
 
@@ -44,8 +41,11 @@ abstract class TestCase extends BaseTestCase
      *
      * @return array string[]
      */
-    protected function getAuthHeader(string $username = 'user123', string $password = 'user123'): array
+    protected function getAuthHeader(string $username = '', string $password = ''): array
     {
+        $username = $username ?: $this->user->username;
+        $password = $password ?: '123456';
+
         return ['Authorization' => 'Bearer '.$this->getToken($username, $password)];
     }
 }
