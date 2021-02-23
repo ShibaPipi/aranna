@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Enums\SearchHistories\SearchHistoryFrom;
 use App\Exceptions\BusinessException;
 use App\Inputs\Goods\GoodsListInput;
@@ -59,7 +59,7 @@ class GoodsController extends BaseController
     {
         $id = $this->verifyId('id', 0);
         if (empty($currentCategory = CategoryService::getInstance()->getCategoryById($id))) {
-            return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
+            return $this->fail(ResponseCode::INVALID_PARAM_VALUE);
         }
         if (0 === $currentCategory->pid) {
             $parentCategory = $currentCategory;
@@ -82,7 +82,7 @@ class GoodsController extends BaseController
     {
         $id = $this->verifyId('id', 0);
         if (empty($info = GoodsService::getInstance()->getGoodsById($id))) {
-            return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
+            return $this->fail(ResponseCode::INVALID_PARAM_VALUE);
         }
 
         $attribute = GoodsService::getInstance()->getAttributes($id);

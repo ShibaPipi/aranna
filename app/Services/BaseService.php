@@ -7,7 +7,7 @@
 
 namespace App\Services;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 
 class BaseService
@@ -44,17 +44,17 @@ class BaseService
     /**
      * 抛出异常，默认为非法参数异常
      *
-     * @param  array  $codeResponse
+     * @param  array  $responseCode
      * @param  string  $message
      * @return void
      *
      * @throws BusinessException
      */
     public function throwBusinessException(
-        array $codeResponse = CodeResponse::INVALID_PARAM,
+        array $responseCode = ResponseCode::INVALID_PARAM,
         string $message = ''
     ): void {
-        throw new BusinessException($codeResponse, $message);
+        throw new BusinessException($responseCode, $message);
     }
 
     /**
@@ -67,7 +67,7 @@ class BaseService
      */
     public function throwInvalidParamValueException(string $message = ''): void
     {
-        $this->throwBusinessException(CodeResponse::INVALID_PARAM_VALUE, $message);
+        $this->throwBusinessException(ResponseCode::INVALID_PARAM_VALUE, $message);
     }
 
     /**
@@ -80,6 +80,6 @@ class BaseService
      */
     public function throwUpdateFailedException(string $message = ''): void
     {
-        $this->throwBusinessException(CodeResponse::UPDATE_FAILED, $message);
+        $this->throwBusinessException(ResponseCode::UPDATE_FAILED, $message);
     }
 }

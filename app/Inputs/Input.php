@@ -7,7 +7,7 @@
 
 namespace App\Inputs;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\VerifyRequestInput;
 use Illuminate\Support\Facades\Validator;
@@ -30,7 +30,7 @@ class Input
 
         $validator = Validator::make($data, $this->rules());
         if ($validator->fails()) {
-            throw new BusinessException(CodeResponse::PARAM_VALIDATION_ERROR);
+            throw new BusinessException(ResponseCode::PARAM_VALIDATION_ERROR);
         }
 
         $vars = array_keys(get_object_vars($this));

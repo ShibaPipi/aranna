@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -58,14 +58,14 @@ class Handler extends ExceptionHandler
     {
         if ($exception instanceof SmsSendFailedException) {
             return response()->json([
-                'errno' => CodeResponse::AUTH_CAPTCHA_SEND_FAILED[0],
-                'errmsg' => CodeResponse::AUTH_CAPTCHA_SEND_FAILED[1]
+                'errno' => ResponseCode::AUTH_CAPTCHA_SEND_FAILED[0],
+                'errmsg' => ResponseCode::AUTH_CAPTCHA_SEND_FAILED[1]
             ]);
         }
         if ($exception instanceof ValidationException) {
             return response()->json([
-                'errno' => CodeResponse::PARAM_VALIDATION_ERROR[0],
-                'errmsg' => CodeResponse::PARAM_VALIDATION_ERROR[1]
+                'errno' => ResponseCode::PARAM_VALIDATION_ERROR[0],
+                'errmsg' => ResponseCode::PARAM_VALIDATION_ERROR[1]
             ]);
         }
         if ($exception instanceof BusinessException) {

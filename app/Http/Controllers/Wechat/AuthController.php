@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Enums\Users\UserGender;
 use App\Exceptions\BusinessException;
 use App\Models\Users\User;
@@ -41,7 +41,7 @@ class AuthController extends BaseController
             $user->nickname = $nickname;
         }
 
-        return $this->judge($user->save(), CodeResponse::UPDATE_FAILED);
+        return $this->judge($user->save(), ResponseCode::UPDATE_FAILED);
     }
 
     /**
@@ -60,12 +60,12 @@ class AuthController extends BaseController
         UserService::getInstance()->checkCaptcha($mobile, $code);
 
         if (is_null($user = UserService::getInstance()->getUserByMobile($mobile))) {
-            return $this->fail(CodeResponse::AUTH_MOBILE_UNREGISTERED);
+            return $this->fail(ResponseCode::AUTH_MOBILE_UNREGISTERED);
         }
 
         $user->password = bcrypt($password);
 
-        return $this->judge($user->save(), CodeResponse::UPDATE_FAILED);
+        return $this->judge($user->save(), ResponseCode::UPDATE_FAILED);
     }
 
     /**
@@ -113,11 +113,11 @@ class AuthController extends BaseController
         $code = $this->verifyRequiredString('code');
 
         if (!empty($user = UserService::getInstance()->getByUsername($username))) {
-            return $this->fail(CodeResponse::AUTH_NAME_REGISTERED);
+            return $this->fail(ResponseCode::AUTH_NAME_REGISTERED);
         }
 
         if (!empty($user = UserService::getInstance()->getUserByMobile($mobile))) {
-            return $this->fail(CodeResponse::AUTH_MOBILE_REGISTERED);
+            return $this->fail(ResponseCode::AUTH_MOBILE_REGISTERED);
         }
 
         // 验证短信验证码
@@ -155,16 +155,16 @@ class AuthController extends BaseController
         $mobile = $this->verifyMobile('mobile', 0);
         // 验证手机号是否被注册
         if (!empty($user = UserService::getInstance()->getUserByMobile($mobile))) {
-            return $this->fail(CodeResponse::AUTH_MOBILE_REGISTERED);
+            return $this->fail(ResponseCode::AUTH_MOBILE_REGISTERED);
         }
 
         // 防刷验证，一分钟只能请求一次，一天只能10次
         if (!$lock = Cache::add('reg_captcha_lock_'.$mobile, 1, 60)) {
-            return $this->fail(CodeResponse::AUTH_CAPTCHA_FREQUENCY, '验证码一分钟只能获取1次');
+            return $this->fail(ResponseCode::AUTH_CAPTCHA_FREQUENCY, '验证码一分钟只能获取1次');
         }
 
         if (!UserService::getInstance()->checkRegCaptchaCount($mobile)) {
-            return $this->fail(CodeResponse::AUTH_CAPTCHA_FREQUENCY, '验证码一天只能获取10次');
+            return $this->fail(ResponseCode::AUTH_CAPTCHA_FREQUENCY, '验证码一天只能获取10次');
         }
 
         UserService::getInstance()->sendCaptcha($mobile);
@@ -185,19 +185,19 @@ class AuthController extends BaseController
 
         // 验证账号是否存在
         if (empty($user = UserService::getInstance()->getByUsername($username))) {
-            return $this->fail(CodeResponse::AUTH_NAME_UNREGISTERED);
+            return $this->fail(ResponseCode::AUTH_NAME_UNREGISTERED);
         }
 
         // 对密码进行验证
         if (!Hash::check($password, $user->getAuthPassword())) {
-            return $this->fail(CodeResponse::AUTH_INVALID_ACCOUNT, '账号密码错误');
+            return $this->fail(ResponseCode::AUTH_INVALID_ACCOUNT, '账号密码错误');
         }
 
         // 更新登录信息
         $user->last_login_time = now()->toDateTimeString();
         $user->last_login_ip = $request->getClientIp();
         if (!$user->save()) {
-            return $this->fail(CodeResponse::UPDATE_FAILED);
+            return $this->fail(ResponseCode::UPDATE_FAILED);
         }
 
         // 获取 token

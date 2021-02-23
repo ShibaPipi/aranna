@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Orders;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\Models\Goods\Goods;
 use App\Models\Goods\GoodsProduct;
@@ -297,7 +297,7 @@ class CartService extends BaseService
     public function edit(Cart $cart, GoodsProduct $product, int $number): Cart
     {
         if ($number > $product->number) {
-            $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
+            $this->throwBusinessException(ResponseCode::GOODS_NO_STOCK);
         }
 
         $cart->fill(compact('number'))->save();
@@ -319,7 +319,7 @@ class CartService extends BaseService
     public function newCartRecord(int $userId, Goods $goods, GoodsProduct $product, int $number): Cart
     {
         if ($number > $product->number) {
-            $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
+            $this->throwBusinessException(ResponseCode::GOODS_NO_STOCK);
         }
 
         $cart = Cart::new();
@@ -367,11 +367,11 @@ class CartService extends BaseService
     public function getGoodsAndProduct(int $goodsId, int $productId): array
     {
         if (is_null($goods = GoodsService::getInstance()->getGoodsById($goodsId)) || !$goods->is_on_sale) {
-            $this->throwBusinessException(CodeResponse::GOODS_UNSHELVE);
+            $this->throwBusinessException(ResponseCode::GOODS_UNSHELVE);
         }
 
         if (is_null($product = GoodsService::getInstance()->getGoodsProductByProductId($productId))) {
-            $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
+            $this->throwBusinessException(ResponseCode::GOODS_NO_STOCK);
         }
 
         return [$goods, $product];

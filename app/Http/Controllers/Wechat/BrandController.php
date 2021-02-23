@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\Inputs\PageInput;
 use App\Services\Goods\BrandService;
@@ -40,11 +40,11 @@ class BrandController extends BaseController
     public function detail(): JsonResponse
     {
         if (empty($id = $this->verifyId())) {
-            return $this->fail(CodeResponse::INVALID_PARAM);
+            return $this->fail(ResponseCode::INVALID_PARAM);
         }
 
         if (is_null($brand = BrandService::getInstance()->getBrand($id))) {
-            return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
+            return $this->fail(ResponseCode::INVALID_PARAM_VALUE);
         }
 
         return $this->success($brand->toArray());

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Orders;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Enums\Orders\OrderStatus;
 use App\Exceptions\BusinessException;
 use App\Inputs\Orders\OrderSubmitInput;
@@ -145,7 +145,7 @@ class OrderService extends BaseService
         }
 
         if (!$order->handleCanDelete()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
+            $this->throwBusinessException(ResponseCode::ORDER_INVALID_OPERATION, '订单不能删除');
         }
 
         $order->delete();
@@ -170,7 +170,7 @@ class OrderService extends BaseService
         }
 
         if (!$order->handleCanConfirm()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能确认收货');
+            $this->throwBusinessException(ResponseCode::ORDER_INVALID_OPERATION, '订单不能确认收货');
         }
 
         $order->comments = $this->countOrderGoods($order->id);
@@ -209,7 +209,7 @@ class OrderService extends BaseService
     public function executeRefund(Order $order, $refundType, $refundContent): Order
     {
         if (!$order->handleCanExecuteRefund()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能执行退款');
+            $this->throwBusinessException(ResponseCode::ORDER_INVALID_OPERATION, '订单不能执行退款');
         }
 
         $now = now()->toDateTimeString();
@@ -250,7 +250,7 @@ class OrderService extends BaseService
         }
 
         if (!$order->handleCanRefund()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能申请退款');
+            $this->throwBusinessException(ResponseCode::ORDER_INVALID_OPERATION, '订单不能申请退款');
         }
 
         $order->order_status = OrderStatus::REFUNDING;
@@ -285,7 +285,7 @@ class OrderService extends BaseService
         }
 
         if (!$order->handleCanShip()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能发货');
+            $this->throwBusinessException(ResponseCode::ORDER_INVALID_OPERATION, '订单不能发货');
         }
 
         $order->order_status = OrderStatus::SHIPPING;
@@ -367,7 +367,7 @@ class OrderService extends BaseService
         }
 
         if (!$order->handleCanCancel()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
+            $this->throwBusinessException(ResponseCode::ORDER_INVALID_OPERATION, '订单不能取消');
         }
 
         switch ($role) {
@@ -385,7 +385,7 @@ class OrderService extends BaseService
         $order->end_time = now()->toDateTimeString();
 
         if (0 === $order->cas()) {
-            $this->throwBusinessException(CodeResponse::UPDATE_FAILED);
+            $this->throwBusinessException(ResponseCode::UPDATE_FAILED);
         }
 
         $this->rollbackStock($orderId);
@@ -541,11 +541,11 @@ class OrderService extends BaseService
             }
 
             if ($product->number < $cart->number) {
-                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
+                $this->throwBusinessException(ResponseCode::GOODS_NO_STOCK);
             }
 
             if (0 === GoodsService::getInstance()->reduceStock($product->id, $cart->number)) {
-                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
+                $this->throwBusinessException(ResponseCode::GOODS_NO_STOCK);
             }
         }
     }
@@ -566,7 +566,7 @@ class OrderService extends BaseService
             if ($this->snAvailable($orderSn)) {
                 Log::warning('订单号获取失败，orderSn：'.$orderSn);
 
-                $this->throwBusinessException(CodeResponse::FAIL, '订单编号获取失败');
+                $this->throwBusinessException(ResponseCode::FAIL, '订单编号获取失败');
             }
 
             return $orderSn;

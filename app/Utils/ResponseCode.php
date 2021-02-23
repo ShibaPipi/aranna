@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
-class CodeResponse
+class ResponseCode
 {
     // 通用返回码
     const SUCCESS = [0, '成功'];

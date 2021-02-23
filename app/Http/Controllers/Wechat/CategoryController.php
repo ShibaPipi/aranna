@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Services\Goods\CategoryService;
 use Illuminate\Http\JsonResponse;
 
@@ -27,11 +27,11 @@ class CategoryController extends BaseController
     public function current(): JsonResponse
     {
         if (empty($id = $this->verifyId())) {
-            $this->fail(CodeResponse::INVALID_PARAM);
+            $this->fail(ResponseCode::INVALID_PARAM);
         }
 
         if (is_null($currentCategory = CategoryService::getInstance()->getL1CategoryById($id))) {
-            return $this->fail(CodeResponse::INVALID_PARAM_VALUE);
+            return $this->fail(ResponseCode::INVALID_PARAM_VALUE);
         }
 
         $currentSubCategory = CategoryService::getInstance()->getL2CategoriesByPid($currentCategory->id);

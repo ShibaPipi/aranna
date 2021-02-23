@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
@@ -32,7 +32,7 @@ class Authenticate extends Middleware
     protected function unauthenticated($request, array $guards)
     {
         if ($request->expectsJson() || in_array('wechat', $guards)) {
-            throw new BusinessException(CodeResponse::NOT_LOGIN);
+            throw new BusinessException(ResponseCode::NOT_LOGIN);
         }
 
         parent::unauthenticated($request, $guards);

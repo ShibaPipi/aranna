@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\Inputs\Orders\OrderSubmitInput;
 use App\Services\Orders\OrderService;
@@ -98,7 +98,7 @@ class OrderController extends BaseController
         $lockKey = sprintf('order_submit_%s_%s'.$this->userId(), md5(serialize($input)));
         $lock = Cache::lock($lockKey, 5);
         if (!$lock->get()) {
-            return $this->fail(CodeResponse::FAIL, '请勿重复下单');
+            return $this->fail(ResponseCode::FAIL, '请勿重复下单');
         }
 
         $order = DB::transaction(function () use ($input) {

@@ -149,7 +149,7 @@ trait VerifyRequestInput
      * @param  int|string|array|mixed  $default
      * @param  string|array  $rules
      * @param  string|null  $handler
-     * @param  array  $codeResponse
+     * @param  array  $responseCode
      * @return mixed|null
      *
      * @throws Throwable

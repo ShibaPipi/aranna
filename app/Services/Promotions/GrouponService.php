@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Promotions;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Enums\GrouponRules\GrouponRuleStatus;
 use App\Enums\Groupons\GrouponStatus;
 use App\Exceptions\BusinessException;
@@ -48,7 +48,7 @@ class GrouponService extends BaseService
 
         $groupon->status = GrouponStatus::ON;
         if (!$groupon->save()) {
-            $this->throwBusinessException(CodeResponse::UPDATE_FAILED);
+            $this->throwBusinessException(ResponseCode::UPDATE_FAILED);
         }
 
         if (0 == $groupon->groupon_id) {
@@ -67,7 +67,7 @@ class GrouponService extends BaseService
             ->update(['status' => GrouponStatus::SUCCEED]);
 
         if (0 == $row) {
-            $this->throwBusinessException(CodeResponse::UPDATE_FAILED);
+            $this->throwBusinessException(ResponseCode::UPDATE_FAILED);
         }
     }
 
@@ -184,11 +184,11 @@ class GrouponService extends BaseService
         }
 
         if ($rule->status == GrouponRuleStatus::DOWN_EXPIRE) {
-            $this->throwBusinessException(CodeResponse::GROUPON_EXPIRED);
+            $this->throwBusinessException(ResponseCode::GROUPON_EXPIRED);
         }
 
         if ($rule->status == GrouponRuleStatus::DOWN_ADMIN) {
-            $this->throwBusinessException(CodeResponse::GROUPON_OFFLINE);
+            $this->throwBusinessException(ResponseCode::GROUPON_OFFLINE);
         }
 
         if ($linkId <= 0) {
@@ -196,11 +196,11 @@ class GrouponService extends BaseService
         }
 
         if ($this->countGrouponJoin($linkId) >= ($rule->discount_member - 1)) {
-            $this->throwBusinessException(CodeResponse::GROUPON_FULL);
+            $this->throwBusinessException(ResponseCode::GROUPON_FULL);
         }
 
         if ($this->isOpenOrJoin($userId, $linkId)) {
-            $this->throwBusinessException(CodeResponse::GROUPON_JOIN);
+            $this->throwBusinessException(ResponseCode::GROUPON_JOIN);
         }
     }
 

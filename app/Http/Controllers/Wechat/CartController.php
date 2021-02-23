@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;
@@ -77,11 +77,11 @@ class CartController extends BaseController
         }
 
         if (is_null($goods = GoodsService::getInstance()->getGoodsById($goodsId)) || !$goods->is_on_sale) {
-            return $this->fail(CodeResponse::GOODS_UNSHELVE);
+            return $this->fail(ResponseCode::GOODS_UNSHELVE);
         }
 
         if (is_null($product = GoodsService::getInstance()->getGoodsProductByProductId($productId)) || $product->number < $number) {
-            return $this->fail(CodeResponse::GOODS_NO_STOCK);
+            return $this->fail(ResponseCode::GOODS_NO_STOCK);
         }
 
         return $this->judge(

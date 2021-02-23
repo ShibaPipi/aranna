@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\Models\Promotions\Coupon;
 use App\Models\Promotions\CouponUser;
@@ -16,7 +16,7 @@ class CouponTest extends TestCase
 
     public function testReceiveLimit()
     {
-        $this->expectExceptionObject(new BusinessException(CodeResponse::COUPON_EXCEED_LIMIT, '优惠券可领取数量已达上限'));
+        $this->expectExceptionObject(new BusinessException(ResponseCode::COUPON_EXCEED_LIMIT, '优惠券可领取数量已达上限'));
         CouponService::getInstance()->receive(1, 1);
     }
 

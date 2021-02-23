@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Wechat;
 
 use App\Http\Controllers\Controller;
 use App\Models\Users\User;
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Utils\VerifyRequestInput;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -110,14 +110,14 @@ class BaseController extends Controller
     }
 
     /**
-     * @param  array  $codeResponse
+     * @param  array  $responseCode
      * @param  array|null  $data
      * @param  string  $info
      * @return JsonResponse
      */
-    protected function codeReturn(array $codeResponse, array $data = null, $info = ''): JsonResponse
+    protected function codeReturn(array $responseCode, array $data = null, $info = ''): JsonResponse
     {
-        [$errno, $errmsg] = $codeResponse;
+        [$errno, $errmsg] = $responseCode;
         $errmsg = $info ?: $errmsg;
         $ret = compact('errno', 'errmsg');
 
@@ -151,78 +151,78 @@ class BaseController extends Controller
      */
     protected function success(array $data = null, string $info = ''): JsonResponse
     {
-        return $this->codeReturn(CodeResponse::SUCCESS, $data, $info);
+        return $this->codeReturn(ResponseCode::SUCCESS, $data, $info);
     }
 
     /**
      * 失败返回结果
      *
-     * @param  array  $codeResponse
+     * @param  array  $responseCode
      * @param  string  $info
      * @return JsonResponse
      */
-    protected function fail(array $codeResponse = CodeResponse::FAIL, string $info = ''): JsonResponse
+    protected function fail(array $responseCode = ResponseCode::FAIL, string $info = ''): JsonResponse
     {
-        return $this->codeReturn($codeResponse, null, $info);
+        return $this->codeReturn($responseCode, null, $info);
     }
 
     /**
      * 表单验证错误返回结果，400
      *
-     * @param  array  $codeResponse
+     * @param  array  $responseCode
      * @param  string  $info
      * @return JsonResponse
      */
     protected function validationFailed(
-        array $codeResponse = CodeResponse::PARAM_VALIDATION_ERROR,
+        array $responseCode = ResponseCode::PARAM_VALIDATION_ERROR,
         string $info = ''
     ): JsonResponse {
-        return $this->fail($codeResponse, $info);
+        return $this->fail($responseCode, $info);
     }
 
     /**
      * 参数非法错误返回结果，401
      *
-     * @param  array  $codeResponse
+     * @param  array  $responseCode
      * @param  string  $info
      * @return JsonResponse
      */
     protected function invalidParam(
-        array $codeResponse = CodeResponse::INVALID_PARAM,
+        array $responseCode = ResponseCode::INVALID_PARAM,
         string $info = ''
     ): JsonResponse {
-        return $this->fail($codeResponse, $info);
+        return $this->fail($responseCode, $info);
     }
 
     /**
      * 参数值非法错误返回结果，402
      *
-     * @param  array  $codeResponse
+     * @param  array  $responseCode
      * @param  string  $info
      * @return JsonResponse
      */
     protected function invalidParamValue(
-        array $codeResponse = CodeResponse::INVALID_PARAM_VALUE,
+        array $responseCode = ResponseCode::INVALID_PARAM_VALUE,
         string $info = ''
     ): JsonResponse {
-        return $this->fail($codeResponse, $info);
+        return $this->fail($responseCode, $info);
     }
 
     /**
      * 根据传入的 bool，判断应该返回成功或者失败
      *
      * @param  bool  $success
-     * @param  array  $codeResponse
+     * @param  array  $responseCode
      * @param  array|null  $data
      * @param  string  $info
      * @return JsonResponse
      */
     protected function judge(
         bool $success,
-        array $codeResponse = CodeResponse::FAIL,
+        array $responseCode = ResponseCode::FAIL,
         array $data = null,
         string $info = ''
     ): JsonResponse {
-        return $success ? $this->success($data, $info) : $this->fail($codeResponse, $info);
+        return $success ? $this->success($data, $info) : $this->fail($responseCode, $info);
     }
 }

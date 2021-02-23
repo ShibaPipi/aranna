@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\Users;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\Models\Users\User;
 use App\Notifications\VerificationCode;
@@ -139,7 +139,7 @@ class UserService extends BaseService
         $key = 'sms_captcha_'.$mobile;
 
         if ($code !== Cache::get($key)) {
-            throw new BusinessException(CodeResponse::AUTH_CAPTCHA_MISMATCH);
+            throw new BusinessException(ResponseCode::AUTH_CAPTCHA_MISMATCH);
         }
 
         Cache::forget($key);

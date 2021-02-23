@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Promotions;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Enums\Coupons\CouponGoodsType;
 use App\Enums\Coupons\CouponStatus;
 use App\Enums\Coupons\CouponTimeType;
@@ -266,33 +266,33 @@ class CouponService extends BaseService
     public function receive(int $userId, int $couponId): bool
     {
         if (is_null($coupon = CouponService::getInstance()->getInfoById($couponId))) {
-            $this->throwBusinessException(CodeResponse::INVALID_PARAM_VALUE);
+            $this->throwBusinessException(ResponseCode::INVALID_PARAM_VALUE);
         }
         // 判断优惠券是否被领取完
         if ($coupon->total > 0) {
             $fetchedCount = CouponService::getInstance()->countReceived($couponId);
             if ($fetchedCount >= $coupon->total) {
-                $this->throwBusinessException(CodeResponse::COUPON_EXCEED_LIMIT);
+                $this->throwBusinessException(ResponseCode::COUPON_EXCEED_LIMIT);
             }
         }
         // 判断用户可领取上限
         if ($coupon->limit > 0) {
             $userFetchedCount = CouponService::getInstance()->countReceivedByUserId($userId, $couponId);
             if ($userFetchedCount >= $coupon->limit) {
-                $this->throwBusinessException(CodeResponse::COUPON_EXCEED_LIMIT, '优惠券可领取数量已达上限');
+                $this->throwBusinessException(ResponseCode::COUPON_EXCEED_LIMIT, '优惠券可领取数量已达上限');
             }
         }
 
         if ($coupon->type != CouponType::COMMON) {
-            $this->throwBusinessException(CodeResponse::COUPON_RECEIVE_FAIL, '优惠券类型不支持领取');
+            $this->throwBusinessException(ResponseCode::COUPON_RECEIVE_FAIL, '优惠券类型不支持领取');
         }
 
         if ($coupon->status == CouponStatus::OUT) {
-            $this->throwBusinessException(CodeResponse::COUPON_EXCEED_LIMIT);
+            $this->throwBusinessException(ResponseCode::COUPON_EXCEED_LIMIT);
         }
 
         if ($coupon->status == CouponStatus::EXPIRED) {
-            $this->throwBusinessException(CodeResponse::COUPON_RECEIVE_FAIL, '优惠券已过期，不能领取');
+            $this->throwBusinessException(ResponseCode::COUPON_RECEIVE_FAIL, '优惠券已过期，不能领取');
         }
 
         if ($coupon->time_type == CouponTimeType::TIME) {

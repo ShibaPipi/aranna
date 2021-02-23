@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Services\Orders;
 
-use App\Utils\CodeResponse;
+use App\Utils\ResponseCode;
 use App\Enums\Orders\OrderStatus;
 use App\Exceptions\BusinessException;
 use App\Models\Orders\Order;
@@ -105,7 +105,7 @@ class PayOrderService extends BaseService
         }
 
         if (0 !== bccomp($order->actual_price, $price, 2)) {
-            $this->throwBusinessException(CodeResponse::FAIL,
+            $this->throwBusinessException(ResponseCode::FAIL,
                 "支付回调，订单[{$order->id}]金额不一致,[total_fee={$price}],订单金额[actual_price={$order->actual_price}]");
         }
 
@@ -148,7 +148,7 @@ class PayOrderService extends BaseService
         }
 
         if (!$order->handleCanPay()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能支付');
+            $this->throwBusinessException(ResponseCode::ORDER_INVALID_OPERATION, '订单不能支付');
         }
 
         return $order;
@@ -167,7 +167,7 @@ class PayOrderService extends BaseService
     public function paymentSucceed(Order $order, string $payId): Order
     {
         if (!$order->handleCanPay()) {
-            $this->throwBusinessException(CodeResponse::ORDER_PAY_FAIL, '订单不能支付');
+            $this->throwBusinessException(ResponseCode::ORDER_PAY_FAIL, '订单不能支付');
         }
 
         $order->pay_id = $payId;
@@ -175,7 +175,7 @@ class PayOrderService extends BaseService
         $order->order_status = OrderStatus::PAID;
 
         if (0 === $order->cas()) {
-            $this->throwBusinessException(CodeResponse::UPDATE_FAILED);
+            $this->throwBusinessException(ResponseCode::UPDATE_FAILED);
         }
 
         // 更新支付成功的团购信息
