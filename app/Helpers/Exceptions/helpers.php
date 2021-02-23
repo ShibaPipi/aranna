@@ -5,51 +5,56 @@
  * Created By 皮神
  * Date: 2021/2/23
  */
+declare(strict_types=1);
 
 use App\Exceptions\BusinessException;
 use App\Utils\ResponseCode;
 
-if (!function_exists('throwBusinessException_if')) {
+if (!function_exists('throw_business_if')) {
     /**
      * Throw business exception if the given condition is true.
      *
-     * @param $condition
-     * @param  mixed  ...$parameters
+     * @param  bool  $condition
+     * @param  array  $responseCode
+     * @param  string  $message
+     * @return void
      *
      * @throws Throwable
      */
-    function throwBusinessException_if($condition, ...$parameters)
+    function throw_business_if(bool $condition, array $responseCode, string $message = ''): void
     {
-        throw_if($condition, BusinessException::class, ...$parameters);
+        throw_if($condition, BusinessException::class, ...[$responseCode, $message]);
     }
 }
 
-if (!function_exists('throwParamValidationException_if')) {
+if (!function_exists('throw_param_validation_if')) {
     /**
-     * 抛出表单验证错误异常
+     * Throw param validation exception if the given condition is true.
      *
-     * @param $condition
+     * @param  bool  $condition
      * @param  mixed  ...$parameters
+     * @return void
      *
      * @throws Throwable
      */
-    function throwParamValidationException_if($condition, ...$parameters)
+    function throw_param_validation_if(bool $condition, ...$parameters): void
     {
-        throwBusinessException_if($condition, ResponseCode::PARAM_VALIDATION_ERROR, ...$parameters);
+        throw_business_if($condition, ResponseCode::PARAM_VALIDATION_ERROR, ...$parameters);
     }
 }
 
-if (!function_exists('throwInvalidParamException_if')) {
+if (!function_exists('throw_invalid_param_if')) {
     /**
-     * 抛出非法参数异常
+     * Throw invalid param exception if the given condition is true.
      *
-     * @param $condition
+     * @param  bool  $condition
      * @param  mixed  ...$parameters
+     * @return void
      *
      * @throws Throwable
      */
-    function throwInvalidParamException_if($condition, ...$parameters)
+    function throw_invalid_param_if(bool $condition, ...$parameters): void
     {
-        throwBusinessException_if($condition, ResponseCode::INVALID_PARAM, ...$parameters);
+        throw_business_if($condition, ResponseCode::INVALID_PARAM, ...$parameters);
     }
 }

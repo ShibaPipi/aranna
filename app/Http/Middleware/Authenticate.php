@@ -32,7 +32,7 @@ class Authenticate extends Middleware
      */
     protected function unauthenticated($request, array $guards)
     {
-        throwBusinessException_if(
+        throw_business_if(
             $request->expectsJson() || in_array('wechat', $guards),
             ResponseCode::NOT_LOGIN
         );

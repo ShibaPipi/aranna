@@ -169,7 +169,7 @@ trait VerifyRequestInput
 
         $validator = Validator::make([$key => $value], [$key => $rules], $messages);
 
-        throwBusinessException_if($validator->fails(),
+        throw_business_if($validator->fails(),
             ResponseCode::PARAM_VALIDATION_ERROR,
             implode(' ', $validator->errors()->all())
         );

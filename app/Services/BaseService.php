@@ -7,8 +7,9 @@
 
 namespace App\Services;
 
-use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
+use App\Utils\ResponseCode;
+use Throwable;
 
 class BaseService
 {
@@ -42,7 +43,7 @@ class BaseService
     }
 
     /**
-     * 抛出异常，默认为非法参数异常
+     * 抛出异常
      *
      * @param  array  $responseCode
      * @param  string  $message
@@ -81,5 +82,51 @@ class BaseService
     public function throwUpdateFailedException(string $message = ''): void
     {
         $this->throwBusinessException(ResponseCode::UPDATE_FAILED, $message);
+    }
+
+    /**
+     * Throw business exception if the given condition is true.
+     *
+     * @param  bool  $condition
+     * @param  array  $responseCode
+     * @param  string  $message
+     * @return void
+     *
+     * @throws Throwable
+     */
+    public function throwIf(
+        bool $condition,
+        array $responseCode = ResponseCode::FAIL,
+        string $message = ''
+    ): void {
+        throw_business_if($condition, $responseCode, $message);
+    }
+
+    /**
+     * Throw invalid param exception if the given condition is true.
+     *
+     * @param  bool  $condition
+     * @param  string  $message
+     * @return void
+     *
+     * @throws Throwable
+     */
+    public function throwInvalidParamIf(bool $condition, string $message = ''): void
+    {
+        $this->throwIf($condition, ResponseCode::INVALID_PARAM, $message);
+    }
+
+    /**
+     * Throw updated failed exception if the given condition is true.
+     *
+     * @param  bool  $condition
+     * @param  string  $message
+     * @return void
+     *
+     * @throws Throwable
+     */
+    public function throwUpdateFailedIf(bool $condition, string $message = ''): void
+    {
+        $this->throwIf($condition, ResponseCode::UPDATE_FAILED, $message);
     }
 }
