@@ -9,14 +9,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Wechat;
 
-use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;
 use App\Services\Orders\OrderService;
 use App\Services\Promotions\CouponService;
-use App\Services\SystemService;
 use App\Services\Users\AddressService;
+use App\Utils\ResponseCode;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
@@ -68,9 +67,7 @@ class CartController extends BaseController
         $productId = $this->verifyId('productId', 0);
         $number = $this->verifyPositiveInteger('number');
 
-        if (is_null($cart = CartService::getInstance()->getCartById($this->userId(), $id))) {
-            return $this->invalidParam();
-        }
+        $cart = CartService::getInstance()->getCartById($this->userId(), $id);
 
         if ($cart->goods_id != $goodsId || $cart->product_id != $productId) {
             return $this->invalidParam();
@@ -80,7 +77,8 @@ class CartController extends BaseController
             return $this->fail(ResponseCode::GOODS_UNSHELVE);
         }
 
-        if (is_null($product = GoodsService::getInstance()->getGoodsProductByProductId($productId)) || $product->number < $number) {
+        $product = GoodsService::getInstance()->getGoodsProductByProductId($productId);
+        if ($product->number < $number) {
             return $this->fail(ResponseCode::GOODS_NO_STOCK);
         }
 
@@ -212,7 +210,7 @@ class CartController extends BaseController
         $availableCouponCount = 0;
         $couponPrice = '0';
         $couponUser = CouponService::getInstance()
-            ->getMeetest($this->userId(), $couponId, $goodsTotalPrice,$availableCouponCount);
+            ->getMeetest($this->userId(), $couponId, $goodsTotalPrice, $availableCouponCount);
         if (!$couponUser) {
             $couponId = -1;
             $couponUserId = -1;

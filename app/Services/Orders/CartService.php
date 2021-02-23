@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace App\Services\Orders;
 
-use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
 use App\Models\Goods\Goods;
 use App\Models\Goods\GoodsProduct;
@@ -17,8 +16,10 @@ use App\Models\Orders\Cart;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotions\GrouponService;
+use App\Utils\ResponseCode;
 use Exception;
 use Illuminate\Support\Collection;
+use Throwable;
 
 class CartService extends BaseService
 {
@@ -31,17 +32,43 @@ class CartService extends BaseService
      *
      * @throws Exception
      */
-    public function clearCartGoods(int $userId, int $cartId = null)
+    public function clearCartGoods(int $userId, int $cartId = null): ?bool
     {
         return empty($cartId)
-            ? Cart::query()
-                ->whereUserId($userId)
-                ->whereChecked(1)
-                ->delete()
-            : Cart::query()
-                ->whereUserId($userId)
-                ->find($cartId)
-                ->delete();
+            ? $this->clearCheckedCartGoods($userId)
+            : $this->clearCartGoodsById($userId, $cartId);
+    }
+
+    /**
+     * 根据购物车 id 清除购物车商品
+     *
+     * @param  int  $userId
+     * @param  int  $cartId
+     * @return bool|mixed|null
+     * @throws Exception
+     */
+    public function clearCartGoodsById(int $userId, int $cartId): ?bool
+    {
+        return Cart::query()
+            ->whereUserId($userId)
+            ->find($cartId)
+            ->delete();
+    }
+
+    /**
+     * 清除选中的购物车商品
+     *
+     * @param  int  $userId
+     * @return bool|mixed|null
+     *
+     * @throws Exception
+     */
+    public function clearCheckedCartGoods(int $userId): ?bool
+    {
+        return Cart::query()
+            ->whereUserId($userId)
+            ->whereChecked(1)
+            ->delete();
     }
 
     /**
@@ -83,7 +110,7 @@ class CartService extends BaseService
      * @param  int|null  $cartId
      * @return Cart[]|Collection
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function getCheckoutGoodsList(int $userId, int $cartId = null): Collection
     {
@@ -91,9 +118,7 @@ class CartService extends BaseService
             ? collect([CartService::getInstance()->getCartById($userId, $cartId)])
             : CartService::getInstance()->getCheckedCartList($userId);
 
-        if ($checkedGoodsList->isEmpty()) {
-            $this->throwInvalidParamException();
-        }
+        $this->throwInvalidParamIf($checkedGoodsList->isEmpty());
 
         return $checkedGoodsList;
     }
@@ -171,9 +196,7 @@ class CartService extends BaseService
      */
     public function getCartList(int $userId): Collection
     {
-        return Cart::query()
-            ->whereUserId($userId)
-            ->get();
+        return Cart::query()->whereUserId($userId)->get();
     }
 
     /**
@@ -190,9 +213,7 @@ class CartService extends BaseService
             return 0;
         }
 
-        return Cart::query()
-            ->whereIn('id', $ids)
-            ->delete();
+        return Cart::query()->whereIn('id', $ids)->delete();
     }
 
     /**
@@ -218,11 +239,11 @@ class CartService extends BaseService
      * @param  int  $userId
      * @param  int  $id
      * @param  array|string[]  $columns
-     * @return Cart|null
+     * @return Cart
      */
-    public function getCartById(int $userId, int $id, array $columns = ['*']): ?Cart
+    public function getCartById(int $userId, int $id, array $columns = ['*']): Cart
     {
-        return Cart::query()->whereUserId($userId)->find($id, $columns);
+        return Cart::query()->whereUserId($userId)->findOrFail($id, $columns);
     }
 
     /**
@@ -233,9 +254,7 @@ class CartService extends BaseService
      */
     public function countCartProducts(int $userId)
     {
-        return Cart::query()
-            ->whereUserId($userId)
-            ->sum('number');
+        return Cart::query()->whereUserId($userId)->sum('number');
     }
 
     /**
@@ -248,6 +267,7 @@ class CartService extends BaseService
      * @return Cart
      *
      * @throws BusinessException
+     * @throws Throwable
      */
     public function fastAdd(int $userId, int $goodsId, int $productId, int $number): Cart
     {
@@ -270,6 +290,7 @@ class CartService extends BaseService
      * @return Cart
      *
      * @throws BusinessException
+     * @throws Throwable
      */
     public function add(int $userId, int $goodsId, int $productId, int $number): Cart
     {
@@ -292,15 +313,14 @@ class CartService extends BaseService
      * @param  int  $number
      * @return Cart
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function edit(Cart $cart, GoodsProduct $product, int $number): Cart
     {
-        if ($number > $product->number) {
-            $this->throwBusinessException(ResponseCode::GOODS_NO_STOCK);
-        }
+        $this->throwIf($number > $product->number, ResponseCode::GOODS_NO_STOCK);
 
-        $cart->fill(compact('number'))->save();
+        $cart->number = $number;
+        $cart->save();
 
         return $cart;
     }
@@ -314,15 +334,14 @@ class CartService extends BaseService
      * @param  int  $number
      * @return Cart
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function newCartRecord(int $userId, Goods $goods, GoodsProduct $product, int $number): Cart
     {
-        if ($number > $product->number) {
-            $this->throwBusinessException(ResponseCode::GOODS_NO_STOCK);
-        }
+        $this->throwIf($number > $product->number, ResponseCode::GOODS_NO_STOCK);
 
         $cart = Cart::new();
+
         $cart->goods_id = $goods->id;
         $cart->goods_sn = $goods->goods_sn;
         $cart->goods_name = $goods->name;
@@ -333,6 +352,7 @@ class CartService extends BaseService
         $cart->user_id = $userId;
         $cart->checked = true;
         $cart->number = $number;
+
         $cart->save();
 
         return $cart;
@@ -362,17 +382,15 @@ class CartService extends BaseService
      * @param  int  $productId
      * @return array
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function getGoodsAndProduct(int $goodsId, int $productId): array
     {
-        if (is_null($goods = GoodsService::getInstance()->getGoodsById($goodsId)) || !$goods->is_on_sale) {
-            $this->throwBusinessException(ResponseCode::GOODS_UNSHELVE);
-        }
+        $goods = GoodsService::getInstance()->getGoodsById($goodsId);
 
-        if (is_null($product = GoodsService::getInstance()->getGoodsProductByProductId($productId))) {
-            $this->throwBusinessException(ResponseCode::GOODS_NO_STOCK);
-        }
+        $this->throwIf(!$goods->is_on_sale, ResponseCode::GOODS_UNSHELVE);
+
+        $product = GoodsService::getInstance()->getGoodsProductByProductId($productId);
 
         return [$goods, $product];
     }

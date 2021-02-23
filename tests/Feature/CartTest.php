@@ -9,7 +9,6 @@
 namespace Tests\Feature;
 
 use App\Models\Goods\GoodsProduct;
-use App\Models\Users\User;
 use App\Services\Goods\GoodsService;
 use App\Services\Orders\CartService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -42,7 +41,6 @@ class CartTest extends TestCase
             'productId' => $this->product->id,
             'number' => 2
         ], $this->authHeader);
-//        dd($response->getOriginalContent());
         $response->assertJson([
             'errno' => 0,
             'errmsg' => '成功',
@@ -212,7 +210,7 @@ class CartTest extends TestCase
             'number' => 3
         ], $this->authHeader);
 
-        $response = $this->post('wechat/cart/index', [], $this->authHeader);
+        $response = $this->get('wechat/cart/index', $this->authHeader);
         $response->assertJson([
             'errno' => 0, 'errmsg' => '成功',
             'data' => [
@@ -233,7 +231,7 @@ class CartTest extends TestCase
 
         $goods = GoodsService::getInstance()->getGoodsById($this->product->goods_id);
         $goods->fill(['is_on_sale' => false])->save();
-        $response = $this->post('wechat/cart/index', [], $this->authHeader);
+        $response = $this->get('wechat/cart/index', $this->authHeader);
         $response->assertJson([
             'errno' => 0, 'errmsg' => '成功',
             'data' => [
@@ -256,5 +254,6 @@ class CartTest extends TestCase
         $this->authHeader = $this->getAuthHeader();
         $response = $this->get('wechat/cart/checkout', $this->authHeader);
         dd($response->getOriginalContent());
+        // TODO: 测试逻辑未完成
     }
 }

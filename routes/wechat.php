@@ -59,7 +59,7 @@ Route::prefix('home')->name('home.')->group(function () {
 });
 
 Route::prefix('cart')->group(function () {
-    Route::get('index', 'CartController@index'); //获取购物车的数据
+    Route::get('index', 'CartController@index'); // 获取购物车的数据
     Route::post('add', 'CartController@add');
     Route::post('fastAdd', 'CartController@fastAdd');
     Route::post('update', 'CartController@update');
