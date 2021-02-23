@@ -25,15 +25,15 @@ class OrderStatus
 
     const STATUS_TEXT_MAP = [
         self::CREATED => '未付款',
-        self::CANCELED => "已取消",
-        self::AUTO_CANCELED => "已取消(系统)",
-        self::ADMIN_CANCELED => "已取消(管理员)",
-        self::PAID => "已付款",
-        self::REFUNDING => "订单取消，退款中",
-        self::REFUND_CONFIRMED => "已退款",
-        self::GROUPON_TIMEOUT => "已超时团购",
-        self::SHIPPING => "已发货",
-        self::CONFIRMED => "已收货",
-        self::AUTO_CONFIRMED => "已收货(系统)",
+        self::CANCELED => '已取消',
+        self::AUTO_CANCELED => '已取消(系统)',
+        self::ADMIN_CANCELED => '已取消(管理员)',
+        self::PAID => '已付款',
+        self::REFUNDING => '订单取消，退款中',
+        self::REFUND_CONFIRMED => '已退款',
+        self::GROUPON_TIMEOUT => '已超时团购',
+        self::SHIPPING => '已发货',
+        self::CONFIRMED => '已收货',
+        self::AUTO_CONFIRMED => '已收货(系统)',
     ];
 }
