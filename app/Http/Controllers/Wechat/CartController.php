@@ -18,10 +18,13 @@ use App\Services\Users\AddressService;
 use App\Utils\ResponseCode;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class CartController extends BaseController
 {
     /**
+     * 购物车列表
+     *
      * @return JsonResponse
      *
      * @throws Exception
@@ -73,7 +76,8 @@ class CartController extends BaseController
             return $this->invalidParam();
         }
 
-        if (is_null($goods = GoodsService::getInstance()->getGoodsById($goodsId)) || !$goods->is_on_sale) {
+        $goods = GoodsService::getInstance()->getGoodsById($goodsId);
+        if (!$goods->is_on_sale) {
             return $this->fail(ResponseCode::GOODS_UNSHELVE);
         }
 
@@ -139,6 +143,7 @@ class CartController extends BaseController
      * @return JsonResponse
      *
      * @throws BusinessException
+     * @throws Throwable
      */
     public function fastAdd(): JsonResponse
     {
@@ -157,6 +162,7 @@ class CartController extends BaseController
      * @return JsonResponse
      *
      * @throws BusinessException
+     * @throws Throwable
      */
     public function add(): JsonResponse
     {
@@ -182,21 +188,16 @@ class CartController extends BaseController
      *         如果优惠券ID是空，则自动选择合适的优惠券。
      *
      * @return JsonResponse
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function checkout(): JsonResponse
     {
-        $cartId = $this->verifyInteger('cartId');
-        $addressId = $this->verifyInteger('addressId');
-        $couponId = $this->verifyInteger('couponId');
-//        $couponUserId = $this->verifyInteger('couponUserId');
-        $grouponRuleId = $this->verifyInteger('grouponRuleId');
+        $cartId = $this->verifyId('cartId', 0);
+        $addressId = $this->verifyId('addressId', 0);
+        $couponId = $this->verifyId('couponId', 0);
+        $grouponRuleId = $this->verifyId('grouponRuleId', 0);
 
-        if (!$checkedAddress = AddressService::getInstance()->getInfoOrDefault($this->userId(), $addressId)) {
-            return $this->invalidParam();
-        }
-
-        $addressId = $checkedAddress->id ?? 0;
+        $checkedAddress = AddressService::getInstance()->getInfoOrDefault($this->userId(), $addressId);
 
         // 获取待下单的商品列表
         $checkedGoodsList = CartService::getInstance()->getCheckoutGoodsList($this->userId(), $cartId);
