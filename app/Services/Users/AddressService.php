@@ -31,7 +31,7 @@ class AddressService extends BaseService
         $address = $id ? $this->getAddressById($userId, $id) : $this->getDefaultAddress($userId);
 
         if (!$address) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         return $address;
@@ -59,9 +59,7 @@ class AddressService extends BaseService
      */
     public function getListByUserId(int $userId): Collection
     {
-        return Address::query()
-            ->where('user_id', $userId)
-            ->get();
+        return Address::query()->whereUserId($userId)->get();
     }
 
     /**
@@ -92,9 +90,6 @@ class AddressService extends BaseService
      */
     public function getAddressById(int $userId, int $addressId): ?Address
     {
-        return Address::query()
-            ->where('user_id', $userId)
-            ->where('id', $addressId)
-            ->first();
+        return Address::query()->whereUserId($userId)->find($addressId);
     }
 }

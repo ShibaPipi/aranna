@@ -58,16 +58,16 @@ class BaseService
     }
 
     /**
-     * 抛出非法参数值异常
+     * 抛出非法参数异常
      *
      * @param  string  $message
      * @return void
      *
      * @throws BusinessException
      */
-    public function throwInvalidParamValueException(string $message = ''): void
+    public function throwInvalidParamException(string $message = ''): void
     {
-        $this->throwBusinessException(ResponseCode::INVALID_PARAM_VALUE, $message);
+        $this->throwBusinessException(ResponseCode::INVALID_PARAM, $message);
     }
 
     /**

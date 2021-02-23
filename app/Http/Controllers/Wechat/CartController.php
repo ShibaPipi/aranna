@@ -69,11 +69,11 @@ class CartController extends BaseController
         $number = $this->verifyPositiveInteger('number');
 
         if (is_null($cart = CartService::getInstance()->getCartById($this->userId(), $id))) {
-            return $this->invalidParamValue();
+            return $this->invalidParam();
         }
 
         if ($cart->goods_id != $goodsId || $cart->product_id != $productId) {
-            return $this->invalidParamValue();
+            return $this->invalidParam();
         }
 
         if (is_null($goods = GoodsService::getInstance()->getGoodsById($goodsId)) || !$goods->is_on_sale) {
@@ -195,7 +195,7 @@ class CartController extends BaseController
         $grouponRuleId = $this->verifyInteger('grouponRuleId');
 
         if (!$checkedAddress = AddressService::getInstance()->getInfoOrDefault($this->userId(), $addressId)) {
-            return $this->invalidParamValue();
+            return $this->invalidParam();
         }
 
         $addressId = $checkedAddress->id ?? 0;

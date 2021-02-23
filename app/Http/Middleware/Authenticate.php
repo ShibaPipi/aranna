@@ -2,19 +2,18 @@
 
 namespace App\Http\Middleware;
 
-use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
+use App\Utils\ResponseCode;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Illuminate\Http\Request;
 
 class Authenticate extends Middleware
 {
     /**
      * Get the path the user should be redirected to when they are not authenticated.
      *
-     * @param  Request  $request
-     * @return string|null
+     * @param  $request
+     * @return string|void
      */
     protected function redirectTo($request)
     {
@@ -24,16 +23,19 @@ class Authenticate extends Middleware
     }
 
     /**
-     * @param  Request  $request
+     * @param  $request
      * @param  array  $guards
+     * @return void
+     *
      * @throws BusinessException
      * @throws AuthenticationException
      */
     protected function unauthenticated($request, array $guards)
     {
-        if ($request->expectsJson() || in_array('wechat', $guards)) {
-            throw new BusinessException(ResponseCode::NOT_LOGIN);
-        }
+        throwBusinessException_if(
+            $request->expectsJson() || in_array('wechat', $guards),
+            ResponseCode::NOT_LOGIN
+        );
 
         parent::unauthenticated($request, $guards);
     }

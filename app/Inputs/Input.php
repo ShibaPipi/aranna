@@ -4,15 +4,16 @@
  * Created By 皮神
  * Date: 2021/1/15
  */
+declare(strict_types=1);
 
 namespace App\Inputs;
 
-use App\Utils\ResponseCode;
 use App\Exceptions\BusinessException;
-use App\VerifyRequestInput;
+use App\Utils\ResponseCode;
+use App\Utils\VerifyRequestInput;
 use Illuminate\Support\Facades\Validator;
 
-class Input
+abstract class Input
 {
     use VerifyRequestInput;
 
@@ -28,7 +29,7 @@ class Input
             $data = request()->input();
         }
 
-        $validator = Validator::make($data, $this->rules());
+        $validator = Validator::make($data, $this->rules(), $this->messages());
         if ($validator->fails()) {
             throw new BusinessException(ResponseCode::PARAM_VALIDATION_ERROR);
         }
@@ -44,9 +45,18 @@ class Input
     }
 
     /**
+     * 验证规则
+     *
      * @return array
      */
-    public function rules(): array
+    abstract public function rules(): array;
+
+    /**
+     * 验证失败后的错误信息
+     *
+     * @return array
+     */
+    public function messages(): array
     {
         return [];
     }

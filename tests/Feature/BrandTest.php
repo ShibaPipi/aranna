@@ -19,7 +19,7 @@ class BrandTest extends TestCase
         $response = $this->get('wechat/brand/detail');
         self::assertEquals(401, $response['errno']);
         $response = $this->get('wechat/brand/detail?id=1');
-        self::assertEquals(402, $response['errno']);
+        self::assertEquals(401, $response['errno']);
         $response = $this->get('wechat/brand/detail?id=1001000');
         self::assertEquals(0, $response['errno']);
         self::assertNotEmpty($response['data']);

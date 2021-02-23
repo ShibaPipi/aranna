@@ -59,7 +59,7 @@ class GoodsController extends BaseController
     {
         $id = $this->verifyId('id', 0);
         if (empty($currentCategory = CategoryService::getInstance()->getCategoryById($id))) {
-            return $this->fail(ResponseCode::INVALID_PARAM_VALUE);
+            return $this->fail(ResponseCode::INVALID_PARAM);
         }
         if (0 === $currentCategory->pid) {
             $parentCategory = $currentCategory;
@@ -82,7 +82,7 @@ class GoodsController extends BaseController
     {
         $id = $this->verifyId('id', 0);
         if (empty($info = GoodsService::getInstance()->getGoodsById($id))) {
-            return $this->fail(ResponseCode::INVALID_PARAM_VALUE);
+            return $this->fail(ResponseCode::INVALID_PARAM);
         }
 
         $attribute = GoodsService::getInstance()->getAttributes($id);

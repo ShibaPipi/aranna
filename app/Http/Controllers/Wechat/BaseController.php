@@ -167,20 +167,6 @@ class BaseController extends Controller
     }
 
     /**
-     * 表单验证错误返回结果，400
-     *
-     * @param  array  $responseCode
-     * @param  string  $info
-     * @return JsonResponse
-     */
-    protected function validationFailed(
-        array $responseCode = ResponseCode::PARAM_VALIDATION_ERROR,
-        string $info = ''
-    ): JsonResponse {
-        return $this->fail($responseCode, $info);
-    }
-
-    /**
      * 参数非法错误返回结果，401
      *
      * @param  array  $responseCode
@@ -189,20 +175,6 @@ class BaseController extends Controller
      */
     protected function invalidParam(
         array $responseCode = ResponseCode::INVALID_PARAM,
-        string $info = ''
-    ): JsonResponse {
-        return $this->fail($responseCode, $info);
-    }
-
-    /**
-     * 参数值非法错误返回结果，402
-     *
-     * @param  array  $responseCode
-     * @param  string  $info
-     * @return JsonResponse
-     */
-    protected function invalidParamValue(
-        array $responseCode = ResponseCode::INVALID_PARAM_VALUE,
         string $info = ''
     ): JsonResponse {
         return $this->fail($responseCode, $info);

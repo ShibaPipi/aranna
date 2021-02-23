@@ -35,7 +35,7 @@ class PayOrderService extends BaseService
     public function alipayNotify(array $data): ?Order
     {
         if (!in_array($data['trade_status'] ?? '', ['TRADE_SUCCESS', 'TRADE_FINISHED'])) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         $orderSn = $data['out_trade_no'] ?? '';
@@ -97,7 +97,7 @@ class PayOrderService extends BaseService
     private function notify(string $orderSn, string $payId, string $price): ?Order
     {
         if (empty($order = OrderService::getInstance()->getOrderBySn($orderSn))) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         if ($order->hasPaid()) {
@@ -144,7 +144,7 @@ class PayOrderService extends BaseService
     private function getPayOrderInfo(int $userId, int $orderId): ?Order
     {
         if (empty($order = OrderService::getInstance()->getOrderById($userId, $orderId))) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         if (!$order->handleCanPay()) {

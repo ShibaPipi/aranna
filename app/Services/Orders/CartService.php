@@ -92,7 +92,7 @@ class CartService extends BaseService
             : CartService::getInstance()->getCheckedCartList($userId);
 
         if ($checkedGoodsList->isEmpty()) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         return $checkedGoodsList;

@@ -266,7 +266,7 @@ class CouponService extends BaseService
     public function receive(int $userId, int $couponId): bool
     {
         if (is_null($coupon = CouponService::getInstance()->getInfoById($couponId))) {
-            $this->throwBusinessException(ResponseCode::INVALID_PARAM_VALUE);
+            $this->throwBusinessException(ResponseCode::INVALID_PARAM);
         }
         // 判断优惠券是否被领取完
         if ($coupon->total > 0) {

@@ -28,7 +28,7 @@ class GoodsTest extends TestCase
         self::assertEquals(400, $response['errno']);
 //        dd($response->getOriginalContent());
         $response = $this->get('wechat/goods/category?id=1');
-        self::assertEquals(402, $response['errno']);
+        self::assertEquals(401, $response['errno']);
         $response = $this->get('wechat/goods/category?id=1008009');
         self::assertNotEmpty($response['data']);
         $response = $this->get('wechat/goods/category?id=1005000');
@@ -66,7 +66,7 @@ class GoodsTest extends TestCase
         $response = $this->get('wechat/goods/detail');
         self::assertEquals(400, $response['errno']);
         $response = $this->get('wechat/goods/detail?id=1');
-        self::assertEquals(402, $response['errno']);
+        self::assertEquals(401, $response['errno']);
         $response = $this->get('wechat/goods/detail?id=1181000');
         self::assertNotEmpty($response['data']);
     }

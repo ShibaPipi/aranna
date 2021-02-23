@@ -31,7 +31,7 @@ class CategoryController extends BaseController
         }
 
         if (is_null($currentCategory = CategoryService::getInstance()->getL1CategoryById($id))) {
-            return $this->fail(ResponseCode::INVALID_PARAM_VALUE);
+            return $this->fail(ResponseCode::INVALID_PARAM);
         }
 
         $currentSubCategory = CategoryService::getInstance()->getL2CategoriesByPid($currentCategory->id);

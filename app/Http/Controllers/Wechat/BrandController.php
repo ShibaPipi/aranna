@@ -44,7 +44,7 @@ class BrandController extends BaseController
         }
 
         if (is_null($brand = BrandService::getInstance()->getBrand($id))) {
-            return $this->fail(ResponseCode::INVALID_PARAM_VALUE);
+            return $this->fail(ResponseCode::INVALID_PARAM);
         }
 
         return $this->success($brand->toArray());

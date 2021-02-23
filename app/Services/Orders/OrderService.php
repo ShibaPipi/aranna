@@ -56,7 +56,7 @@ class OrderService extends BaseService
     public function detail(int $userId, int $orderId): array
     {
         if (empty($order = $this->getOrderById($userId, $orderId))) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         $orderInfo = Arr::only($order->toArray(), [
@@ -141,7 +141,7 @@ class OrderService extends BaseService
     public function delete(int $userId, int $orderId): void
     {
         if (empty($order = $this->getOrderById($userId, $orderId))) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         if (!$order->handleCanDelete()) {
@@ -166,7 +166,7 @@ class OrderService extends BaseService
     public function confirm(Order $order, bool $auto = false): ?Order
     {
         if (empty($order)) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         if (!$order->handleCanConfirm()) {
@@ -246,7 +246,7 @@ class OrderService extends BaseService
         $order = $this->getOrderById($userId, $orderId);
 
         if (empty($order)) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         if (!$order->handleCanRefund()) {
@@ -281,7 +281,7 @@ class OrderService extends BaseService
         $order = $this->getOrderById($userId, $orderId);
 
         if (empty($order)) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         if (!$order->handleCanShip()) {
@@ -363,7 +363,7 @@ class OrderService extends BaseService
         $order = $this->getOrderById($userId, $orderId);
 
         if (is_null($order)) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         if (!$order->handleCanCancel()) {
@@ -450,7 +450,7 @@ class OrderService extends BaseService
         }
 
         if (empty($address = AddressService::getInstance()->getAddressById($userId, $input->addressId))) {
-            $this->throwInvalidParamValueException();
+            $this->throwInvalidParamException();
         }
 
         // 获取待下单的商品列表
@@ -537,7 +537,7 @@ class OrderService extends BaseService
 
         foreach ($checkedGoodsList as $cart) {
             if (empty($product = $products->get($cart->product_id))) {
-                $this->throwInvalidParamValueException();
+                $this->throwInvalidParamException();
             }
 
             if ($product->number < $cart->number) {
