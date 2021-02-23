@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 use App\Utils\ResponseCode;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException as SmsSendFailedException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -35,46 +35,47 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  Throwable  $exception
+     * @param  Throwable  $e
      * @return void
      *
      * @throws Throwable
      */
-    public function report(Throwable $exception)
+    public function report(Throwable $e)
     {
-        parent::report($exception);
+        parent::report($e);
     }
 
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  Request  $request
-     * @param  Throwable  $exception
-     * @return Response
-     *
+     * @param  $request
+     * @param  Throwable  $e
+     * @return JsonResponse|\Illuminate\Http\Response|Response
      * @throws Throwable
      */
-    public function render($request, Throwable $exception)
+    public function render($request, Throwable $e)
     {
-        if ($exception instanceof SmsSendFailedException) {
+        if ($e instanceof SmsSendFailedException) {
             return response()->json([
                 'errno' => ResponseCode::AUTH_CAPTCHA_SEND_FAILED[0],
                 'errmsg' => ResponseCode::AUTH_CAPTCHA_SEND_FAILED[1]
             ]);
         }
-        if ($exception instanceof ValidationException) {
+
+        if ($e instanceof ModelNotFoundException) {
             return response()->json([
-                'errno' => ResponseCode::PARAM_VALIDATION_ERROR[0],
-                'errmsg' => ResponseCode::PARAM_VALIDATION_ERROR[1]
-            ]);
-        }
-        if ($exception instanceof BusinessException) {
-            return response()->json([
-                'errno' => $exception->getCode(),
-                'errmsg' => $exception->getMessage()
+                'errno' => ResponseCode::MODEL_NOT_FOUND[0],
+                'errmsg' => ResponseCode::MODEL_NOT_FOUND[1]
             ]);
         }
 
-        return parent::render($request, $exception);
+        if ($e instanceof BusinessException) {
+            return response()->json([
+                'errno' => $e->getCode(),
+                'errmsg' => $e->getMessage()
+            ]);
+        }
+
+        return parent::render($request, $e);
     }
 }
