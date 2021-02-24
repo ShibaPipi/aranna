@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace App\Services\Users;
 
-use App\Exceptions\BusinessException;
 use App\Models\Users\Address;
 use App\Services\BaseService;
 use Exception;
@@ -22,33 +21,27 @@ class AddressService extends BaseService
      *
      * @param  int  $userId
      * @param  int|null  $id
-     * @return Address|null
-     *
-     * @throws BusinessException
+     * @return Address
      */
-    public function getInfoOrDefault(int $userId, int $id = null): ?Address
+    public function getInfoOrDefault(int $userId, int $id = null): Address
     {
-        $address = $id ? $this->getAddressById($userId, $id) : $this->getDefaultAddress($userId);
-
-        if (!$address) {
-            $this->throwInvalidParamException();
-        }
-
-        return $address;
+        return $id
+            ? $this->getAddressById($userId, $id)
+            : $this->getDefaultAddress($userId);
     }
 
     /**
      * 获取默认地址
      *
      * @param  int  $userId
-     * @return Address|null
+     * @return Address
      */
-    public function getDefaultAddress(int $userId): ?Address
+    public function getDefaultAddress(int $userId): Address
     {
         return Address::query()
             ->whereUserId($userId)
             ->whereIsDefault(1)
-            ->first();
+            ->firstOrFail();
     }
 
     /**
@@ -69,16 +62,11 @@ class AddressService extends BaseService
      * @param $addressId
      * @return bool|null
      *
-     * @throws BusinessException
      * @throws Exception
      */
     public function delete(int $userId, int $addressId): ?bool
     {
-        if (is_null($address = $this->getAddressById($userId, $addressId))) {
-            $this->throwBusinessException();
-        }
-
-        return $address->delete();
+        return $this->getAddressById($userId, $addressId)->delete();
     }
 
     /**
@@ -86,10 +74,10 @@ class AddressService extends BaseService
      *
      * @param $userId
      * @param $addressId
-     * @return Address|null
+     * @return Address
      */
-    public function getAddressById(int $userId, int $addressId): ?Address
+    public function getAddressById(int $userId, int $addressId): Address
     {
-        return Address::query()->whereUserId($userId)->find($addressId);
+        return Address::query()->whereUserId($userId)->findOrFail($addressId);
     }
 }
