@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace App\Services\Orders;
 
-use App\Utils\ResponseCode;
 use App\Enums\Orders\OrderStatus;
 use App\Exceptions\BusinessException;
 use App\Inputs\Orders\OrderSubmitInput;
@@ -20,9 +19,11 @@ use App\Models\Orders\OrderGoods;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotions\CouponService;
+use App\Services\Promotions\CouponUserService;
 use App\Services\Promotions\GrouponService;
 use App\Services\SystemService;
 use App\Services\Users\AddressService;
+use App\Utils\ResponseCode;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
@@ -449,9 +450,7 @@ class OrderService extends BaseService
             GrouponService::getInstance()->checkValidToOpenOrJoin($userId, $input->grouponRuleId);
         }
 
-        if (empty($address = AddressService::getInstance()->getAddressById($userId, $input->addressId))) {
-            $this->throwInvalidParamException();
-        }
+        $address = AddressService::getInstance()->getAddressById($userId, $input->addressId);
 
         // 获取待下单的商品列表
         $checkedGoodsList = CartService::getInstance()->getCheckoutGoodsList($userId, $input->cartId);
@@ -464,8 +463,8 @@ class OrderService extends BaseService
         // 获取优惠券优惠金额
         $couponPrice = '0';
         if ($input->couponId > 0) {
-            $coupon = CouponService::getInstance()->getInfoById($input->couponId);
-            $couponUser = CouponService::getInstance()->getCouponUserById($input->couponUserId);
+            $coupon = CouponService::getInstance()->getCouponById($input->couponId);
+            $couponUser = CouponUserService::getInstance()->getCouponUserById($input->couponUserId);
             if (CouponService::getInstance()->checkUsableWithPrice($coupon, $couponUser, $goodsTotalPrice)) {
                 $couponPrice = $coupon->discount;
             }
