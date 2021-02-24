@@ -9,19 +9,15 @@ declare(strict_types=1);
 
 namespace App\Services\Promotions;
 
-use App\Utils\ResponseCode;
 use App\Enums\Coupons\CouponGoodsType;
 use App\Enums\Coupons\CouponStatus;
 use App\Enums\Coupons\CouponTimeType;
 use App\Enums\Coupons\CouponType;
-use App\Enums\CouponUsers\CouponUserStatus;
-use App\Exceptions\BusinessException;
 use App\Inputs\PageInput;
 use App\Models\Promotions\Coupon;
 use App\Models\Promotions\CouponUser;
 use App\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class CouponService extends BaseService
@@ -30,6 +26,7 @@ class CouponService extends BaseService
      * 获取优惠券信息
      *     如果用户自己选择了一张优惠券，则判断该优惠券是否可以使用并返回
      *     否则，获取当前可以使用的优惠力度最大的优惠券
+     *     如果用户没有优惠券，返回 null
      *
      * @param  int  $userId
      * @param  int|null  $couponId
@@ -47,8 +44,8 @@ class CouponService extends BaseService
         }
 
         if ($couponId) {
-            $coupon = $this->getInfoById($couponId);
-            $couponUser = $this->getCouponUserByCouponId($userId, $couponId);
+            $coupon = $this->getCouponById($couponId);
+            $couponUser = CouponUserService::getInstance()->getCouponUserByCouponId($userId, $couponId);
             if ($this->checkUsableWithPrice($coupon, $couponUser, $price)) {
                 return $couponUser;
             }
@@ -66,7 +63,7 @@ class CouponService extends BaseService
      */
     public function getMeetestAndSort(int $userId, string $price)
     {
-        $couponUsers = CouponService::getInstance()->getUsableListByUserId($userId);
+        $couponUsers = CouponUserService::getInstance()->getUsableListByUserId($userId);
         $couponIds = $couponUsers->pluck('coupon_id')->toArray();
         $coupons = CouponService::getInstance()->getInfoByIds($couponIds)->keyBy('id');
 
@@ -84,34 +81,6 @@ class CouponService extends BaseService
     }
 
     /**
-     * 根据优惠券 id 获取用户优惠券信息
-     *
-     * @param  int  $userId
-     * @param  int  $couponId
-     * @return CouponUser|null
-     */
-    public function getCouponUserByCouponId(int $userId, int $couponId): ?CouponUser
-    {
-        return CouponUser::query()
-            ->whereUserId($userId)
-            ->whereCouponId($couponId)
-            ->orderBy('id')
-            ->first();
-    }
-
-    /**
-     * 根据 id 获取用户优惠券信息
-     *
-     * @param  int  $id
-     * @param  array|string[]  $columns
-     * @return CouponUser|null
-     */
-    public function getCouponUserById(int $id, array $columns = ['*']): ?CouponUser
-    {
-        return CouponUser::query()->find($id, $columns);
-    }
-
-    /**
      * 验证订单价格是否可以使用优惠券
      *
      * @param  Coupon  $coupon
@@ -122,7 +91,6 @@ class CouponService extends BaseService
     public function checkUsableWithPrice(Coupon $coupon, CouponUser $couponUser, string $price): bool
     {
         if (empty($coupon)
-            || empty($couponUser)
             || $coupon->id != $couponUser->coupon_id
             || CouponStatus::NORMAL != $coupon->status
             || CouponGoodsType::ALL != $coupon->goods_type
@@ -152,20 +120,6 @@ class CouponService extends BaseService
     }
 
     /**
-     * 获取用户可以使用的优惠券列表
-     *
-     * @param  int  $userId
-     * @return CouponUser[]|Collection
-     */
-    public function getUsableListByUserId(int $userId)
-    {
-        return CouponUser::query()
-            ->whereUserId($userId)
-            ->whereStatus(CouponUserStatus::USABLE)
-            ->get();
-    }
-
-    /**
      * @param  PageInput  $input
      * @param  array|string[]  $columns
      * @return LengthAwarePaginator
@@ -179,26 +133,6 @@ class CouponService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    /**
-     * @param  int  $userId
-     * @param  PageInput  $input
-     * @param  int|null  $status
-     * @param  array|string[]  $columns
-     * @return LengthAwarePaginator
-     */
-    public function myList(
-        int $userId,
-        PageInput $input,
-        ?int $status = null,
-        array $columns = ['*']
-    ): LengthAwarePaginator {
-        return CouponUser::query()->where('user_id', $userId)
-            ->when(!is_null($status), function (Builder $query) use ($status) {
-                return $query->where('status', $status);
-            })
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
-    }
 
     /**
      * 根据 id 列表获取优惠券
@@ -219,95 +153,10 @@ class CouponService extends BaseService
      *
      * @param  int  $id
      * @param  array|string[]  $columns
-     * @return Coupon|null
+     * @return Coupon
      */
-    public function getInfoById(int $id, array $columns = ['*']): ?Coupon
+    public function getCouponById(int $id, array $columns = ['*']): Coupon
     {
-        return Coupon::query()->find($id, $columns);
-    }
-
-    /**
-     * 获取优惠券已经被领取的数量
-     *
-     * @param  int  $couponId
-     * @return int
-     */
-    public function countReceived(int $couponId): int
-    {
-        return CouponUser::query()
-            ->where('coupon_id', $couponId)
-            ->count('id');
-    }
-
-    /**
-     * 获取用户领取某张优惠券的数量
-     *
-     * @param  int  $userId
-     * @param  int  $couponId
-     * @return int
-     */
-    public function countReceivedByUserId(int $userId, int $couponId): int
-    {
-        return CouponUser::query()
-            ->where('coupon_id', $couponId)
-            ->where('user_id', $userId)
-            ->count('id');
-    }
-
-    /**
-     * 领取优惠券
-     *
-     * @param  int  $userId
-     * @param  int  $couponId
-     * @return bool
-     *
-     * @throws BusinessException
-     */
-    public function receive(int $userId, int $couponId): bool
-    {
-        if (is_null($coupon = CouponService::getInstance()->getInfoById($couponId))) {
-            $this->throwBusinessException(ResponseCode::INVALID_PARAM);
-        }
-        // 判断优惠券是否被领取完
-        if ($coupon->total > 0) {
-            $fetchedCount = CouponService::getInstance()->countReceived($couponId);
-            if ($fetchedCount >= $coupon->total) {
-                $this->throwBusinessException(ResponseCode::COUPON_EXCEED_LIMIT);
-            }
-        }
-        // 判断用户可领取上限
-        if ($coupon->limit > 0) {
-            $userFetchedCount = CouponService::getInstance()->countReceivedByUserId($userId, $couponId);
-            if ($userFetchedCount >= $coupon->limit) {
-                $this->throwBusinessException(ResponseCode::COUPON_EXCEED_LIMIT, '优惠券可领取数量已达上限');
-            }
-        }
-
-        if ($coupon->type != CouponType::COMMON) {
-            $this->throwBusinessException(ResponseCode::COUPON_RECEIVE_FAIL, '优惠券类型不支持领取');
-        }
-
-        if ($coupon->status == CouponStatus::OUT) {
-            $this->throwBusinessException(ResponseCode::COUPON_EXCEED_LIMIT);
-        }
-
-        if ($coupon->status == CouponStatus::EXPIRED) {
-            $this->throwBusinessException(ResponseCode::COUPON_RECEIVE_FAIL, '优惠券已过期，不能领取');
-        }
-
-        if ($coupon->time_type == CouponTimeType::TIME) {
-            $startTime = $coupon->start_time;
-            $endTime = $coupon->end_time;
-        } else {
-            $startTime = now();
-            $endTime = $startTime->copy()->addDays($coupon->days);
-        }
-
-        return CouponUser::new()->fill([
-            'coupon_id' => $couponId,
-            'user_id' => $userId,
-            'start_time' => $startTime,
-            'end_time' => $endTime
-        ])->save();
+        return Coupon::query()->findOrFail($id, $columns);
     }
 }

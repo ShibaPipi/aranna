@@ -8,7 +8,9 @@ use App\Inputs\PageInput;
 use App\Models\Promotions\Coupon;
 use App\Models\Promotions\CouponUser;
 use App\Services\Promotions\CouponService;
+use App\Services\Promotions\CouponUserService;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class CouponController extends BaseController
 {
@@ -28,11 +30,19 @@ class CouponController extends BaseController
         return $this->successPaginate($list);
     }
 
-    public function myList()
+    /**
+     * 我的优惠券列表
+     *
+     * @return JsonResponse
+     *
+     * @throws BusinessException
+     * @throws Throwable
+     */
+    public function myList(): JsonResponse
     {
         $status = $this->verifyInteger('status');
         $page = PageInput::new();
-        $list = CouponService::getInstance()->mylist($this->userId(), $page, $status);
+        $list = CouponUserService::getInstance()->myCoupons($this->userId(), $page, $status);
 
         $couponUserList = collect($list->items());
         $couponIds = $couponUserList->pluck('coupon_id')->toArray();
@@ -54,6 +64,7 @@ class CouponController extends BaseController
                 'available' => false
             ];
         });
+
         $list = $this->paginate($list, $myList);
 
         return $this->success($list);
@@ -64,13 +75,13 @@ class CouponController extends BaseController
      *
      * @return JsonResponse
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function receive(): JsonResponse
     {
         $couponId = $this->verifyId('couponId', 0);
 
-        CouponService::getInstance()->receive($this->userId(), $couponId);
+        CouponUserService::getInstance()->receive($this->userId(), $couponId);
 
         return $this->success();
     }
