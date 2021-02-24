@@ -61,7 +61,7 @@ class CartController extends BaseController
      *
      * @return JsonResponse
      *
-     * @throws BusinessException
+     * @throws Throwable
      */
     public function update(): JsonResponse
     {
@@ -94,8 +94,8 @@ class CartController extends BaseController
     /**
      * 删除购物车商品
      *
-     * @throws BusinessException
      * @throws Exception
+     * @throws Throwable
      */
     public function delete(): JsonResponse
     {
@@ -111,9 +111,7 @@ class CartController extends BaseController
      *
      * @return JsonResponse
      *
-     * @throws BusinessException
-     *
-     * @throws Exception
+     * @throws Exception|Throwable
      */
     public function checked(): JsonResponse
     {
@@ -216,9 +214,9 @@ class CartController extends BaseController
             $couponId = -1;
             $couponUserId = -1;
         } else {
-            $couponId = $couponUser->coupon_id ?? 0;
-            $couponUserId = $couponUser->id ?? 0;
-            $couponPrice = CouponService::getInstance()->getInfoById($couponId)->discount ?? '0';
+            $couponId = $couponUser->coupon_id;
+            $couponUserId = $couponUser->id;
+            $couponPrice = CouponService::getInstance()->getCouponById($couponId)->discount;
         }
 
         // 获取运费信息
