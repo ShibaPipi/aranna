@@ -37,6 +37,7 @@ class BaseService
         if (static::$instance instanceof static) {
             return static::$instance;
         }
+
         static::$instance = new static;
 
         return static::$instance;
